@@ -184,7 +184,7 @@ public class Render {
         tes.startDrawing(GL11.GL_TRIANGLE_FAN);
         tes.addVertex(x + (length * Math.cos(angle)), y + (length * Math.sin(angle)), zDepth);
         tes.addVertex(x + (length * 0.5D * Math.cos(angle - arrowBackAngle)), y + (length * 0.5D * Math.sin(angle - arrowBackAngle)), zDepth);
-        tes.addVertex(x + (length * 0.3D * Math.cos(angle + Math.PI)), y + (length * 0.5D * Math.sin(angle + Math.PI)), zDepth);
+        tes.addVertex(x + (length * 0.2D * Math.cos(angle + Math.PI)), y + (length * 0.5D * Math.sin(angle + Math.PI)), zDepth);
         tes.addVertex(x + (length * 0.5D * Math.cos(angle + arrowBackAngle)), y + (length * 0.5D * Math.sin(angle + arrowBackAngle)), zDepth);
         tes.draw();
         GL11.glEnable(GL11.GL_TEXTURE_2D);

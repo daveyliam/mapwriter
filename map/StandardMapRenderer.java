@@ -10,7 +10,6 @@ import mapwriter.map.mapmode.MapMode;
 
 public class StandardMapRenderer implements MapRenderer {
 	private Mw mw;
-	private MapTexture mapTexture;
 	public MarkerManager markerManager;
 	private MapMode mapMode;
 	private MapView mapView;
@@ -18,7 +17,6 @@ public class StandardMapRenderer implements MapRenderer {
 	
 	public StandardMapRenderer(Mw mw, MapTexture mapTexture, MarkerManager markerManager, MapMode mapMode, MapView mapView) {
 		this.mw = mw;
-		this.mapTexture = mapTexture;
 		this.markerManager = markerManager;
 		this.mapMode = mapMode;
 		this.mapView = mapView;
@@ -30,12 +28,13 @@ public class StandardMapRenderer implements MapRenderer {
 	public void update() {
 		this.mapMode.setScreenRes();
 		this.mapView.setAspect(this.mapMode);
-		this.mapTexture.update(this.mw.regionManager, this.mapView);
+		this.mapView.setTextureSize(this.mw.mapTexture.textureSize);
+		this.mw.mapTexture.update(this.mw.regionManager, this.mapView);
 	}
 	
 	public void draw() {	
 		int regionZoomLevel = Math.max(0, this.mapView.getZoomLevel());
-		double tSize = (double) (Mw.TEXTURE_SIZE << regionZoomLevel);
+		double tSize = (double) (this.mw.mapTexture.textureSize << regionZoomLevel);
 		
 		double u = (this.mapView.getMinX() % tSize) / tSize;
 		double v = (this.mapView.getMinZ() % tSize) / tSize;
@@ -53,7 +52,7 @@ public class StandardMapRenderer implements MapRenderer {
 		}
 		
 		Render.setColourWithAlphaPercent(0xffffff, this.mapMode.alphaPercent);
-		this.mapTexture.bind();
+		this.mw.mapTexture.bind();
 		Render.drawTexturedRect(this.mapMode.x, this.mapMode.y, this.mapMode.w, this.mapMode.h,
 				u, v, u + w, v + h);
 		

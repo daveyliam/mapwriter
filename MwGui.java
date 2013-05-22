@@ -12,6 +12,7 @@ import mapwriter.map.mapmode.FullScreenMapMode;
 import mapwriter.map.mapmode.MapMode;
 import mapwriter.region.MergeTask;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiOptions;
 import net.minecraft.client.gui.GuiScreen;
 
 import org.lwjgl.input.Keyboard;
@@ -49,6 +50,7 @@ public class MwGui extends GuiScreen {
     private int exit = 0;
     
     private Label helpLabel;
+    private Label optionsLabel;
     private Label dimensionLabel;
     private Label groupLabel;
     
@@ -220,6 +222,7 @@ public class MwGui extends GuiScreen {
     	this.mapView.setZoomLevel(0);
     	
     	this.helpLabel = new Label();
+    	this.optionsLabel = new Label();
     	this.dimensionLabel = new Label();
     	this.groupLabel = new Label();
     }
@@ -293,7 +296,7 @@ public class MwGui extends GuiScreen {
 		File outputFile = MwUtil.getFreeFilename(null, this.mw.worldDir.getName(), "png");
 		if (outputFile != null) {
 			this.mw.regionManager.saveChunks();
-			this.mw.executor.addTask(new MergeTask(this.mw.regionManager, outputFile, this.mapView.getDimension(),
+			this.mw.executor.addTask(new MergeTask(this.mw, outputFile, this.mapView.getDimension(),
 					(int) this.mapView.getX(),
 					(int) this.mapView.getZ(),
 					(int) this.mapView.getWidth(),
@@ -311,7 +314,7 @@ public class MwGui extends GuiScreen {
 				(int) this.mapView.getHeight(),
 				(int) this.mapView.getMinX(),
 				(int) this.mapView.getMinZ()));
-		this.mw.reloadRegionManager();
+		this.mw.reloadBlockColours();
 		this.mw.regionManager.reloadRegions(
 				(int) this.mapView.getMinX(),
 				(int) this.mapView.getMinZ(),
@@ -373,21 +376,6 @@ public class MwGui extends GuiScreen {
 				this.exitGui();
 				break;
 				
-    		case Keyboard.KEY_L:
-    			this.mw.linearTextureScalingEnabled = !this.mw.linearTextureScalingEnabled;
-    			this.mw.mapTexture.setLinearScaling(this.mw.linearTextureScalingEnabled);
-    			break;
-				
-    		case Keyboard.KEY_1:
-				this.mw.overlayManager.toggleCoords();
-				this.exitGui();
-				break;
-			
-    		case Keyboard.KEY_2:
-				this.mw.overlayManager.toggleRotating();
-				this.exitGui();
-				break;
-				
     		case Keyboard.KEY_T:
 	        	if (this.mw.markerManager.selectedMarker != null) {
 	        		this.mw.teleportToMarker(this.mw.markerManager.selectedMarker);
@@ -415,10 +403,10 @@ public class MwGui extends GuiScreen {
     			this.exitGui();
     			break;
     			
-    		case Keyboard.KEY_9:
-    			MwUtil.log("refreshing maptexture");
-    			this.mw.mapTexture.updateTexture();
-    			break;
+    		//case Keyboard.KEY_9:
+    		//	MwUtil.log("refreshing maptexture");
+    		//	this.mw.mapTexture.updateTexture();
+    		//	break;
     		
     		default:
     			if (key == MwKeyHandler.keyMapGui.keyCode) {
@@ -469,6 +457,8 @@ public class MwGui extends GuiScreen {
     			if (this.currentTextDialog == null) {
     				this.currentTextDialog = new DimensionTextDialog(this.mapView.getDimension());
     			}
+    		} else if (this.optionsLabel.posWithin(x, y)) {
+    			this.mc.displayGuiScreen(new MwGuiOptions(this.mw, this));
     		} else {
 	    		this.mouseLeftHeld = 1;
 	    		this.mouseLeftDragStartX = x;
@@ -600,9 +590,6 @@ public class MwGui extends GuiScreen {
     			"  N\n" +
     			"  T\n" +
     			"  P\n" +
-    			"  L\n" +
-    			"  1\n" +
-    			"  2\n" +
     			"  R\n\n" +
     			"Left click drag or arrow keys pan the map.\n" +
     			"Mouse wheel or Page Up/Down zooms map.\n" +
@@ -620,9 +607,6 @@ public class MwGui extends GuiScreen {
     			"| Select next marker\n" +
     			"| Teleport to cursor or selected marker\n" +
     			"| Save PNG of visible map area\n" +
-    			"| Toggle linear texture scaling (blur)\n" +
-    			"| Toggle coords in game\n" +
-    			"| Toggle circular rotating map\n" +
     			"| Regenerate visible map area\n",
     			70, 42, 210, 0xffffff);
     }
@@ -706,8 +690,9 @@ public class MwGui extends GuiScreen {
         
         // draw labels
        this.helpLabel.draw(menuX, menuY, "[help]");
+       this.optionsLabel.drawToRightOf(this.helpLabel, "[options]");
        String dimString = String.format("[dimension: %d]", this.mapView.getDimension());
-       this.dimensionLabel.drawToRightOf(this.helpLabel, dimString);
+       this.dimensionLabel.drawToRightOf(this.optionsLabel, dimString);
        String groupString = String.format("[group: %s]", this.mw.markerManager.getVisibleGroupName());
        this.groupLabel.drawToRightOf(this.dimensionLabel, groupString);
         

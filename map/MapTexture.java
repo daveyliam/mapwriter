@@ -11,6 +11,9 @@ import org.lwjgl.opengl.GL11;
 
 public class MapTexture extends Texture {
 	
+	public int textureRegions;
+	public int textureSize;
+	
 	class Rect {
 		final int x, y, w, h;
 		Rect(int x, int y, int w, int h) {
@@ -21,25 +24,29 @@ public class MapTexture extends Texture {
 		}
 	}
 	
-	private Region[] regionArray = new Region[Mw.TEXTURE_REGIONS * Mw.TEXTURE_REGIONS];
+	private Region[] regionArray;
 	private ArrayList<Rect> textureUpdateQueue = new ArrayList<Rect>();
 	
-	public MapTexture() {
-		super(Mw.TEXTURE_SIZE, Mw.TEXTURE_SIZE, 0xff000000, GL11.GL_LINEAR, GL11.GL_LINEAR, GL11.GL_REPEAT);
+	public MapTexture(int textureSize) {
+		super(textureSize, textureSize, 0xff000000, GL11.GL_LINEAR, GL11.GL_LINEAR, GL11.GL_REPEAT);
+		
+		this.textureRegions = textureSize >> Mw.REGION_SHIFT;
+		this.textureSize = textureSize;
+		this.regionArray = new Region[this.textureRegions * this.textureRegions];
 	}
 	
-	public static int getRegionIndex(int x, int z, int zoomLevel) {
-		x = (x >> (Mw.REGION_SHIFT + zoomLevel)) & (Mw.TEXTURE_REGIONS - 1);
-		z = (z >> (Mw.REGION_SHIFT + zoomLevel)) & (Mw.TEXTURE_REGIONS - 1);
-		return (z * Mw.TEXTURE_REGIONS) + x;
+	public int getRegionIndex(int x, int z, int zoomLevel) {
+		x = (x >> (Mw.REGION_SHIFT + zoomLevel)) & (this.textureRegions - 1);
+		z = (z >> (Mw.REGION_SHIFT + zoomLevel)) & (this.textureRegions - 1);
+		return (z * this.textureRegions) + x;
 	}
 	
 	public void requestRegion(RegionManager regionManager, int x, int z, int zoomLevel, int dimension) {
-		int index = getRegionIndex(x, z, zoomLevel);
+		int index = this.getRegionIndex(x, z, zoomLevel);
 		Region currentRegion = this.regionArray[index];
 		if ((currentRegion == null) || (!currentRegion.equals(x, z, zoomLevel, dimension))) {
 			Region newRegion = regionManager.getRegion(x, z, zoomLevel, dimension);
-			this.regionArray[newRegion.index] = newRegion;
+			this.regionArray[index] = newRegion;
 			this.fillAndUpdateRegionArea(newRegion, 0xff000000);
 			newRegion.addLoadTask(this);
 			//MwUtil.log("regionArray[%d] = %s", newRegion.index, newRegion);
@@ -47,7 +54,7 @@ public class MapTexture extends Texture {
 	}
 	
 	public boolean isRegionInTexture(Region region) {
-		return region.equals(this.regionArray[region.index]);
+		return region.equals(this.regionArray[this.getRegionIndex(region.x, region.z, region.zoomLevel)]);
 	}
 	
 	public void update(RegionManager regionManager, MapView mapView) {
@@ -59,8 +66,8 @@ public class MapTexture extends Texture {
 		int dimension = mapView.getDimension();
 		
 		int rS = Mw.REGION_SIZE << zoomLevel;
-		for (int j = 0; j < Mw.TEXTURE_REGIONS; j++) {
-			for (int i = 0; i < Mw.TEXTURE_REGIONS; i++) {
+		for (int j = 0; j < this.textureRegions; j++) {
+			for (int i = 0; i < this.textureRegions; i++) {
 				this.requestRegion(regionManager,
 						x + (i << (zoomLevel + Mw.REGION_SHIFT)),
 						z + (j << (zoomLevel + Mw.REGION_SHIFT)),
@@ -70,13 +77,13 @@ public class MapTexture extends Texture {
 	}
 	
 	public boolean rectWithinTexture(int tx, int ty, int tw, int th) {
-		return (tx >= 0) && ((tx + tw) <= Mw.TEXTURE_SIZE) &&
-				(ty >= 0) && ((ty + th) <= Mw.TEXTURE_SIZE);
+		return (tx >= 0) && ((tx + tw) <= this.textureSize) &&
+				(ty >= 0) && ((ty + th) <= this.textureSize);
 	}
 	
 	public void fillAndUpdateRegionArea(Region region, int colour) {
-		int tx = (region.x >> region.zoomLevel) & (Mw.TEXTURE_SIZE - 1);
-		int ty = (region.z >> region.zoomLevel) & (Mw.TEXTURE_SIZE - 1);
+		int tx = (region.x >> region.zoomLevel) & (this.textureSize - 1);
+		int ty = (region.z >> region.zoomLevel) & (this.textureSize - 1);
 		int tw = (region.size >> region.zoomLevel);
 		int th = (region.size >> region.zoomLevel);
 		this.fillRect(tx, ty, tw, th, colour);
@@ -84,8 +91,8 @@ public class MapTexture extends Texture {
 	}
 	
 	public void updateFromRegion(Region region, int x, int z, int w, int h) {
-		int tx = (x >> region.zoomLevel) & (Mw.TEXTURE_SIZE - 1);
-		int ty = (z >> region.zoomLevel) & (Mw.TEXTURE_SIZE - 1);
+		int tx = (x >> region.zoomLevel) & (this.textureSize - 1);
+		int ty = (z >> region.zoomLevel) & (this.textureSize - 1);
 		int tw = (w >> region.zoomLevel);
 		int th = (h >> region.zoomLevel);
 		int[] pixels = region.getPixels();

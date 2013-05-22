@@ -22,11 +22,13 @@ public class MergeTask extends Task {
 	private int rXMax;
 	private int rZMax;
 	private String errorMsg = null;
-	private RegionManager regionManager;
-	private File outputFile;
+	private final File worldDir;
+	private final BlockColours blockColours;
+	private final File outputFile;
 	
-	public MergeTask(RegionManager regionManager, File outputFile, int dimension, int xCentre, int zCentre, int w, int h) {
-		this.regionManager = regionManager;
+	public MergeTask(Mw mw, File outputFile, int dimension, int xCentre, int zCentre, int w, int h) {
+		this.worldDir = mw.worldDir;
+		this.blockColours = mw.blockColours;
 		this.outputFile = outputFile;
 		this.dimension = dimension;
 		
@@ -87,13 +89,13 @@ public class MergeTask extends Task {
 					Arrays.fill(pixels, 0);
 					int czStart = rZ << 5;
 					int cxStart = rX << 5;
-					if (MwChunk.regionFileExists(cxStart, czStart, this.dimension, this.regionManager.worldDir)) {	
+					if (MwChunk.regionFileExists(cxStart, czStart, this.dimension, this.worldDir)) {	
 						for (int cz = 0; cz < 32; cz++) {
 							for (int cx = 0; cx < 32; cx++) {
-								MwChunk chunk = MwChunk.read(cxStart + cx, czStart + cz, this.dimension, this.regionManager.worldDir);
+								MwChunk chunk = MwChunk.read(cxStart + cx, czStart + cz, this.dimension, this.worldDir);
 								if (!chunk.isEmpty()) {
 									int offset = ((cz << 4) * Mw.REGION_SIZE) + (cx << 4);
-									ChunkToPixels.getMapPixels(this.regionManager.blockColours, chunk, pixels, offset, Mw.REGION_SIZE);
+									ChunkToPixels.getMapPixels(this.blockColours, chunk, pixels, offset, Mw.REGION_SIZE);
 								}
 							}
 						}

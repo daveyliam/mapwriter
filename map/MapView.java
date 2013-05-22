@@ -10,6 +10,7 @@ public class MapView {
 	private double aspect = 1.0;
 	private int zoomLevel = 0;
 	private int dimension = 0;
+	private int textureSize = 2048;
 	
 	// the position of the centre of the 'view' of the map using game (block) coordinates
 	private double x = 0.0;
@@ -160,12 +161,19 @@ public class MapView {
 		this.setViewCentre(vX * scale, vZ * scale);
 	}
 	
+	public void setTextureSize(int n) {
+		if (this.textureSize != n) {
+			this.textureSize = n;
+			this.update();
+		}
+	}
+	
 	public void update() {
 		double viewSize;
 		if (this.zoomLevel >= 0) {
-			viewSize = (Mw.TEXTURE_SIZE >> 1) << (this.zoomLevel);
+			viewSize = (this.textureSize >> 1) << (this.zoomLevel);
 		} else {
-			viewSize = (Mw.TEXTURE_SIZE >> 1) >> (-this.zoomLevel);
+			viewSize = (this.textureSize >> 1) >> (-this.zoomLevel);
 		}
 		this.w = (this.aspect < 1.0) ? viewSize * this.aspect : viewSize;
 		this.h = (this.aspect > 1.0) ? viewSize / this.aspect : viewSize;

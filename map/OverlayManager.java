@@ -35,9 +35,9 @@ public class OverlayManager {
 	private ArrayList<MapRenderer> mapList;
 	private MapRenderer currentMap = null;
 	
-	public OverlayManager(Mw mw) {
+	public OverlayManager(Mw mw, MapTexture mapTexture) {
 		this.mw = mw;
-		this.mapTexture = mw.mapTexture;
+		this.mapTexture = mapTexture;
 		
 		// small map mode
 		this.smallMapMode = new SmallMapMode(this.mw.config);

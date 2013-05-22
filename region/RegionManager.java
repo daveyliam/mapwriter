@@ -15,33 +15,27 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.RegionFileCache;
 
 public class RegionManager {
-	public final BlockColours blockColours;
-	public final MapTexture mapTexture;
-	public final BackgroundExecutor executor;
-	public final File imageDir;
-	public final File worldDir;
+	public Mw mw;
 	private final boolean enableChunkSaving;
 	
 	HashMap<Long, Region> regionMap = new HashMap<Long, Region>();
 	
 	private HashSet<Chunk> chunkSet;
 	private boolean chunkUpdateReady = false;
+	private boolean closed = false;
 	private int chunkUpdateXIndex = 0;
 	private int chunkUpdateZIndex = 0;
 	private int chunkUpdateX = 0;
 	private int chunkUpdateZ = 0;
 	
-	public RegionManager(File worldDir, File imageDir, BackgroundExecutor executor, MapTexture mapTexture, BlockColours blockColours, boolean enableChunkSaving) {
-		this.executor = executor;
-		this.mapTexture = mapTexture;
-		this.blockColours = blockColours;
-		this.imageDir = imageDir;
-		this.worldDir = worldDir;
+	public RegionManager(Mw mw, boolean enableChunkSaving) {
+		this.mw = mw;
 		this.chunkSet = new HashSet<Chunk>();
 		this.enableChunkSaving = enableChunkSaving;
 	}
 	
 	public void close() {
+		this.closed = true;
 		for (Region region : this.regionMap.values()) {
 			if (region != null) {
 				region.addCloseTask();
@@ -60,20 +54,20 @@ public class RegionManager {
 			if (zoomLevel + 1 <= Mw.maxZoom) {
 				nextZoomLevel = this.getRegion(x, z, zoomLevel + 1, dimension);
 			}
-			region = new Region(this, x, z, zoomLevel, dimension, nextZoomLevel);
+			region = new Region(this.mw, x, z, zoomLevel, dimension, nextZoomLevel);
 			this.regionMap.put(region.key, region);
 		}
 		return region;
 	}
 	
 	public void addChunk(Chunk chunk) {
-		if (this.enableChunkSaving) {
+		if ((!this.closed) && this.enableChunkSaving) {
 			this.chunkSet.add(chunk);
 		}
 	}
 	
 	public void removeChunk(Chunk chunk) {
-		if (this.enableChunkSaving) {
+		if ((!this.closed) && this.enableChunkSaving) {
 			if (this.chunkSet.remove(chunk)) {
 				this.addSaveChunkTask(chunk);
 			}
@@ -116,23 +110,25 @@ public class RegionManager {
 	}
 	
 	public void onTick(Mw mw) {
-		if (!this.chunkUpdateReady) {
-			this.resetChunkUpdate(mw.playerXInt, mw.playerZInt);
-			this.chunkUpdateReady = true;
-		}
-		
-		int attempts = 20;
-		int chunksToUpdate = mw.chunksPerTick;
-		while ((attempts-- > 0) && (chunksToUpdate > 0)) {
-			Chunk chunk = this.getNextUpdateChunk(mw.mc.theWorld, mw.playerXInt, mw.playerZInt);
-			if (!this.addUpdateChunkTask(chunk, mw.playerXInt, mw.playerZInt)) {
-				chunksToUpdate--;
+		if (!this.closed) {
+			if (!this.chunkUpdateReady) {
+				this.resetChunkUpdate(mw.playerXInt, mw.playerZInt);
+				this.chunkUpdateReady = true;
 			}
-		}
-		
-		if ((mw.tickCounter & 0xff) == 0xff) {
-			this.closeInactiveRegions();
-			//MwUtil.log("%d regions in map", this.regionMap.size());
+			
+			int attempts = 20;
+			int chunksToUpdate = mw.chunksPerTick;
+			while ((attempts-- > 0) && (chunksToUpdate > 0)) {
+				Chunk chunk = this.getNextUpdateChunk(mw.mc.theWorld, mw.playerXInt, mw.playerZInt);
+				if (!this.addUpdateChunkTask(chunk, mw.playerXInt, mw.playerZInt)) {
+					chunksToUpdate--;
+				}
+			}
+			
+			if ((mw.tickCounter & 0xff) == 0xff) {
+				this.closeInactiveRegions();
+				//MwUtil.log("%d regions in map", this.regionMap.size());
+			}
 		}
 	}
 	
@@ -152,7 +148,7 @@ public class RegionManager {
 	private Region getRegionAtTextureZoomLevel(Region region) {
 		Region textureRegion = null;
 		while ((region != null) && (textureRegion == null)) {
-			if (this.mapTexture.isRegionInTexture(region)) {
+			if (this.mw.mapTexture.isRegionInTexture(region)) {
 				textureRegion = region;
 			}
 			region = region.nextZoomLevel;
@@ -172,7 +168,7 @@ public class RegionManager {
 			
 			Region region = this.getRegion(mwchunk.x << 4, mwchunk.z << 4, 0, mwchunk.dimension);
 			Region textureRegion = this.getRegionAtTextureZoomLevel(region);
-			region.addUpdateChunkTask(mwchunk, textureRegion, this.mapTexture, (distSquared <= 160));
+			region.addUpdateChunkTask(mwchunk, textureRegion, this.mw.mapTexture, (distSquared <= 160));
 			taskAdded = true;
 		}
 		return !taskAdded;
@@ -202,10 +198,10 @@ public class RegionManager {
 		
 		for (int rX = xStart; rX < (xStart + w); rX += Mw.REGION_SIZE) {
 			for (int rZ = zStart; rZ < (zStart + h); rZ += Mw.REGION_SIZE) {
-				if (MwChunk.regionFileExists(rX >> 5, rZ >> 5, dimension, this.worldDir)) {
+				if (MwChunk.regionFileExists(rX >> 5, rZ >> 5, dimension, this.mw.worldDir)) {
 					Region region = this.getRegion(rX, rZ, 0, dimension);
-					if (this.mapTexture.isRegionInTexture(region)) {
-						region.addLoadAndUpdateZoomLevelsTask(this.mapTexture);
+					if (this.mw.mapTexture.isRegionInTexture(region)) {
+						region.addLoadAndUpdateZoomLevelsTask(this.mw.mapTexture);
 					} else {
 						region.addLoadAndUpdateZoomLevelsTask(null);
 					}
@@ -235,6 +231,6 @@ public class RegionManager {
 	
 	private void addSaveChunkTask(Chunk chunk) {
 		MwChunk mwChunk = MwChunk.copyFromChunk(chunk);
-		this.executor.addTask(new SaveChunkTask(mwChunk, this.worldDir));
+		this.mw.executor.addTask(new SaveChunkTask(mwChunk, this.mw.worldDir));
 	}
 }

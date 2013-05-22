@@ -19,14 +19,13 @@ import mapwriter.map.MapTexture;
 	Represents a 32x32 chunk area (512x512 blocks).
 */
 public class Region {
-	public final RegionManager regionManager;
+	public final Mw mw;
 	
 	public final int x;
 	public final int z;
 	public final int size;
 	public final int dimension;
 	public final int zoomLevel;
-	public final int index;
 	public final Long key;
 	public final File imageFile;
 	public final Region nextZoomLevel;
@@ -38,17 +37,16 @@ public class Region {
 	public SoftReference<int[]> pixelsSoftRef = new SoftReference<int[]>(null);
 	public int[] pixelsHardRef = null;
 	
-	public Region(RegionManager regionManager, int x, int z, int zoomLevel, int dimension, Region nextZoomLevel) {
-		this.regionManager = regionManager;
+	public Region(Mw mw, int x, int z, int zoomLevel, int dimension, Region nextZoomLevel) {
+		this.mw = mw;
 		this.zoomLevel = Math.min(Math.max(0, zoomLevel), Mw.maxZoom);
 		this.dimension = dimension;
 		this.size = Mw.REGION_SIZE << zoomLevel;
 		this.x = x & (~(this.size - 1));
 		this.z = z & (~(this.size - 1));
 		
-		this.index = MapTexture.getRegionIndex(this.x, this.z, this.zoomLevel);
 		this.key = this.getKey(this.x, this.z, this.zoomLevel, this.dimension);
-		this.imageFile = this.getImageFile(regionManager.imageDir);
+		this.imageFile = this.getImageFile(mw.imageDir);
 		this.nextZoomLevel = nextZoomLevel;
 		
 		//MwUtil.log("created region %s", this);
@@ -190,7 +188,7 @@ public class Region {
 				int x = (chunk.x << 4);
 				int z = (chunk.z << 4);
 				int offset = this.getPixelOffset(x, z);
-				ChunkToPixels.getMapPixels(this.regionManager.blockColours, chunk, pixels, offset, Mw.REGION_SIZE);
+				ChunkToPixels.getMapPixels(this.mw.blockColours, chunk, pixels, offset, Mw.REGION_SIZE);
 				this.updateZoomLevels(x, z, Mw.CHUNK_SIZE, Mw.CHUNK_SIZE);
 				
 				this.chunkSums[chunkSumIndex] = chunkSum;
@@ -253,16 +251,18 @@ public class Region {
 		int cxStart = (this.x >> 4);
 		int czStart = (this.z >> 4);
 		
-		boolean regionExists = MwChunk.regionFileExists(cxStart, czStart, this.dimension, this.regionManager.worldDir);
+		boolean regionExists = MwChunk.regionFileExists(cxStart, czStart, this.dimension, this.mw.worldDir);
 		if (regionExists) {
 			int[] pixels = this.allocatePixels();
 			for (int cz = 0; cz < 32; cz++) {
 				for (int cx = 0; cx < 32; cx++) {
 					// load chunk from anvil file
-					MwChunk chunk = MwChunk.read(cxStart + cx, czStart + cz, this.dimension, this.regionManager.worldDir);
+					MwChunk chunk = MwChunk.read(cxStart + cx, czStart + cz, this.dimension, this.mw.worldDir);
 					if (!chunk.isEmpty()) {
 						int offset = ((cz << 4) << Mw.REGION_SHIFT) + (cx << 4);
-						ChunkToPixels.getMapPixels(this.regionManager.blockColours, chunk, pixels, offset, Mw.REGION_SIZE);
+						// hopefully accessing the non final field blockColours from a separate
+						// thread will be fine. All threads should be shut down before it is ever closed.
+						ChunkToPixels.getMapPixels(this.mw.blockColours, chunk, pixels, offset, Mw.REGION_SIZE);
 					}
 				}
 			}
@@ -413,22 +413,22 @@ public class Region {
 	}
 	
 	public void addLoadTask(MapTexture mapTexture) {
-		this.regionManager.executor.addTask(new LoadTask(this, mapTexture, false));
+		this.mw.executor.addTask(new LoadTask(this, mapTexture, false));
 	}
 	
 	public void addLoadAndUpdateZoomLevelsTask(MapTexture mapTexture) {
-		this.regionManager.executor.addTask(new LoadTask(this, mapTexture, true));
+		this.mw.executor.addTask(new LoadTask(this, mapTexture, true));
 	}
 	
 	public void addSaveTask() {
-		this.regionManager.executor.addTask(new SaveTask(this, false));
+		this.mw.executor.addTask(new SaveTask(this, false));
 	}
 	
 	public void addCloseTask() {
-		this.regionManager.executor.addTask(new SaveTask(this, true));
+		this.mw.executor.addTask(new SaveTask(this, true));
 	}
 	
 	public void addUpdateChunkTask(MwChunk mwChunk, Region textureRegion, MapTexture mapTexture, boolean forceUpdate) {
-		this.regionManager.executor.addTask(new UpdateChunkTask(mwChunk, this, textureRegion, mapTexture, forceUpdate));
+		this.mw.executor.addTask(new UpdateChunkTask(mwChunk, this, textureRegion, mapTexture, forceUpdate));
 	}
 }

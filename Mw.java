@@ -100,11 +100,11 @@ public class Mw {
 	public int chunksPerTick = 3;
 	public String teleportCommand = "tp";
 	public int defaultTeleportHeight = 80;
-	public int maxTextureSizeOverride = 1024;
 	public static int maxZoom = 5;
 	public static int minZoom = -5;
-	public static int TEXTURE_SIZE = Mw.REGION_SIZE * 2;
-	public static int TEXTURE_REGIONS = 2;
+	
+	private int textureSize = 2048;
+	public int configTextureSize = 2048;
 	
 	// list of available dimensions
 	public ArrayList<Integer> dimensionList = new ArrayList<Integer>();
@@ -138,6 +138,7 @@ public class Mw {
 	public BackgroundExecutor executor = null;
 	public OverlayManager overlayManager = null;
 	public MarkerManager markerManager = null;
+	public BlockColours blockColours = null;
 	public RegionManager regionManager = null;
 	
 	public Mw(MwConfig config) {
@@ -176,18 +177,15 @@ public class Mw {
 	public void loadConfig() {
 		this.config.load();
 		//this.linearTextureScalingEnabled = (this.config.get(catOptions, "linearTextureScaling", 1).getInt() != 0);
-		this.teleportEnabled = (this.config.get(catOptions, "teleportEnabled", 1).getInt() != 0);
-		this.chunksPerTick = this.config.get(catOptions, "chunksPerTick", this.chunksPerTick).getInt();
-		this.chunksPerTick = Math.min(Math.max(1, this.chunksPerTick), 64);
+		this.teleportEnabled = this.config.getOrSetBoolean(catOptions, "teleportEnabled", this.teleportEnabled);
+		this.chunksPerTick = this.config.getOrSetInt(catOptions, "chunksPerTick", this.chunksPerTick, 1, 64);
 		this.teleportCommand = this.config.get(catOptions, "teleportCommand", this.teleportCommand).getString();
 		
-		maxZoom = this.config.get(catOptions, "zoomOutLevels", maxZoom).getInt();
-		maxZoom = Math.min(Math.max(1, maxZoom), 256);
-		int zoomInLevels = this.config.get(catOptions, "zoomInLevels", -minZoom).getInt();
-		minZoom = -Math.min(Math.max(1, zoomInLevels), 256);
+		maxZoom = this.config.getOrSetInt(catOptions, "zoomOutLevels", maxZoom, 1, 256);
+		minZoom = -this.config.getOrSetInt(catOptions, "zoomInLevels", -minZoom, 1, 256);
 		
-		this.maxTextureSizeOverride = this.config.get(catOptions, "maxTextureSize", this.maxTextureSizeOverride).getInt();
-		this.maxTextureSizeOverride = Math.min(Math.max(1024, this.maxTextureSizeOverride), 8192);
+		this.configTextureSize = this.config.getOrSetInt(catOptions, "textureSize", this.configTextureSize, 1024, 8192);
+		this.setTextureSize();
 		
 		// load markers from config
 		File worldConfigFile = new File(this.worldDir, worldDirConfigName);
@@ -203,26 +201,33 @@ public class Mw {
 	public void saveConfig() {
 		this.worldConfig.setIntList(catWorld, "dimensionList", this.dimensionList);
 		this.config.get(catOptions, "linearTextureScaling", 1).set(this.linearTextureScalingEnabled ? 1 : 0);
+		this.config.get(catOptions, "textureSize", this.configTextureSize).set(this.configTextureSize);
 		
 		// save config
 		this.config.save();
 		this.worldConfig.save();
 	}
 	
-	public void setMaxTextureSize() {
-		int maxTextureSize = Render.getMaxTextureSize();
-		int textureSize = 1024;
-		int textureRegions = 2;
-		boolean done = false;
-		while ((textureSize <= maxTextureSize) && (textureSize <= this.maxTextureSizeOverride)) {
-			textureRegions *= 2;
-			textureSize *= 2;
+	public void setTextureSize() {
+		if (this.configTextureSize != this.textureSize) {
+			int maxTextureSize = Render.getMaxTextureSize();
+			int textureSize = 1024;
+			while ((textureSize <= maxTextureSize) && (textureSize <= this.configTextureSize)) {
+				textureSize *= 2;
+			}
+			textureSize /= 2;
+			
+			MwUtil.log("GL reported max texture size = %d", maxTextureSize);
+			MwUtil.log("texture size from config = %d", this.configTextureSize);
+			MwUtil.log("setting map texture size to = %d", textureSize);
+			
+			this.textureSize = textureSize;
+			if (this.ready) {
+				// if we are already up and running need to close and reinitialize the map texture and
+				// region manager.
+				this.reloadMapTexture();
+			}
 		}
-		Mw.TEXTURE_REGIONS = textureRegions / 2;
-		Mw.TEXTURE_SIZE = textureSize / 2;
-		MwUtil.log("GL reported max texture size = %d", maxTextureSize);
-		MwUtil.log("max texture size from config = %d", this.maxTextureSizeOverride);
-		MwUtil.log("setting map texture size to = %d", Mw.TEXTURE_SIZE);
 	}
 	
 	// update the saved player position and orientation
@@ -292,10 +297,21 @@ public class Mw {
 		this.teleportToOverworldPos(marker.x, marker.y, marker.z);
 	}
 	
-	public void reloadRegionManager() {
-		this.regionManager.close();
+	public void reloadBlockColours() {
 		BlockColours bc = BlockColourGen.genBlockColours(this, this.config);
-		this.regionManager = new RegionManager(this.worldDir, this.imageDir, this.executor, this.mapTexture, bc, this.multiplayer);
+		this.blockColours = bc;
+	}
+	
+	public void reloadMapTexture() {
+		this.regionManager.close();
+		this.executor.close();
+		MapTexture oldMapTexture = this.mapTexture;
+		this.mapTexture = new MapTexture(this.textureSize);
+		if (oldMapTexture != null) {
+			oldMapTexture.close();
+		}
+		this.executor = new BackgroundExecutor();
+		this.regionManager = new RegionManager(this, this.multiplayer);
 	}
 	
 	
@@ -348,26 +364,25 @@ public class Mw {
 			zDir.mkdirs();
 		}
 		
-		this.loadConfig();
-		
-		this.executor = new BackgroundExecutor();
-		
-		this.setMaxTextureSize();
-		
-		this.mapTexture = new MapTexture();
-		BlockColours bc = BlockColourGen.genBlockColours(this, this.config);
-		this.regionManager = new RegionManager(this.worldDir, this.imageDir, this.executor, this.mapTexture, bc, this.multiplayer);
-		
-		// init values
 		this.tickCounter = 0;
 		
+		this.loadConfig();
 		//this.multiplayer = !this.mc.isIntegratedServerRunning();
 		
-		// marker manager
+		// marker manager only depends on the config being loaded
 		this.markerManager = new MarkerManager(this);
 		this.markerManager.load(this.worldConfig, this.catMarkers);
 		
-		this.overlayManager = new OverlayManager(this);
+		// executor does not depend on anything
+		this.executor = new BackgroundExecutor();
+		
+		// mapTexture depends on config being loaded
+		this.mapTexture = new MapTexture(this.textureSize);
+		this.blockColours = BlockColourGen.genBlockColours(this, this.config);
+		// region manager depends on config, mapTexture, and block colours
+		this.regionManager = new RegionManager(this, this.multiplayer);
+		// overlay manager depends on mapTexture
+		this.overlayManager = new OverlayManager(this, this.mapTexture);
 		this.overlayManager.overlayView.setDimension(login.dimension);
 		
 		this.ready = true;
