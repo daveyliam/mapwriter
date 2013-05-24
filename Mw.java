@@ -2,13 +2,8 @@ package mapwriter;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.regex.Pattern;
 
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.PixelFormat;
-
-import mapwriter.forge.CommonProxy;
 import mapwriter.forge.MwConfig;
 import mapwriter.forge.MwKeyHandler;
 import mapwriter.map.MapTexture;
@@ -16,9 +11,9 @@ import mapwriter.map.MapView;
 import mapwriter.map.Marker;
 import mapwriter.map.MarkerManager;
 import mapwriter.map.OverlayManager;
+import mapwriter.map.Trail;
 import mapwriter.region.BlockColourGen;
 import mapwriter.region.BlockColours;
-import mapwriter.region.MwChunk;
 import mapwriter.region.RegionManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
@@ -27,7 +22,6 @@ import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.src.ModLoader;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.storage.RegionFileCache;
 
 /*
 
@@ -96,6 +90,7 @@ public class Mw {
 	public MwConfig config;
 	public MwConfig worldConfig = null;
 	public boolean linearTextureScalingEnabled = true;
+	public boolean coordsEnabled = false;
 	public boolean teleportEnabled = true;
 	public int chunksPerTick = 3;
 	public String teleportCommand = "tp";
@@ -140,6 +135,7 @@ public class Mw {
 	public MarkerManager markerManager = null;
 	public BlockColours blockColours = null;
 	public RegionManager regionManager = null;
+	public Trail playerTrail = null;
 	
 	public Mw(MwConfig config) {
 		// client only initialization
@@ -180,6 +176,7 @@ public class Mw {
 		this.teleportEnabled = this.config.getOrSetBoolean(catOptions, "teleportEnabled", this.teleportEnabled);
 		this.chunksPerTick = this.config.getOrSetInt(catOptions, "chunksPerTick", this.chunksPerTick, 1, 64);
 		this.teleportCommand = this.config.get(catOptions, "teleportCommand", this.teleportCommand).getString();
+		this.coordsEnabled = this.config.getOrSetBoolean(catOptions, "coordsEnabled", this.coordsEnabled);
 		
 		maxZoom = this.config.getOrSetInt(catOptions, "zoomOutLevels", maxZoom, 1, 256);
 		minZoom = -this.config.getOrSetInt(catOptions, "zoomInLevels", -minZoom, 1, 256);
@@ -200,8 +197,9 @@ public class Mw {
 	
 	public void saveConfig() {
 		this.worldConfig.setIntList(catWorld, "dimensionList", this.dimensionList);
-		this.config.get(catOptions, "linearTextureScaling", 1).set(this.linearTextureScalingEnabled ? 1 : 0);
-		this.config.get(catOptions, "textureSize", this.configTextureSize).set(this.configTextureSize);
+		this.config.setBoolean(catOptions, "linearTextureScaling", this.linearTextureScalingEnabled);
+		this.config.setInt(catOptions, "textureSize", this.configTextureSize);
+		this.config.setBoolean(catOptions, "coordsEnabled", this.coordsEnabled);
 		
 		// save config
 		this.config.save();
@@ -314,6 +312,14 @@ public class Mw {
 		this.regionManager = new RegionManager(this, this.multiplayer);
 	}
 	
+	public void setCoords(boolean enabled) {
+		this.coordsEnabled = enabled;
+	}
+	
+	public boolean toggleCoords() {
+		this.setCoords(!this.coordsEnabled);
+		return this.coordsEnabled;
+	}
 	
 	////////////////////////////////
 	// Event handling methods
@@ -373,6 +379,8 @@ public class Mw {
 		this.markerManager = new MarkerManager(this);
 		this.markerManager.load(this.worldConfig, this.catMarkers);
 		
+		this.playerTrail = new Trail(this, "player");
+		
 		// executor does not depend on anything
 		this.executor = new BackgroundExecutor();
 		
@@ -430,6 +438,8 @@ public class Mw {
 			}
 			MwUtil.log("done");
 			
+			this.playerTrail.close();
+			
 			this.markerManager.save(this.worldConfig, this.catMarkers);
 			this.markerManager.clear();
 			
@@ -469,6 +479,7 @@ public class Mw {
 	    	//if (this.tickCounter % 100 == 0) {
 	    	//	MwUtil.log("tick %d", this.tickCounter);
 	    	//}
+	    	this.playerTrail.onTick();
 	    	
 			this.tickCounter++;
 		}

@@ -1,15 +1,7 @@
 package mapwriter;
 
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiMainMenu;
-import net.minecraft.client.gui.GuiOptions;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiShareToLan;
-import net.minecraft.client.gui.achievement.GuiAchievements;
-import net.minecraft.client.gui.achievement.GuiStats;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.stats.StatList;
-import net.minecraft.util.StatCollector;
 
 public class MwGuiOptions extends GuiScreen {
 	
@@ -25,6 +17,7 @@ public class MwGuiOptions extends GuiScreen {
         this.buttonList.clear();
         this.buttonList.add(new GuiButton(1, 0, 0, this.getDrawCoordsString()));
         this.buttonList.add(new GuiButton(2, 0, 0, this.getCircularModeString()));
+        this.buttonList.add(new GuiButton(5, 0, 0, this.getTrailString()));
         this.buttonList.add(new GuiButton(3, 0, 0, this.getTextureSizeString()));
         this.buttonList.add(new GuiButton(4, 0, 0, this.getTextureScalingString()));
         this.buttonList.add(new GuiButton(0, 0, 0, "Done"));
@@ -40,7 +33,7 @@ public class MwGuiOptions extends GuiScreen {
     }
     
     String getDrawCoordsString() {
-    	return "Draw coords: " + this.mw.overlayManager.smallMapMode.coordsEnabled;
+    	return "Draw coords: " + this.mw.coordsEnabled;
     }
     
     String getCircularModeString() {
@@ -55,6 +48,9 @@ public class MwGuiOptions extends GuiScreen {
     	return "Texture scaling: " + (this.mw.linearTextureScalingEnabled ? "linear" : "nearest");
     }
     
+    String getTrailString() {
+    	return "Trail Markers: " + (this.mw.playerTrail.enabled);
+    }
     
     protected void actionPerformed(GuiButton button) {
 		switch (button.id) {
@@ -66,7 +62,7 @@ public class MwGuiOptions extends GuiScreen {
 			break;
 		case 1:
 	        // toggle coords
-			this.mw.overlayManager.toggleCoords();
+			this.mw.toggleCoords();
 			button.displayString = this.getDrawCoordsString();
 			break;
 		case 2:
@@ -87,6 +83,11 @@ public class MwGuiOptions extends GuiScreen {
 			this.mw.linearTextureScalingEnabled = !this.mw.linearTextureScalingEnabled;
 			this.mw.mapTexture.setLinearScaling(this.mw.linearTextureScalingEnabled);
 			button.displayString = this.getTextureScalingString();
+			break;
+		case 5:
+			// player trail
+			this.mw.playerTrail.enabled = !this.mw.playerTrail.enabled;
+			button.displayString = this.getTrailString();
 			break;
 		default:
 			break;

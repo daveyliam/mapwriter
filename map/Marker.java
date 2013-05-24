@@ -2,6 +2,9 @@ package mapwriter.map;
 
 import java.awt.Point;
 
+import mapwriter.Render;
+import mapwriter.map.mapmode.MapMode;
+
 public class Marker {
 	public String name;
 	public int x;
@@ -45,4 +48,23 @@ public class Marker {
     	colourIndex = (colourIndex + colours.length - 1) % colours.length;
 		this.colour = getCurrentColour();
     }
+    
+    public void draw(MapMode mapMode, MapView mapView, int borderColour) {
+		Point.Double p;
+		// markers are always specified by their overworld coordinates
+		if (mapView.getDimension() == -1) {
+			p = mapMode.getClampedScreenXY(mapView, this.x / 8, this.z / 8);
+		} else {
+			p = mapMode.getClampedScreenXY(mapView, this.x, this.z);
+		}
+		this.screenPos.setLocation(p.x + mapMode.xTranslation, p.y + mapMode.yTranslation);
+		
+		// draw a coloured rectangle centered on the calculated (x, y)
+		double mSize = mapMode.markerSize;
+		double halfMSize = mapMode.markerSize / 2.0;
+		Render.setColour(borderColour);
+		Render.drawRect(p.x - halfMSize, p.y - halfMSize, mSize, mSize);
+		Render.setColour(this.colour);
+		Render.drawRect(p.x - halfMSize + 0.5, p.y - halfMSize + 0.5, mSize - 1.0, mSize - 1.0);
+	}
 }

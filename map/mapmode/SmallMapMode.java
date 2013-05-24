@@ -17,6 +17,8 @@ public class SmallMapMode extends MapMode {
 		this.playerArrowSize = 4;
 		this.markerSize = 3;
 		
+		this.coordsEnabled = true;
+		
 		this.loadConfig();
 	}
 }

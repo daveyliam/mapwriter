@@ -5,11 +5,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import mapwriter.BackgroundExecutor;
 import mapwriter.Mw;
 import mapwriter.MwUtil;
 import mapwriter.Task;
-import mapwriter.map.MapTexture;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.RegionFileCache;

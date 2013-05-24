@@ -1,7 +1,7 @@
 package mapwriter.forge;
 
-import net.minecraftforge.common.MinecraftForge;
 import mapwriter.Mw;
+import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;

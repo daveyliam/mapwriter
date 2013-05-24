@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import mapwriter.Mw;
 import mapwriter.MwUtil;
 import mapwriter.forge.MwConfig;
+import mapwriter.map.mapmode.MapMode;
 
 public class MarkerManager {
 	
@@ -246,5 +247,14 @@ public class MarkerManager {
 			}
 		}
 		return nearestMarker;
+	}
+	
+	public void drawMarkers(MapMode mapMode, MapView mapView) {
+		for (Marker marker : this.visibleMarkerList) {
+			marker.draw(mapMode, mapView, 0xff000000);
+		}
+		if (this.selectedMarker != null) {
+			this.selectedMarker.draw(mapMode, mapView, 0xffffffff);
+		}
 	}
 }

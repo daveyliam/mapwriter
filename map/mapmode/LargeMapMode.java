@@ -17,6 +17,8 @@ public class LargeMapMode extends MapMode {
 		this.playerArrowSize = 5;
 		this.markerSize = 5;
 		
+		this.coordsEnabled = true;
+		
 		this.loadConfig();
 	}
 }

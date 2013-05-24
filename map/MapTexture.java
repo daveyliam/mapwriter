@@ -3,7 +3,6 @@ package mapwriter.map;
 import java.util.ArrayList;
 
 import mapwriter.Mw;
-import mapwriter.MwUtil;
 import mapwriter.region.Region;
 import mapwriter.region.RegionManager;
 

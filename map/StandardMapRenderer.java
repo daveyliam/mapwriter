@@ -2,11 +2,11 @@ package mapwriter.map;
 
 import java.awt.Point;
 
-import org.lwjgl.opengl.GL11;
-
 import mapwriter.Mw;
 import mapwriter.Render;
 import mapwriter.map.mapmode.MapMode;
+
+import org.lwjgl.opengl.GL11;
 
 public class StandardMapRenderer implements MapRenderer {
 	private Mw mw;
@@ -61,7 +61,12 @@ public class StandardMapRenderer implements MapRenderer {
 		this.drawBorder(this.mapMode);
 		
 		// draw markers
-		this.drawMarkers();
+		this.mw.markerManager.drawMarkers(this.mapMode, this.mapView);
+		
+		// draw player trail
+		if (this.mw.playerTrail.enabled) {
+			this.mw.playerTrail.draw(this.mapMode, this.mapView);
+		}
 		
 		// the position of the player within the map
 		Point.Double arrow = this.getPlayerArrowPos();
@@ -80,7 +85,7 @@ public class StandardMapRenderer implements MapRenderer {
 	
 	public static void drawCoords(Mw mw, MapMode mapMode) {
 		// draw coordinates
-		if (mapMode.coordsEnabled) {
+		if (mw.coordsEnabled && mapMode.coordsEnabled) {
 			Render.drawCentredString(mapMode.textX, mapMode.textY, mapMode.textColour,
 					"%d %d %d", mw.playerXInt, mw.playerYInt, mw.playerZInt);
 		}
@@ -95,34 +100,6 @@ public class StandardMapRenderer implements MapRenderer {
 				Render.drawRectBorder(mapMode.x, mapMode.y, mapMode.w, mapMode.h, mapMode.borderWidth);
 			}
 		}
-	}
-	
-	private void drawMarkers() {
-		for (Marker marker : this.markerManager.visibleMarkerList) {
-			this.drawMarker(marker, 0xff000000);
-		}
-		if (this.markerManager.selectedMarker != null) {
-			this.drawMarker(this.markerManager.selectedMarker, 0xffffffff);
-		}
-	}
-	
-	private void drawMarker(Marker marker, int borderColour) {
-		Point.Double p;
-		// markers are always specified by their overworld coordinates
-		if (this.mapView.getDimension() == -1) {
-			p = this.mapMode.getClampedScreenXY(this.mapView, marker.x / 8, marker.z / 8);
-		} else {
-			p = this.mapMode.getClampedScreenXY(this.mapView, marker.x, marker.z);
-		}
-		marker.screenPos.setLocation(p.x + this.mapMode.xTranslation, p.y + this.mapMode.yTranslation);
-		
-		// draw a coloured 2x2 rectangle centered on the calculated (x, y)
-		double mSize = this.mapMode.markerSize;
-		double halfMSize = this.mapMode.markerSize / 2.0;
-		Render.setColour(borderColour);
-		Render.drawRect(p.x - halfMSize, p.y - halfMSize, mSize, mSize);
-		Render.setColour(marker.colour);
-		Render.drawRect(p.x - halfMSize + 0.5, p.y - halfMSize + 0.5, mSize - 1.0, mSize - 1.0);
 	}
 	
 	public Point.Double getPlayerArrowPos() {

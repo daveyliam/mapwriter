@@ -16,6 +16,8 @@ public class UndergroundMapMode extends MapMode {
 		this.borderColour = 0xff000000;
 		this.playerArrowSize = 4;
 		
+		this.coordsEnabled = true;
+		
 		this.loadConfig();
 	}
 }

@@ -85,12 +85,6 @@ public class OverlayManager {
 		return this.currentMap;
 	}
 	
-	public void toggleCoords() {
-		boolean coords = this.smallMapMode.toggleCoords();
-		this.largeMapMode.setCoords(coords);
-		this.undergroundMapMode.setCoords(coords);
-	}
-	
 	public void toggleRotating() {
 		boolean rotate = this.smallMapMode.toggleRotating();
 		this.largeMapMode.setRotating(rotate);

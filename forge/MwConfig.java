@@ -16,9 +16,17 @@ public class MwConfig extends Configuration {
 		return this.get(category, key, defaultValue ? 1 : 0).getInt() != 0;
 	}
 	
+	public void setBoolean(String category, String key, boolean value) {
+		this.get(category, key, value).set(value ? 1 : 0);
+	}
+	
 	public int getOrSetInt(String category, String key, int defaultValue, int minValue, int maxValue) {
 		int value = this.get(category, key, defaultValue).getInt();
 		return Math.min(Math.max(minValue, value), maxValue);
+	}
+	
+	public void setInt(String category, String key, int value) {
+		this.get(category, key, value).set(value);
 	}
 	
 	public long getColour(String category, String key) {

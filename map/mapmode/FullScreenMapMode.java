@@ -20,6 +20,7 @@ public class FullScreenMapMode extends MapMode {
 		
 		this.rotate = false;
 		this.circular = false;
+		this.coordsEnabled = false;
 		
 		this.loadConfig();
 	}

@@ -139,11 +139,6 @@ public class MapView {
 		return this.z + (this.h / 2);
 	}
 	
-	public boolean isBlockWithinView(int x, int z) {
-		return (x > this.getMinX()) && (x < this.getMaxX()) &&
-				(z > this.getMinZ()) && (z < this.getMaxZ());
-	}
-	
 	public double getDimensionScaling(int playerDimension) {
 		double scale;
 		if ((this.dimension != -1) && (playerDimension == -1)) {
@@ -179,4 +174,17 @@ public class MapView {
 		this.h = (this.aspect > 1.0) ? viewSize / this.aspect : viewSize;
 	}
 	
+	public boolean isBlockWithinView(double bX, double bZ, boolean circular) {
+		boolean inside;
+		if (!circular) {
+			inside = (bX > this.getMinX()) || (bX < this.getMaxX()) ||
+					(bZ > this.getMinZ()) || (bZ < this.getMaxZ());
+		} else {
+			double x = (bX - this.x);
+			double z = (bZ - this.z);
+			double r = this.getHeight() / 2;
+			inside = ((x * x) + (z * z)) < (r * r);
+		}
+		return inside;
+	}
 }

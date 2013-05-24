@@ -12,7 +12,6 @@ import mapwriter.map.mapmode.FullScreenMapMode;
 import mapwriter.map.mapmode.MapMode;
 import mapwriter.region.MergeTask;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiOptions;
 import net.minecraft.client.gui.GuiScreen;
 
 import org.lwjgl.input.Keyboard;

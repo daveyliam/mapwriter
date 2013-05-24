@@ -28,10 +28,12 @@ public class MapMode {
 	public boolean enabled = true;
 	public boolean rotate = false;
 	public boolean circular = false;
+	public boolean coordsEnabled = false;
 	public int borderWidth = 0;
 	public int borderColour = 0;
 	public int playerArrowSize = 5;
 	public int markerSize = 5;
+	public int trailMarkerSize = 3;
 	public int playerArrowColour = 0xffff0000;
 	public int alphaPercent = 100;
 	
@@ -40,8 +42,6 @@ public class MapMode {
 	public int marginLeft = 0;
 	public int marginRight = 0;
 	public int heightPercent = -1;
-	
-	public boolean coordsEnabled = false;
 	
 	public int textX = 0;
 	public int textY = 0;
@@ -55,7 +55,6 @@ public class MapMode {
 	public void loadConfig() {
 		// get options from config file
 		this.enabled = this.config.getOrSetBoolean(this.configCategory, "enabled", this.enabled);
-		this.coordsEnabled = this.config.getOrSetBoolean(this.configCategory, "drawCoords", this.coordsEnabled);
 		this.playerArrowSize = this.config.getOrSetInt(this.configCategory, "playerArrowSize", this.playerArrowSize, 1, 20);
 		this.markerSize = this.config.getOrSetInt(this.configCategory, "markerSize", this.markerSize, 1, 20);
 		this.alphaPercent = this.config.getOrSetInt(this.configCategory, "alphaPercent", this.alphaPercent, 0, 100);
@@ -71,12 +70,14 @@ public class MapMode {
 		
 		this.rotate = this.config.getOrSetBoolean(this.configCategory, "rotate", this.rotate);
 		this.circular = this.config.getOrSetBoolean(this.configCategory, "circular", this.circular);
+		this.coordsEnabled = this.config.getOrSetBoolean(this.configCategory, "coordsEnabled", this.coordsEnabled);
+		
+		this.trailMarkerSize = Math.max(1, this.markerSize - 1);
 	}
 	
 	public void close() {
-		this.config.get(this.configCategory, "drawCoords", 0).set(this.coordsEnabled ? 1 : 0);
-		this.config.get(this.configCategory, "rotate", 0).set(this.rotate ? 1 : 0);
-		this.config.get(this.configCategory, "circular", 0).set(this.circular ? 1 : 0);
+		this.config.setBoolean(this.configCategory, "rotate", this.rotate);
+		this.config.setBoolean(this.configCategory, "circular", this.circular);
 	}
 	
 	public void setScreenRes(int dw, int dh, int sw, int sh) {
@@ -150,15 +151,6 @@ public class MapMode {
 		//		this.marginLeft, this.marginRight, this.marginTop, this.marginBottom, size);
 	}
 	
-	public void setCoords(boolean enabled) {
-		this.coordsEnabled = enabled;
-	}
-	
-	public boolean toggleCoords() {
-		this.setCoords(!this.coordsEnabled);
-		return this.coordsEnabled;
-	}
-	
 	public void setRotating(boolean enabled) {
 		this.rotate = enabled;
 		this.circular = enabled;
@@ -176,6 +168,14 @@ public class MapMode {
 		int bx = (int) Math.floor((mapView.getMinX() + (withinMapX * mapView.w)));
 		int bz = (int) Math.floor((mapView.getMinZ() + (withinMapY * mapView.h)));
 		return new Point(bx, bz);
+	}
+	
+	public Point.Double blockXZtoScreenXY(MapView mapView, double bX, double bZ) {
+		double xNorm = (bX - mapView.getX()) / mapView.w;
+		double zNorm = (bZ - mapView.getZ()) / mapView.h;
+		return new Point.Double(
+				this.x + (this.w * (xNorm + 0.5)),
+				this.y + (this.h * (zNorm + 0.5)));
 	}
 	
 	public Point.Double getClampedScreenXY(MapView mapView, double bX, double bZ) {
