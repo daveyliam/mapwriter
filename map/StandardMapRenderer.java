@@ -56,7 +56,9 @@ public class StandardMapRenderer implements MapRenderer {
 		Render.drawTexturedRect(this.mapMode.x, this.mapMode.y, this.mapMode.w, this.mapMode.h,
 				u, v, u + w, v + h);
 		
-		Render.disableStencil();
+		if (this.mapMode.circular) {
+			Render.disableStencil();
+		}
 		
 		this.drawBorder(this.mapMode);
 		
@@ -80,6 +82,8 @@ public class StandardMapRenderer implements MapRenderer {
 		
 		drawCoords(this.mw, this.mapMode);
 		
+		// some shader mods seem to need depth testing re-enabled
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glPopMatrix();
 	}
 	

@@ -343,7 +343,7 @@ public class Mw {
 	}
 	
 	public void onClientLoggedIn(Packet1Login login) {
-		MwUtil.log("client logged in, dimension = %d", login.dimension);
+		MwUtil.log("onClienLoggedIn: dimension = %d", login.dimension);
 		
 		this.worldName = this.getWorldName();
 		

@@ -277,13 +277,24 @@ public class Render {
 		GL11.glColorMask(false, false, false, false);
 		// enable writing to depth buffer
 		GL11.glDepthMask(true);
-		GL11.glClearDepth(3000.0);
-		// clear depth buffer
-		GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
+		
+		// Clearing the depth buffer causes problems with shader mods.
+		// I guess we just have to hope that the rest of the depth buffer
+		// contains z values greater than 2000 at this stage in the frame
+		// render.
+		// It would be much easier to use the stencil buffer instead, but it is
+		// not specifically requested in the Minecraft LWJGL display setup code.
+		// So the stencil buffer is only available on GL implementations that
+		// set it up by default.
+		
+		// clear depth buffer to z = 3000.0
+		//GL11.glClearDepth(3000.0);
+		//GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
+		
 		// always write to depth buffer
 		GL11.glDepthFunc(GL11.GL_ALWAYS);
 		
-		// draw stencil pattern
+		// draw stencil pattern (filled circle at z = 1000.0)
 		Render.setColour(0xffffffff);
 		Render.zDepth = 1000.0;
 		Render.drawCircle(x, y, r);
@@ -301,9 +312,30 @@ public class Render {
 	}
 	
 	public static void disableStencil() {
+		GL11.glDepthMask(true);
 		GL11.glDepthFunc(GL11.GL_LEQUAL);
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 	}
+	
+	// A better implementation of a circular stencil using the stencil buffer
+	// rather than the depth buffer can be found below. It works only on GL
+	// implementations that attach a stencil buffer by default (e.g. Intel, but
+	// not on Nvidia).
+	//
+	// To fix this we would need to change the display create line in
+	// 'Minecraft.java' file from:
+	//   Display.create((new PixelFormat()).withDepthBits(24));
+	// to:
+	//   Display.create((new PixelFormat()).withDepthBits(24).withStencilBits(8));
+	//
+	// Then we could use the stencil buffer and the the circular map would have
+	// far less problems.
+	//
+	// I suppose it would also be possible to detect the number of stencil bits
+	// available at runtime using GL11.glGetInteger(GL11.GL_STENCIL_BITS) and
+	// only use the depth buffer stencil algorithm if it returns 0. But this
+	// doesn't solve the problem of the stencil buffer not being initialized by
+	// default on some systems.
 	
 	/*public static void setCircularStencil(double x, double y, double r) {
 		GL11.glEnable(GL11.GL_STENCIL_TEST);

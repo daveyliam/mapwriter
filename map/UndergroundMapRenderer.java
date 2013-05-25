@@ -94,7 +94,9 @@ public class UndergroundMapRenderer implements MapRenderer {
 				this.mapMode.x, this.mapMode.y, this.mapMode.w, this.mapMode.h,
 				tu1, tv1, tu2, tv2);
 		
-		Render.disableStencil();
+		if (this.mapMode.circular) {
+			Render.disableStencil();
+		}
 		
 		StandardMapRenderer.drawBorder(this.mapMode);
 		
@@ -112,6 +114,8 @@ public class UndergroundMapRenderer implements MapRenderer {
 		
 		StandardMapRenderer.drawCoords(this.mw, this.mapMode);
 		
+		// some shader mods seem to need depth testing re-enabled
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glPopMatrix();
 	}
 	
