@@ -478,7 +478,7 @@ public class MwGui extends GuiScreen {
     		if (this.currentTextDialog == null) {
     			if ((marker != null) && (prevMarker == marker)) {
         			// right clicked previously selected marker.
-        			// start moving the marker.
+        			// edit the marker
         			this.currentTextDialog = new MarkerTextDialog(this.mw.markerManager, marker);
         			
         		} else if (marker == null) {
@@ -487,14 +487,30 @@ public class MwGui extends GuiScreen {
             		if (group.equals("none")) {
             			group = "group";
             		}
-            		int scale = 1;
-            		if (this.mapView.getDimension() == -1) {
-            			scale = 8;
+            		
+            		int mx, my, mz;
+            		if (this.isPlayerNearScreenPos(x, y)) {
+            			// marker at player's locations
+            			int scale = 1;
+            			if (this.mw.playerDimension == -1) {
+            				scale = 8;
+            			}
+            			mx = this.mw.playerXInt;
+            			my = this.mw.playerYInt;
+            			mz = this.mw.playerZInt;
+            		
+            		} else {
+            			// marker at mouse pointer location
+            			int scale = 1;
+                		if (this.mapView.getDimension() == -1) {
+                			scale = 8;
+                		}
+            			mx = this.mouseBlockX * scale;
+            			my = (this.mouseBlockY > 0) ? this.mouseBlockY : this.mw.defaultTeleportHeight;
+            			mz = this.mouseBlockZ * scale;
             		}
         			this.currentTextDialog = new MarkerTextDialog(this.mw.markerManager, "", group,
-        					this.mouseBlockX * scale,
-        					(this.mouseBlockY > 0) ? this.mouseBlockY : this.mw.defaultTeleportHeight,
-        					this.mouseBlockZ * scale);
+        					mx, my, mz);
         		}
     		}
     	}

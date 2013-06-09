@@ -26,8 +26,10 @@ public class MapTexture extends Texture {
 	private Region[] regionArray;
 	private ArrayList<Rect> textureUpdateQueue = new ArrayList<Rect>();
 	
-	public MapTexture(int textureSize) {
+	public MapTexture(int textureSize, boolean linearScaling) {
 		super(textureSize, textureSize, 0xff000000, GL11.GL_LINEAR, GL11.GL_LINEAR, GL11.GL_REPEAT);
+		
+		this.setLinearScaling(linearScaling);
 		
 		this.textureRegions = textureSize >> Mw.REGION_SHIFT;
 		this.textureSize = textureSize;

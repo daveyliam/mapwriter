@@ -97,6 +97,7 @@ public class Mw {
 	public int defaultTeleportHeight = 80;
 	public static int maxZoom = 5;
 	public static int minZoom = -5;
+	public int overlayModeIndex = 0;
 	
 	private int textureSize = 2048;
 	public int configTextureSize = 2048;
@@ -172,11 +173,12 @@ public class Mw {
 	
 	public void loadConfig() {
 		this.config.load();
-		//this.linearTextureScalingEnabled = (this.config.get(catOptions, "linearTextureScaling", 1).getInt() != 0);
+		this.linearTextureScalingEnabled = this.config.getOrSetBoolean(catOptions, "linearTextureScaling", true);
 		this.teleportEnabled = this.config.getOrSetBoolean(catOptions, "teleportEnabled", this.teleportEnabled);
 		this.chunksPerTick = this.config.getOrSetInt(catOptions, "chunksPerTick", this.chunksPerTick, 1, 64);
 		this.teleportCommand = this.config.get(catOptions, "teleportCommand", this.teleportCommand).getString();
 		this.coordsEnabled = this.config.getOrSetBoolean(catOptions, "coordsEnabled", this.coordsEnabled);
+		this.overlayModeIndex = this.config.getOrSetInt(catOptions, "overlayModeIndex", this.overlayModeIndex, 0, 1000);
 		
 		maxZoom = this.config.getOrSetInt(catOptions, "zoomOutLevels", maxZoom, 1, 256);
 		minZoom = -this.config.getOrSetInt(catOptions, "zoomInLevels", -minZoom, 1, 256);
@@ -200,6 +202,8 @@ public class Mw {
 		this.config.setBoolean(catOptions, "linearTextureScaling", this.linearTextureScalingEnabled);
 		this.config.setInt(catOptions, "textureSize", this.configTextureSize);
 		this.config.setBoolean(catOptions, "coordsEnabled", this.coordsEnabled);
+		this.config.setInt(catOptions, "overlayModeIndex", this.overlayModeIndex);
+		
 		
 		// save config
 		this.config.save();
@@ -304,7 +308,7 @@ public class Mw {
 		this.regionManager.close();
 		this.executor.close();
 		MapTexture oldMapTexture = this.mapTexture;
-		this.mapTexture = new MapTexture(this.textureSize);
+		this.mapTexture = new MapTexture(this.textureSize, this.linearTextureScalingEnabled);
 		if (oldMapTexture != null) {
 			oldMapTexture.close();
 		}
@@ -385,7 +389,7 @@ public class Mw {
 		this.executor = new BackgroundExecutor();
 		
 		// mapTexture depends on config being loaded
-		this.mapTexture = new MapTexture(this.textureSize);
+		this.mapTexture = new MapTexture(this.textureSize, this.linearTextureScalingEnabled);
 		this.blockColours = BlockColourGen.genBlockColours(this, this.config);
 		// region manager depends on config, mapTexture, and block colours
 		this.regionManager = new RegionManager(this, this.multiplayer);

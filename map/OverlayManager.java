@@ -31,7 +31,6 @@ public class OverlayManager {
 	public UndergroundMapRenderer undergroundMap;
 	public StandardMapRenderer guiMap;
 	
-	private int mapListIndex;
 	private ArrayList<MapRenderer> mapList;
 	private MapRenderer currentMap = null;
 	
@@ -54,13 +53,24 @@ public class OverlayManager {
 		this.undergroundMap = new UndergroundMapRenderer(mw, this.undergroundMapMode);
 		
 		this.mapList = new ArrayList<MapRenderer>();
-		this.mapList.add(null);
-		this.mapList.add(this.smallMap);
-		this.mapList.add(this.largeMap);
-		this.mapList.add(this.undergroundMap);
 		
-		this.mapListIndex = 0;
-		this.nextOverlayMode(1);
+		// add small, large and underground map modes if they
+		// are enabled.
+		if (this.smallMapMode.enabled) {
+			this.mapList.add(this.smallMap);
+		}
+		if (this.largeMapMode.enabled) {
+			this.mapList.add(this.largeMap);
+		}
+		if (this.undergroundMapMode.enabled) {
+			this.mapList.add(this.undergroundMap);
+		}
+		// add a null entry (hides the overlay when selected)
+		this.mapList.add(null);
+		
+		// sanitize overlayModeIndex loaded from config
+		this.nextOverlayMode(0);
+		this.currentMap = this.mapList.get(this.mw.overlayModeIndex);
 	}
 	
 	public void close() {
@@ -80,8 +90,8 @@ public class OverlayManager {
 	// toggle between small map, underground map and no map
 	public MapRenderer nextOverlayMode(int increment) {
 		int size = this.mapList.size();
-		this.mapListIndex = (this.mapListIndex + size + increment) % size;
-		this.currentMap = this.mapList.get(this.mapListIndex);
+		this.mw.overlayModeIndex = (this.mw.overlayModeIndex + size + increment) % size;
+		this.currentMap = this.mapList.get(this.mw.overlayModeIndex);
 		return this.currentMap;
 	}
 	
