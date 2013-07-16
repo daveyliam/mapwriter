@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import mapwriter.forge.MwConfig;
+import mapwriter.forge.MwForge;
 import mapwriter.forge.MwKeyHandler;
 import mapwriter.map.MapTexture;
 import mapwriter.map.MapView;
@@ -12,7 +13,6 @@ import mapwriter.map.Marker;
 import mapwriter.map.MarkerManager;
 import mapwriter.map.OverlayManager;
 import mapwriter.map.Trail;
-import mapwriter.region.BlockColourGen;
 import mapwriter.region.BlockColours;
 import mapwriter.region.RegionManager;
 import net.minecraft.client.Minecraft;
@@ -72,6 +72,21 @@ logged in.
 	
 */
 
+
+/* TODO list
+ * 
+ * - Button to cycle through group selection
+ * - Add marker in game hot key and GUI
+ * - Save map as 8192x8192 tiles
+ * - Dimension field on markers
+ * - Rei's format marker reading and writing
+ * - Save single player chunks to separate directory
+ * - Convert to use own anvil writer implementation
+ * - Allow using default texture pack for map with custom texture pack in game
+ * - Cave map
+ * - Death markers
+ */
+
 public class Mw {
 	
 	public Minecraft mc = null;
@@ -97,7 +112,6 @@ public class Mw {
 	public int defaultTeleportHeight = 80;
 	public static int maxZoom = 5;
 	public static int minZoom = -5;
-	public int overlayModeIndex = 0;
 	
 	private int textureSize = 2048;
 	public int configTextureSize = 2048;
@@ -117,11 +131,6 @@ public class Mw {
 	public double mapRotationDegrees = 0.0;
 	
 	// constants
-	public final static int HEIGHT_LEVELS = 16;
-	public final static int CHUNK_SIZE = 16;
-	public final static int REGION_SHIFT = 9;
-	public final static int REGION_SIZE = 1 << REGION_SHIFT;	// 512
-	public final static int REGION_MASK = ~(REGION_SIZE - 1);	// -512
 	public final static double PAN_FACTOR = 0.3D;
 	public final static String catWorld = "world";
 	public final static String catMarkers = "markers";
@@ -136,6 +145,7 @@ public class Mw {
 	public MarkerManager markerManager = null;
 	public BlockColours blockColours = null;
 	public RegionManager regionManager = null;
+	public ChunkManager chunkManager = null;
 	public Trail playerTrail = null;
 	
 	public Mw(MwConfig config) {
@@ -146,9 +156,11 @@ public class Mw {
 		this.config = config;
 		
 		// create base save directory
-		this.saveDir = new File(Minecraft.getMinecraftDir(), "saves");
+		this.saveDir = new File(Minecraft.getMinecraft().mcDataDir, "saves");
 		
 		this.ready = false;
+		
+		RegionManager.logger = MwForge.logger;
 	}
 	
 	public String getWorldName() {
@@ -161,8 +173,9 @@ public class Mw {
 		} else {
 			// strip invalid characters from the server name so that it
 			// can't be something malicious like '..\..\..\windows\'
-			worldName = MwUtil.mungeString(String.format("%s_%d", this.serverName, this.serverPort));
+			worldName = String.format("%s_%d", this.serverName, this.serverPort);
 		}
+		worldName = MwUtil.mungeString(worldName);
 		// if something went wrong make sure the name is not blank
 		// (causes crash on start up due to empty configuration section)
 		if (worldName == "") {
@@ -178,7 +191,6 @@ public class Mw {
 		this.chunksPerTick = this.config.getOrSetInt(catOptions, "chunksPerTick", this.chunksPerTick, 1, 64);
 		this.teleportCommand = this.config.get(catOptions, "teleportCommand", this.teleportCommand).getString();
 		this.coordsEnabled = this.config.getOrSetBoolean(catOptions, "coordsEnabled", this.coordsEnabled);
-		this.overlayModeIndex = this.config.getOrSetInt(catOptions, "overlayModeIndex", this.overlayModeIndex, 0, 1000);
 		
 		maxZoom = this.config.getOrSetInt(catOptions, "zoomOutLevels", maxZoom, 1, 256);
 		minZoom = -this.config.getOrSetInt(catOptions, "zoomInLevels", -minZoom, 1, 256);
@@ -202,8 +214,6 @@ public class Mw {
 		this.config.setBoolean(catOptions, "linearTextureScaling", this.linearTextureScalingEnabled);
 		this.config.setInt(catOptions, "textureSize", this.configTextureSize);
 		this.config.setBoolean(catOptions, "coordsEnabled", this.coordsEnabled);
-		this.config.setInt(catOptions, "overlayModeIndex", this.overlayModeIndex);
-		
 		
 		// save config
 		this.config.save();
@@ -282,21 +292,17 @@ public class Mw {
 		}
 	}
 	
-	public void teleportToOverworldPos(int x, int y, int z) {
-		if (this.playerDimension == -1) {
-			this.teleportTo(x / 8, y, z / 8);
-		} else {
-			this.teleportTo(x, y, z);
-		}
-	}
-	
 	public void teleportToMapPos(MapView mapView, int x, int y, int z) {
 		double scale = mapView.getDimensionScaling(this.playerDimension);
 		this.teleportTo((int) (x / scale), y, (int) (z / scale));
 	}
 	
 	public void teleportToMarker(Marker marker) {
-		this.teleportToOverworldPos(marker.x, marker.y, marker.z);
+		if (marker.dimension == this.playerDimension) {
+			this.teleportTo(marker.x, marker.y, marker.z);
+		} else {
+			MwUtil.printBoth("cannot teleport to marker in different dimension");
+		}
 	}
 	
 	public void reloadBlockColours() {
@@ -305,7 +311,7 @@ public class Mw {
 	}
 	
 	public void reloadMapTexture() {
-		this.regionManager.close();
+		this.executor.addTask(new CloseRegionManagerTask(this.regionManager));
 		this.executor.close();
 		MapTexture oldMapTexture = this.mapTexture;
 		this.mapTexture = new MapTexture(this.textureSize, this.linearTextureScalingEnabled);
@@ -313,7 +319,7 @@ public class Mw {
 			oldMapTexture.close();
 		}
 		this.executor = new BackgroundExecutor();
-		this.regionManager = new RegionManager(this, this.multiplayer);
+		this.regionManager = new RegionManager(this.worldDir, this.imageDir, this.blockColours);
 	}
 	
 	public void setCoords(boolean enabled) {
@@ -347,7 +353,7 @@ public class Mw {
 	}
 	
 	public void onClientLoggedIn(Packet1Login login) {
-		MwUtil.log("onClienLoggedIn: dimension = %d", login.dimension);
+		MwUtil.log("onClientLoggedIn: dimension = %d", login.dimension);
 		
 		this.worldName = this.getWorldName();
 		
@@ -355,7 +361,7 @@ public class Mw {
 		if (this.multiplayer) {
 			this.worldDir = new File(new File(this.saveDir, "mapwriter_mp_worlds"), this.worldName);
 		} else {
-			this.worldDir = new File(this.saveDir, this.worldName);
+			this.worldDir = new File(new File(this.saveDir, "mapwriter_sp_worlds"), this.worldName);
 		}
 		
 		this.imageDir = new File(this.worldDir, "images");
@@ -368,7 +374,7 @@ public class Mw {
 		
 		// create directories for zoom levels 1..n
 		//boolean zoomLevelsExist = true;
-		for (int i = 1; i <= this.maxZoom; i++) {
+		for (int i = 1; i <= maxZoom; i++) {
 			File zDir = new File(imageDir, "z" + i);
 			//zoomLevelsExist &= zDir.exists();
 			zDir.mkdirs();
@@ -380,8 +386,8 @@ public class Mw {
 		//this.multiplayer = !this.mc.isIntegratedServerRunning();
 		
 		// marker manager only depends on the config being loaded
-		this.markerManager = new MarkerManager(this);
-		this.markerManager.load(this.worldConfig, this.catMarkers);
+		this.markerManager = new MarkerManager();
+		this.markerManager.load(this.worldConfig, catMarkers);
 		
 		this.playerTrail = new Trail(this, "player");
 		
@@ -392,10 +398,12 @@ public class Mw {
 		this.mapTexture = new MapTexture(this.textureSize, this.linearTextureScalingEnabled);
 		this.blockColours = BlockColourGen.genBlockColours(this, this.config);
 		// region manager depends on config, mapTexture, and block colours
-		this.regionManager = new RegionManager(this, this.multiplayer);
+		this.regionManager = new RegionManager(this.worldDir, this.imageDir, this.blockColours);
 		// overlay manager depends on mapTexture
-		this.overlayManager = new OverlayManager(this, this.mapTexture);
+		this.overlayManager = new OverlayManager(this);
 		this.overlayManager.overlayView.setDimension(login.dimension);
+		
+		this.chunkManager = new ChunkManager(this);
 		
 		this.ready = true;
 		
@@ -428,12 +436,16 @@ public class Mw {
 	public void onConnectionClosed() {
 		
 		MwUtil.log("connection closed");
-			
+		
 		if (this.ready) {
 			this.ready = false;
+			
+			this.chunkManager.close();
+			this.chunkManager = null;
+			
 			// close all loaded regions, saving modified images.
 			// this will create extra tasks that need to be completed.
-			this.regionManager.close();
+			this.executor.addTask(new CloseRegionManagerTask(this.regionManager));
 			this.regionManager = null;
 			
 			MwUtil.log("waiting for %d tasks to finish...", this.executor.tasksRemaining());
@@ -444,7 +456,7 @@ public class Mw {
 			
 			this.playerTrail.close();
 			
-			this.markerManager.save(this.worldConfig, this.catMarkers);
+			this.markerManager.save(this.worldConfig, catMarkers);
 			this.markerManager.clear();
 			
 			// close overlay
@@ -469,16 +481,15 @@ public class Mw {
 			}
 			
 			// process background tasks
-			boolean waitingOnTask = false;
 			int maxTasks = 50;
 			while (!this.executor.processTaskQueue() && (maxTasks > 0)) {
 				maxTasks--;
 			}
 			
-			this.regionManager.onTick(this);
+			this.chunkManager.onTick();
 			
 			// let the renderEngine know we have changed the bound texture.
-	    	this.mc.renderEngine.resetBoundTexture();
+	    	//this.mc.renderEngine.resetBoundTexture();
 			
 	    	//if (this.tickCounter % 100 == 0) {
 	    	//	MwUtil.log("tick %d", this.tickCounter);
@@ -492,7 +503,7 @@ public class Mw {
 	// add chunk to the set of loaded chunks
 	public void onChunkLoad(Chunk chunk) {
 		if (this.ready && (chunk != null) && (chunk.worldObj instanceof net.minecraft.client.multiplayer.WorldClient)) {
-			this.regionManager.addChunk(chunk);
+			this.chunkManager.addChunk(chunk);
 		}
 	}
 	
@@ -500,7 +511,7 @@ public class Mw {
 	// convert to mwchunk and write chunk to region file if in multiplayer.
 	public void onChunkUnload(Chunk chunk) {
 		if (this.ready && (chunk != null) && (chunk.worldObj instanceof net.minecraft.client.multiplayer.WorldClient)) {
-			this.regionManager.removeChunk(chunk);
+			this.chunkManager.removeChunk(chunk);
 		}
 	}
 	

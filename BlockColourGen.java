@@ -1,13 +1,11 @@
-package mapwriter.region;
+package mapwriter;
 
-import mapwriter.Mw;
-import mapwriter.MwUtil;
-import mapwriter.Render;
 import mapwriter.forge.MwConfig;
-import mapwriter.map.Texture;
+import mapwriter.region.BlockColours;
 import mapwriter.region.BlockColours.BlockType;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.Icon;
 import net.minecraft.world.biome.BiomeGenBase;
 
@@ -168,16 +166,14 @@ public class BlockColourGen {
 	}
 	
 	private static int getIconMapColour(Icon icon, Texture terrainTexture) {
-		//MwUtil.log("block %03x:%01x: (%f, %f, %f, %f)", blockID, dv, u1, v1, u2, v2); 
-		
-		int iconX = icon.getOriginX();
-		int iconY = icon.getOriginY();
-		float iconWidthF = ((float) icon.getSheetWidth()) * (icon.getMaxU() - icon.getMinU());
-		float iconHeightF = ((float) icon.getSheetHeight()) * (icon.getMaxV() - icon.getMinV());
-		int iconWidth = (int) (iconWidthF);
-		int iconHeight = (int) (iconHeightF);
+		int iconX = (int) Math.round(((float) terrainTexture.w) * icon.getMinU());
+		int iconY = (int) Math.round(((float) terrainTexture.h) * icon.getMinV());
+		int iconWidth = (int) Math.round(((float) terrainTexture.w) * (icon.getMaxU() - icon.getMinU()));
+		int iconHeight = (int) Math.round(((float) terrainTexture.h) * (icon.getMaxV() - icon.getMinV()));
 		
 		int[] pixels = new int[iconWidth * iconHeight];
+		
+		//MwUtil.log("(%d, %d) %dx%d", iconX, iconY, iconWidth, iconHeight);
 		
 		terrainTexture.getRGB(iconX, iconY, iconWidth, iconHeight, pixels, 0, iconWidth);
 		
@@ -213,8 +209,17 @@ public class BlockColourGen {
 		MwUtil.log("generating block map colours from textures");
 
 		// copy terrain texture to MwRender pixel bytebuffer
-		int terrainTextureID = Minecraft.getMinecraft().renderEngine.getTexture("/terrain.png");
-		Texture terrainTexture = new Texture(terrainTextureID);
+		//int terrainTextureID = Minecraft.getMinecraft().renderEngine.getTexture("/terrain.png");
+		// bind the terrain texture
+		Minecraft.getMinecraft().func_110434_K().func_110577_a(TextureMap.field_110575_b);
+		// get the bound texture id
+		int terrainTextureId = Render.getBoundTextureId();
+		// create texture object from the currently bound GL texture
+		if (terrainTextureId == 0) {
+			MwUtil.log("error: could get terrain texture ID");
+			return;
+		}
+		Texture terrainTexture = new Texture(terrainTextureId);
 		
 		double u1Last = 0;
 		double u2Last = 0;

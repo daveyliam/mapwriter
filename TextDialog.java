@@ -60,7 +60,7 @@ public class TextDialog extends Gui {
 	
 	public void draw() {
 		int w = this.sw * textDialogWidthPercent / 100;
-    	this.drawRect(
+    	drawRect(
     			(this.sw - w) / 2,
     			textDialogTitleY - 4,
     			(this.sw - w) / 2 + w,

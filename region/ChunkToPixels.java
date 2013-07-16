@@ -1,8 +1,5 @@
 package mapwriter.region;
 
-import mapwriter.Mw;
-import net.minecraft.block.Block;
-
 public class ChunkToPixels {
 	
 	// values that change how height shading algorithm works
@@ -38,7 +35,6 @@ public class ChunkToPixels {
 	}
 	
 	public static double getPixelHeightShading(int[] pixels, int offset, int scanSize) {
-		int pixel = pixels[offset];
 		int samples = 0;
 		int height = (pixels[offset] >> 24) & 0xff;
 		int heightDiff = 0;
@@ -74,13 +70,11 @@ public class ChunkToPixels {
 	}
 	
 	public static void getMapPixels(BlockColours bc, MwChunk chunk, int[] pixels, int offset, int scanSize) {
-		int i = 0;
-		int count = 0;
 		boolean caveMap = (chunk.dimension == -1);
 		
 		// opaque layer
-		for (int z = 0; z < Mw.CHUNK_SIZE; z++) {
-			for (int x = 0; x < Mw.CHUNK_SIZE; x++) {
+		for (int z = 0; z < MwChunk.SIZE; z++) {
+			for (int x = 0; x < MwChunk.SIZE; x++) {
 				
 				int yEnd = (caveMap) ? getFirstNonOpaqueBlockY(bc, chunk, x, chunk.maxHeight - 1, z) : chunk.maxHeight - 1;
 				int yStart = getFirstOpaqueBlockY(bc, chunk, x, yEnd, z);
@@ -92,31 +86,23 @@ public class ChunkToPixels {
 				double b = 0.0;
 				for (int y = yStart; y <= yEnd; y++) {
 					int blockAndMeta = chunk.getBlockAndMetadata(x, y, z);
-					int blockID = blockAndMeta >> 4;
-					int dv = blockAndMeta & 0xf;
 					
-					Block block = Block.blocksList[blockID];
+					int c1 = bc.getColour(blockAndMeta);
+					int c2 = bc.getBiomeColour(blockAndMeta, biome);
 					
-					if (block != null) {
-						int c1 = bc.getColour(blockAndMeta);
-						int c2 = bc.getBiomeColour(blockAndMeta, biome);
-						
-						double c1A = (double) ((c1 >> 24) & 0xff) / 255.0;
-						double c1R = (double) ((c1 >> 16) & 0xff) / 255.0;
-						double c1G = (double) ((c1 >> 8)  & 0xff) / 255.0;
-						double c1B = (double) ((c1 >> 0)  & 0xff) / 255.0;
-						
-						double c2R = (double) ((c2 >> 16) & 0xff) / 255.0;
-						double c2G = (double) ((c2 >> 8)  & 0xff) / 255.0;
-						double c2B = (double) ((c2 >> 0)  & 0xff) / 255.0;
-						
-						// alpha blend and multiply
-						r = r * (1.0 - c1A) + ((c1R * c2R) * c1A);
-						g = g * (1.0 - c1A) + ((c1G * c2G) * c1A);
-						b = b * (1.0 - c1A) + ((c1B * c2B) * c1A);
-						
-						count++;
-					}
+					double c1A = (double) ((c1 >> 24) & 0xff) / 255.0;
+					double c1R = (double) ((c1 >> 16) & 0xff) / 255.0;
+					double c1G = (double) ((c1 >> 8)  & 0xff) / 255.0;
+					double c1B = (double) ((c1 >> 0)  & 0xff) / 255.0;
+					
+					double c2R = (double) ((c2 >> 16) & 0xff) / 255.0;
+					double c2G = (double) ((c2 >> 8)  & 0xff) / 255.0;
+					double c2B = (double) ((c2 >> 0)  & 0xff) / 255.0;
+					
+					// alpha blend and multiply
+					r = r * (1.0 - c1A) + ((c1R * c2R) * c1A);
+					g = g * (1.0 - c1A) + ((c1G * c2G) * c1A);
+					b = b * (1.0 - c1A) + ((c1B * c2B) * c1A);
 				}
 				
 				// shade heights

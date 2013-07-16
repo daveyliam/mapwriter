@@ -7,12 +7,9 @@ import mapwriter.map.mapmode.LargeMapMode;
 import mapwriter.map.mapmode.MapMode;
 import mapwriter.map.mapmode.SmallMapMode;
 import mapwriter.map.mapmode.UndergroundMapMode;
-import net.minecraft.client.Minecraft;
 
 public class OverlayManager {
-	private Minecraft mc;
 	private Mw mw;
-	private MapTexture mapTexture;
 	
 	public static final String catSmallMap = "smallMap";
 	public static final String catLargeMap = "largeMap";
@@ -34,19 +31,26 @@ public class OverlayManager {
 	private ArrayList<MapRenderer> mapList;
 	private MapRenderer currentMap = null;
 	
-	public OverlayManager(Mw mw, MapTexture mapTexture) {
+	public int modeIndex = 0;
+	
+	public OverlayManager(Mw mw) {
 		this.mw = mw;
-		this.mapTexture = mapTexture;
+		
+		// load config file options
+		this.modeIndex = this.mw.config.getOrSetInt(Mw.catOptions, "overlayModeIndex", this.modeIndex, 0, 1000);
+		int zoomLevel = this.mw.config.getOrSetInt(Mw.catOptions, "overlayZoomLevel", 0, Mw.minZoom, Mw.maxZoom);
+		
+		// map view shared between large and small map modes
+		this.overlayView = new MapView();
+		this.overlayView.setZoomLevel(zoomLevel);
 		
 		// small map mode
 		this.smallMapMode = new SmallMapMode(this.mw.config);
-		this.overlayView = new MapView();
-		this.overlayView.setZoomLevel(-1);
-		this.smallMap = new StandardMapRenderer(mw, this.mapTexture, this.mw.markerManager, this.smallMapMode, this.overlayView);
+		this.smallMap = new StandardMapRenderer(mw, this.smallMapMode, this.overlayView);
 		
 		// large map mode
 		this.largeMapMode = new LargeMapMode(this.mw.config);
-		this.largeMap = new StandardMapRenderer(mw, this.mapTexture, this.mw.markerManager, this.largeMapMode, this.overlayView);
+		this.largeMap = new StandardMapRenderer(mw, this.largeMapMode, this.overlayView);
 		
 		// undergound map mode
 		this.undergroundMapMode = new UndergroundMapMode(this.mw.config);
@@ -70,7 +74,7 @@ public class OverlayManager {
 		
 		// sanitize overlayModeIndex loaded from config
 		this.nextOverlayMode(0);
-		this.currentMap = this.mapList.get(this.mw.overlayModeIndex);
+		this.currentMap = this.mapList.get(this.modeIndex);
 	}
 	
 	public void close() {
@@ -85,13 +89,16 @@ public class OverlayManager {
 		this.smallMapMode.close();
 		this.largeMapMode.close();
 		this.undergroundMapMode.close();
+		
+		this.mw.config.setInt(Mw.catOptions, "overlayModeIndex", this.modeIndex);
+		this.mw.config.setInt(Mw.catOptions, "overlayZoomLevel", this.overlayView.getZoomLevel());
 	}
 	
 	// toggle between small map, underground map and no map
 	public MapRenderer nextOverlayMode(int increment) {
 		int size = this.mapList.size();
-		this.mw.overlayModeIndex = (this.mw.overlayModeIndex + size + increment) % size;
-		this.currentMap = this.mapList.get(this.mw.overlayModeIndex);
+		this.modeIndex = (this.modeIndex + size + increment) % size;
+		this.currentMap = this.mapList.get(this.modeIndex);
 		return this.currentMap;
 	}
 	

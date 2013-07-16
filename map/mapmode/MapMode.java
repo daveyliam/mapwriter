@@ -15,6 +15,7 @@ public class MapMode {
 	private int sh = 240;
 	private int dw = 320;
 	private int dh = 240;
+	private double screenScalingFactor = 1.0;
 	
 	// calculated before every frame drawn by updateMapDimensions
 	public int xTranslation = 0;
@@ -23,6 +24,8 @@ public class MapMode {
 	public int y = -50;
 	public int w = 50;
 	public int h = 50;
+	public int wPixels = 50;
+	public int hPixels = 50;
 	
 	// config settings
 	public boolean enabled = true;
@@ -80,12 +83,13 @@ public class MapMode {
 		this.config.setBoolean(this.configCategory, "circular", this.circular);
 	}
 	
-	public void setScreenRes(int dw, int dh, int sw, int sh) {
+	public void setScreenRes(int dw, int dh, int sw, int sh, double scaling) {
 		if ((dw != this.dw) || (dh != this.dh) ||(sw != this.sw) || (sh != this.sh)) {
 			this.dw = dw;
 			this.dh = dh;
 			this.sw = sw;
 			this.sh = sh;
+			this.screenScalingFactor = scaling;
 			this.update();
 		}
 	}
@@ -93,7 +97,7 @@ public class MapMode {
 	public void setScreenRes() {
 		Minecraft mc = Minecraft.getMinecraft();
 		ScaledResolution sRes = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
-		this.setScreenRes(mc.displayWidth, mc.displayHeight, sRes.getScaledWidth(), sRes.getScaledHeight());
+		this.setScreenRes(mc.displayWidth, mc.displayHeight, sRes.getScaledWidth(), sRes.getScaledHeight(), sRes.getScaleFactor());
 	}
 	
 	private void update() {
@@ -129,6 +133,9 @@ public class MapMode {
 			y = (this.sh - size) / 2;
 			this.h = size;
 		}
+		
+		this.wPixels = (int) Math.round(((double) this.w) * this.screenScalingFactor);
+		this.hPixels = (int) Math.round(((double) this.h) * this.screenScalingFactor);
 		
 		int halfW = this.w / 2;
 		int halfH = this.h / 2;

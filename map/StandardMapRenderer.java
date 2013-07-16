@@ -10,14 +10,12 @@ import org.lwjgl.opengl.GL11;
 
 public class StandardMapRenderer implements MapRenderer {
 	private Mw mw;
-	public MarkerManager markerManager;
 	private MapMode mapMode;
 	private MapView mapView;
 	public Point.Double playerArrowScreenPos = new Point.Double(0, 0);
 	
-	public StandardMapRenderer(Mw mw, MapTexture mapTexture, MarkerManager markerManager, MapMode mapMode, MapView mapView) {
+	public StandardMapRenderer(Mw mw, MapMode mapMode, MapView mapView) {
 		this.mw = mw;
-		this.markerManager = markerManager;
 		this.mapMode = mapMode;
 		this.mapView = mapView;
 	}
@@ -27,12 +25,12 @@ public class StandardMapRenderer implements MapRenderer {
 	
 	public void update() {
 		this.mapMode.setScreenRes();
-		this.mapView.setAspect(this.mapMode);
+		this.mapView.setMapWH(this.mapMode);
 		this.mapView.setTextureSize(this.mw.mapTexture.textureSize);
-		this.mw.mapTexture.update(this.mw.regionManager, this.mapView);
+		this.mw.mapTexture.requestView(this.mapView, this.mw.executor, this.mw.regionManager);
 	}
 	
-	public void draw() {	
+	public void draw() {
 		int regionZoomLevel = Math.max(0, this.mapView.getZoomLevel());
 		double tSize = (double) (this.mw.mapTexture.textureSize << regionZoomLevel);
 		
@@ -60,7 +58,7 @@ public class StandardMapRenderer implements MapRenderer {
 			Render.disableStencil();
 		}
 		
-		this.drawBorder(this.mapMode);
+		drawBorder(this.mapMode);
 		
 		// draw markers
 		this.mw.markerManager.drawMarkers(this.mapMode, this.mapView);

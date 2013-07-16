@@ -10,7 +10,6 @@ import mapwriter.map.MarkerManager;
 import mapwriter.map.StandardMapRenderer;
 import mapwriter.map.mapmode.FullScreenMapMode;
 import mapwriter.map.mapmode.MapMode;
-import mapwriter.region.MergeTask;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 
@@ -33,8 +32,8 @@ public class MwGui extends GuiScreen {
     private static final int menuX = 5;
     
     private int mouseLeftHeld = 0;
-    private int mouseRightHeld = 0;
-    private int mouseMiddleHeld = 0;
+    //private int mouseRightHeld = 0;
+    //private int mouseMiddleHeld = 0;
     private int mouseLeftDragStartX = 0;
     private int mouseLeftDragStartY = 0;
     private double viewXStart;
@@ -62,7 +61,7 @@ public class MwGui extends GuiScreen {
     		this.x = x;
     		this.y = y;
     		this.w = MwGui.this.fontRenderer.getStringWidth(s) + 4;
-    		MwGui.this.drawRect(this.x, this.y, this.x + this.w, this.y + this.h, 0x80000000);
+    		MwGui.drawRect(this.x, this.y, this.x + this.w, this.y + this.h, 0x80000000);
     		MwGui.this.drawString(MwGui.this.fontRenderer, s, this.x + 2, this.y + 2, 0xffffff);
     	}
     	
@@ -159,7 +158,8 @@ public class MwGui extends GuiScreen {
     	    			this.editingMarker = null;
     	    		}
     	    		this.markerManager.addMarker(this.markerName, this.markerGroup,
-    						this.markerX, this.markerY, this.markerZ, colour);
+    						this.markerX, this.markerY, this.markerZ,
+    						MwGui.this.mapView.getDimension(), colour);
     				this.markerManager.setVisibleGroupName(this.markerGroup);
     				this.markerManager.update();
     			}
@@ -208,13 +208,11 @@ public class MwGui extends GuiScreen {
     }
     
     
-    
-    
     public MwGui(Mw mw) {
     	this.mw = mw;
     	this.mapMode = new FullScreenMapMode(mw.config);
     	this.mapView = new MapView();
-    	this.map = new StandardMapRenderer(this.mw, this.mw.mapTexture, this.mw.markerManager, this.mapMode, this.mapView);
+    	this.map = new StandardMapRenderer(this.mw, this.mapMode, this.mapView);
     	
     	this.mapView.setDimension(this.mw.overlayManager.overlayView.getDimension());
     	this.mapView.setViewCentreScaled(this.mw.playerX, this.mw.playerZ, this.mw.playerDimension);
@@ -249,10 +247,6 @@ public class MwGui extends GuiScreen {
         this.mc.sndManager.resumeAllSounds();
     }
     
-    
-    
-    
-    
     // get a marker near the specified block pos if it exists.
     // the maxDistance is based on the view width so that you need to click closer
     // to a marker when zoomed in to select it.
@@ -270,7 +264,7 @@ public class MwGui extends GuiScreen {
     
     public int getHeightAtBlockPos(int bX, int bZ) {
     	int bY = 0;
-    	if (this.mw.mc.theWorld.provider.dimensionId != -1) {
+    	if (this.mw.mc.theWorld.provider.dimensionId == this.mapView.getDimension()) {
     		bY = this.mw.mc.theWorld.getChunkFromBlockCoords(bX, bZ).getHeightValue(bX & 0xf, bZ & 0xf);
     	}
     	return bY;
@@ -294,12 +288,14 @@ public class MwGui extends GuiScreen {
     	// get free output file name in the minecraft launcher dir
 		File outputFile = MwUtil.getFreeFilename(null, this.mw.worldDir.getName(), "png");
 		if (outputFile != null) {
-			this.mw.regionManager.saveChunks();
-			this.mw.executor.addTask(new MergeTask(this.mw, outputFile, this.mapView.getDimension(),
+			this.mw.chunkManager.saveChunks();
+			this.mw.executor.addTask(new MergeTask(this.mw.regionManager,
 					(int) this.mapView.getX(),
 					(int) this.mapView.getZ(),
 					(int) this.mapView.getWidth(),
-					(int) this.mapView.getHeight()));
+					(int) this.mapView.getHeight(),
+					this.mapView.getDimension(),
+					outputFile));
 			
 			MwUtil.printBoth("merging to '" + outputFile.getAbsolutePath() + "'");
 		} else {
@@ -474,7 +470,7 @@ public class MwGui extends GuiScreen {
     		}
     		
     	} else if (button == 1) {
-    		this.mouseRightHeld = 1;
+    		//this.mouseRightHeld = 1;
     		if (this.currentTextDialog == null) {
     			if ((marker != null) && (prevMarker == marker)) {
         			// right clicked previously selected marker.
@@ -491,23 +487,15 @@ public class MwGui extends GuiScreen {
             		int mx, my, mz;
             		if (this.isPlayerNearScreenPos(x, y)) {
             			// marker at player's locations
-            			int scale = 1;
-            			if (this.mw.playerDimension == -1) {
-            				scale = 8;
-            			}
             			mx = this.mw.playerXInt;
             			my = this.mw.playerYInt;
             			mz = this.mw.playerZInt;
             		
             		} else {
             			// marker at mouse pointer location
-            			int scale = 1;
-                		if (this.mapView.getDimension() == -1) {
-                			scale = 8;
-                		}
-            			mx = this.mouseBlockX * scale;
+            			mx = this.mouseBlockX;
             			my = (this.mouseBlockY > 0) ? this.mouseBlockY : this.mw.defaultTeleportHeight;
-            			mz = this.mouseBlockZ * scale;
+            			mz = this.mouseBlockZ;
             		}
         			this.currentTextDialog = new MarkerTextDialog(this.mw.markerManager, "", group,
         					mx, my, mz);
@@ -527,7 +515,7 @@ public class MwGui extends GuiScreen {
     		this.mouseLeftHeld = 0;
     		this.movingMarker = null;
     	} else if (button == 1) {
-    		this.mouseRightHeld = 0;
+    		//this.mouseRightHeld = 0;
     	}
     }
     
@@ -588,13 +576,13 @@ public class MwGui extends GuiScreen {
          /*if (this.mw.markerManager.selectedMarker != null) {
          	s += ", current marker: " + this.mw.markerManager.selectedMarker.name;
          }*/
-         this.drawRect(10, this.height - 21, this.width - 20, this.height - 6, 0x80000000);
+         drawRect(10, this.height - 21, this.width - 20, this.height - 6, 0x80000000);
          this.drawCenteredString(this.fontRenderer,
          		s, this.width / 2, this.height - 18, 0xffffff);
     }
     
     public void drawHelp() {
-    	this.drawRect(10, 20, 288, 215, 0x80000000);
+    	drawRect(10, 20, 288, 215, 0x80000000);
     	this.fontRenderer.drawSplitString(
     			"Keys:\n\n" + 
     			"  Space\n" +
@@ -635,7 +623,7 @@ public class MwGui extends GuiScreen {
     	x = Math.min(x, this.width - (stringW + 16));
     	y = Math.min(Math.max(10, y), this.height - 14);
     	
-    	this.drawRect(x + 8, y - 10, x + stringW + 16, y + 14, 0x80000000);
+    	drawRect(x + 8, y - 10, x + stringW + 16, y + 14, 0x80000000);
     	this.drawString(this.fontRenderer,
     			title,
     			x + 10, y - 8, 0xffffff);
@@ -657,13 +645,9 @@ public class MwGui extends GuiScreen {
     		yOffset = (this.mouseLeftDragStartY - mouseY) * this.mapView.getHeight() / this.mapMode.h;
     		
     		if (this.movingMarker != null) {
-    			if (this.mapView.getDimension() == -1) {
-    				this.movingMarker.x = this.movingMarkerXStart - (int) (xOffset * 8);
-        			this.movingMarker.z = this.movingMarkerZStart - (int) (yOffset * 8);
-        		} else {
-        			this.movingMarker.x = this.movingMarkerXStart - (int) xOffset;
-        			this.movingMarker.z = this.movingMarkerZStart - (int) yOffset;
-        		}
+    			double scale = this.mapView.getDimensionScaling(this.movingMarker.dimension);
+        		this.movingMarker.x = this.movingMarkerXStart - (int) (xOffset / scale);
+        		this.movingMarker.z = this.movingMarkerZStart - (int) (yOffset / scale);
     		} else {
 	    		this.mapView.setViewCentre(this.viewXStart + xOffset, this.viewZStart + yOffset);
     		}
@@ -678,7 +662,7 @@ public class MwGui extends GuiScreen {
         this.map.draw();
         
         // let the renderEngine know we have changed the texture.
-    	this.mc.renderEngine.resetBoundTexture();
+    	//this.mc.renderEngine.resetBoundTexture();
         
         // get the block the mouse is currently hovering over
     	Point p = this.mapMode.screenXYtoBlockXZ(this.mapView, mouseX, mouseY);

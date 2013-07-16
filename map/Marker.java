@@ -10,6 +10,7 @@ public class Marker {
 	public int x;
 	public int y;
 	public int z;
+	public int dimension;
 	public String groupName;
 	public int colour;
 	
@@ -21,18 +22,19 @@ public class Marker {
 	// static so that current index is shared between all markers
     private static int colourIndex = 0;
 	
-	public Marker(String name, String groupName, int x, int y, int z, int colour) {
+	public Marker(String name, String groupName, int x, int y, int z, int dimension, int colour) {
 		this.name = name;
 		this.x = x;
 		this.y = y;
 		this.z = z;
+		this.dimension = dimension;
 		this.colour = colour;
 		this.groupName = groupName;
 	}
 	
 	public String getString() {
-		return String.format("%s %s (%d, %d, %d) %06x",
-				this.name, this.groupName, this.x, this.y, this.z, this.colour & 0xffffff);
+		return String.format("%s %s (%d, %d, %d) %d %06x",
+				this.name, this.groupName, this.x, this.y, this.z, this.dimension, this.colour & 0xffffff);
 	}
 	
 	public static int getCurrentColour() {
@@ -50,13 +52,9 @@ public class Marker {
     }
     
     public void draw(MapMode mapMode, MapView mapView, int borderColour) {
-		Point.Double p;
 		// markers are always specified by their overworld coordinates
-		if (mapView.getDimension() == -1) {
-			p = mapMode.getClampedScreenXY(mapView, this.x / 8, this.z / 8);
-		} else {
-			p = mapMode.getClampedScreenXY(mapView, this.x, this.z);
-		}
+		double scale = mapView.getDimensionScaling(this.dimension);
+		Point.Double p = mapMode.getClampedScreenXY(mapView, this.x * scale, this.z * scale);
 		this.screenPos.setLocation(p.x + mapMode.xTranslation, p.y + mapMode.yTranslation);
 		
 		// draw a coloured rectangle centered on the calculated (x, y)

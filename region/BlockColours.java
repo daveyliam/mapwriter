@@ -2,17 +2,16 @@ package mapwriter.region;
 
 import java.util.Arrays;
 
-import net.minecraft.world.biome.BiomeGenBase;
-
 public class BlockColours {
 	
 	public static final int MAX_BLOCKS = 4096;
 	public static final int MAX_META = 16;
+	public static final int MAX_BIOMES = 256;
 	
 	private int[] bcArray = new int[MAX_BLOCKS * MAX_META];
-	private int[] waterMultiplierArray = null;
-	private int[] grassMultiplierArray = null;
-	private int[] foliageMultiplierArray = null;
+	private int[] waterMultiplierArray = new int[MAX_BIOMES];
+	private int[] grassMultiplierArray = new int[MAX_BIOMES];
+	private int[] foliageMultiplierArray = new int[MAX_BIOMES];
 	
 	public enum BlockType {
 		NORMAL,
@@ -27,6 +26,9 @@ public class BlockColours {
 	
 	public BlockColours() {
 		Arrays.fill(this.bcArray, 0);
+		Arrays.fill(this.waterMultiplierArray, 0xffffff);
+		Arrays.fill(this.grassMultiplierArray, 0xffffff);
+		Arrays.fill(this.foliageMultiplierArray, 0xffffff);
 		Arrays.fill(this.blockTypeArray, BlockType.NORMAL);
 	}
 	
@@ -75,9 +77,7 @@ public class BlockColours {
 	}
 	
 	public void clearBiomeArrays() {
-		this.waterMultiplierArray = new int[BiomeGenBase.biomeList.length];
-		this.grassMultiplierArray = new int[BiomeGenBase.biomeList.length];
-		this.foliageMultiplierArray = new int[BiomeGenBase.biomeList.length];
+		
 	}
 	
 	public void setBiomeWaterShading(int biomeID, int colour) {

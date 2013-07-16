@@ -13,7 +13,8 @@ public class MwGuiOptions extends GuiScreen {
 		this.parentScreen = parentScreen;
 	}
 	
-    public void initGui() {
+    @SuppressWarnings("unchecked")
+	public void initGui() {
         this.buttonList.clear();
         this.buttonList.add(new GuiButton(1, 0, 0, this.getDrawCoordsString()));
         this.buttonList.add(new GuiButton(2, 0, 0, this.getCircularModeString()));

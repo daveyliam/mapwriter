@@ -11,12 +11,24 @@ import net.minecraft.client.entity.EntityClientPlayerMP;
 
 public class MwUtil {
 	
-	public static void log(String s, Object...args) {
+	public static void logInfo(String s, Object...args) {
 		MwForge.logger.info(String.format(s, args));
+	}
+	
+	public static void logWarning(String s, Object...args) {
+		MwForge.logger.warning(String.format(s, args));
+	}
+	
+	public static void logError(String s, Object...args) {
+		MwForge.logger.severe(String.format(s, args));
 	}
 	
 	public static void debug(String s, Object...args) {
 		MwForge.logger.finest(String.format(s, args));
+	}
+	
+	public static void log(String s, Object...args) {
+		logInfo(String.format(s, args));
 	}
 	
 	public static String mungeString(String s) {
@@ -69,4 +81,22 @@ public class MwUtil {
 		return ByteBuffer.allocateDirect(size * 4).order(ByteOrder.nativeOrder()).asIntBuffer();
 	}
 	
+	// algorithm from http://graphics.stanford.edu/~seander/bithacks.html (Sean Anderson)
+	// works by making sure all bits to the right of the highest set bit are 1, then
+	// adding 1 to get the answer.
+	public static int nextHighestPowerOf2(int v) {
+		// decrement by 1 (to handle cases where v is already a power of two)
+		v--;
+		
+		// set all bits to the right of the uppermost set bit.
+		v |= v >> 1;
+		v |= v >> 2;
+		v |= v >> 4;
+		v |= v >> 8;
+		v |= v >> 16;
+		// v |= v >> 32; // uncomment for 64 bit input values
+		
+		// add 1 to get the power of two result
+		return v + 1;
+	}
 }

@@ -1,8 +1,10 @@
 package mapwriter.map;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 
-import mapwriter.Mw;
+import mapwriter.BackgroundExecutor;
+import mapwriter.Texture;
+import mapwriter.region.MwChunk;
 import mapwriter.region.Region;
 import mapwriter.region.RegionManager;
 
@@ -13,101 +15,173 @@ public class MapTexture extends Texture {
 	public int textureRegions;
 	public int textureSize;
 	
-	class Rect {
-		final int x, y, w, h;
-		Rect(int x, int y, int w, int h) {
-			this.x = x;
-			this.y = y;
-			this.w = w;
-			this.h = h;
-		}
-	}
+	public int viewUpdateCount = 0;
+	
+	public int requestedMinX = 0;
+	public int requestedMinZ = 0;
+	public int requestedMaxX = 0;
+	public int requestedMaxZ = 0;
+	public int requestedZoomLevel = 0;
+	public int requestedDimension = 0;
+	
+	public int loadedMinX = 0;
+	public int loadedMinZ = 0;
+	public int loadedMaxX = 0;
+	public int loadedMaxZ = 0;
+	public int loadedZoomLevel = 0;
+	public int loadedDimension = 0;
 	
 	private Region[] regionArray;
-	private ArrayList<Rect> textureUpdateQueue = new ArrayList<Rect>();
+	
+	// accessed from both render and background thread.
+	// make sure all methods using it are synchronized.
+	private int[] regionModifiedArray;
 	
 	public MapTexture(int textureSize, boolean linearScaling) {
 		super(textureSize, textureSize, 0xff000000, GL11.GL_LINEAR, GL11.GL_LINEAR, GL11.GL_REPEAT);
 		
 		this.setLinearScaling(linearScaling);
 		
-		this.textureRegions = textureSize >> Mw.REGION_SHIFT;
+		this.textureRegions = textureSize >> Region.SHIFT;
 		this.textureSize = textureSize;
 		this.regionArray = new Region[this.textureRegions * this.textureRegions];
+		this.regionModifiedArray = new int[this.textureRegions * this.textureRegions];
+		Arrays.fill(this.regionModifiedArray, 0);
+	}
+	
+	public void requestView(MapView view, BackgroundExecutor executor, RegionManager regionManager) {
+		// round to nearest multiple of 512
+		
+		int zoomLevel = view.getRegionZoomLevel();
+		int size = Region.SIZE << zoomLevel;
+		int minX = ((int) view.getMinX()) & (-size);
+		int minZ = ((int) view.getMinZ()) & (-size);
+		int maxX = ((int) view.getMaxX()) & (-size);
+		int maxZ = ((int) view.getMaxZ()) & (-size);
+		int dimension = view.getDimension();
+		if ((this.viewUpdateCount <= 0) ||
+				(minX != this.requestedMinX) ||
+				(minZ != this.requestedMinZ) ||
+				(maxX != this.requestedMaxX) ||
+				(maxZ != this.requestedMaxZ) ||
+				(zoomLevel != this.requestedZoomLevel) ||
+				(dimension != this.requestedDimension)) {
+			this.requestedMinX = minX;
+			this.requestedMinZ = minZ;
+			this.requestedMaxX = maxX;
+			this.requestedMaxZ = maxZ;
+			this.requestedZoomLevel = zoomLevel;
+			this.requestedDimension = dimension;
+			this.viewUpdateCount++;
+			executor.addTask(new MapUpdateViewTask(this, regionManager));
+		}
+	}
+	
+	//
+	// methods below this point run in the background thread
+	//
+	
+	public void updateTextureFromRegion(Region region, int x, int z, int w, int h) {
+		int tx = (x >> region.zoomLevel) & (this.w - 1);
+		int ty = (z >> region.zoomLevel) & (this.h - 1);
+		int tw = (w >> region.zoomLevel);
+		int th = (h >> region.zoomLevel);
+		
+		// make sure we don't write outside texture
+		tw = Math.min(tw, this.w - tx);
+		th = Math.min(th, this.h - th);
+		
+		//MwUtil.log("updateTextureFromRegion: region %s, %d %d %d %d -> %d %d %d %d", region, x, z, w, h, tx, ty, tw, th);
+		
+		int[] pixels = region.getPixels();
+		if (pixels != null) {
+			this.setRGBOpaque(tx, ty, tw, th, pixels, region.getPixelOffset(x, z), Region.SIZE);
+		} else {
+			this.fillRect(tx, ty, tw, th, 0xff000000);
+		}
 	}
 	
 	public int getRegionIndex(int x, int z, int zoomLevel) {
-		x = (x >> (Mw.REGION_SHIFT + zoomLevel)) & (this.textureRegions - 1);
-		z = (z >> (Mw.REGION_SHIFT + zoomLevel)) & (this.textureRegions - 1);
+		x = (x >> (Region.SHIFT + zoomLevel)) & (this.textureRegions - 1);
+		z = (z >> (Region.SHIFT + zoomLevel)) & (this.textureRegions - 1);
 		return (z * this.textureRegions) + x;
 	}
 	
-	public void requestRegion(RegionManager regionManager, int x, int z, int zoomLevel, int dimension) {
+	public boolean loadRegion(RegionManager regionManager, int x, int z, int zoomLevel, int dimension) {
+		//MwUtil.log("mapTexture.loadRegion %d %d %d %d", x, z, zoomLevel, dimension);
+		boolean alreadyLoaded = true;
 		int index = this.getRegionIndex(x, z, zoomLevel);
 		Region currentRegion = this.regionArray[index];
 		if ((currentRegion == null) || (!currentRegion.equals(x, z, zoomLevel, dimension))) {
 			Region newRegion = regionManager.getRegion(x, z, zoomLevel, dimension);
 			this.regionArray[index] = newRegion;
-			this.fillAndUpdateRegionArea(newRegion, 0xff000000);
-			newRegion.addLoadTask(this);
+			this.setRegionModified(index);
+			this.updateTextureFromRegion(newRegion, newRegion.x, newRegion.z, newRegion.size, newRegion.size);
 			//MwUtil.log("regionArray[%d] = %s", newRegion.index, newRegion);
+			alreadyLoaded = false;
 		}
+		return alreadyLoaded;
 	}
 	
-	public boolean isRegionInTexture(Region region) {
-		return region.equals(this.regionArray[this.getRegionIndex(region.x, region.z, region.zoomLevel)]);
+	//public boolean isRegionInTexture(Region region) {
+	//	return region.equals(this.regionArray[this.getRegionIndex(region.x, region.z, region.zoomLevel)]);
+	//}
+	
+	public int loadRegions(RegionManager regionManager, int minX, int minZ, int maxX, int maxZ, int zoomLevel, int dimension) {
+		int size = Region.SIZE << zoomLevel;
+		int loadedCount = 0;
+		for (int z = minZ; z <= maxZ; z += size) {
+			for (int x = minX; x <= maxX; x += size) {
+				if (!this.loadRegion(regionManager, x, z, zoomLevel, dimension)) {
+					loadedCount++;
+				}
+			}
+		}
+		return loadedCount;
 	}
 	
-	public void update(RegionManager regionManager, MapView mapView) {
-		this.processTextureUpdates();
-		
-		int zoomLevel = mapView.getRegionZoomLevel();
-		int x = (int) mapView.getMinX();
-		int z = (int) mapView.getMinZ();
-		int dimension = mapView.getDimension();
-		
-		int rS = Mw.REGION_SIZE << zoomLevel;
-		for (int j = 0; j < this.textureRegions; j++) {
-			for (int i = 0; i < this.textureRegions; i++) {
-				this.requestRegion(regionManager,
-						x + (i << (zoomLevel + Mw.REGION_SHIFT)),
-						z + (j << (zoomLevel + Mw.REGION_SHIFT)),
-						zoomLevel, dimension);
+	public void updateChunk(RegionManager regionManager, MwChunk chunk) {
+		for (int i = 0; i < this.regionArray.length; i++) {
+			Region region = this.regionArray[i];
+			if ((region != null) && (region.isChunkWithin(chunk))) {
+				this.updateTextureFromRegion(region, chunk.x << 4, chunk.z << 4, MwChunk.SIZE, MwChunk.SIZE);
+				this.setRegionModified(i);
 			}
 		}
 	}
 	
-	public boolean rectWithinTexture(int tx, int ty, int tw, int th) {
-		return (tx >= 0) && ((tx + tw) <= this.textureSize) &&
-				(ty >= 0) && ((ty + th) <= this.textureSize);
-	}
+	//public boolean rectWithinTexture(int tx, int ty, int tw, int th) {
+	//	return (tx >= 0) && ((tx + tw) <= this.textureSize) &&
+	//			(ty >= 0) && ((ty + th) <= this.textureSize);
+	//}
 	
-	public void fillAndUpdateRegionArea(Region region, int colour) {
-		int tx = (region.x >> region.zoomLevel) & (this.textureSize - 1);
-		int ty = (region.z >> region.zoomLevel) & (this.textureSize - 1);
-		int tw = (region.size >> region.zoomLevel);
-		int th = (region.size >> region.zoomLevel);
-		this.fillRect(tx, ty, tw, th, colour);
-		this.updateTextureArea(tx, ty, tw, th);
-	}
-	
-	public void updateFromRegion(Region region, int x, int z, int w, int h) {
-		int tx = (x >> region.zoomLevel) & (this.textureSize - 1);
-		int ty = (z >> region.zoomLevel) & (this.textureSize - 1);
-		int tw = (w >> region.zoomLevel);
-		int th = (h >> region.zoomLevel);
-		int[] pixels = region.getPixels();
-		if (pixels != null) {
-			//MwUtil.log("updating maptexture from region %s, %d %d -> %d %d %d %d", region, x, z, tx, ty, tw, th);
-			this.setRGBOpaque(tx, ty, tw, th, pixels, region.getPixelOffset(x, z), Mw.REGION_SIZE);
+	public void setRegionModified(int index) {
+		synchronized (this.regionModifiedArray) {
+			this.regionModifiedArray[index]++;
 		}
-		// not needed if area filled upon region request
-		//else {
-		//	this.fillRect(tx, ty, tw, th, 0xff000000);
-		//}
-		this.addTextureUpdate(tx, ty, tw, th);
 	}
 	
+	public void updateGLTexture() {
+		synchronized (this.regionModifiedArray) {
+			for (int j = 0; j < this.textureRegions; j++) {
+				for (int i = 0; i < this.textureRegions; i++) {
+					int arrayIndex = (j * this.textureRegions) + i;
+					if (this.regionModifiedArray[arrayIndex] > 0) {
+						// update the texture for this region
+						//MwUtil.log("updating GL texture (%d, %d, %d %d)", i * Region.SIZE, j * Region.SIZE, Region.SIZE, Region.SIZE);
+						this.updateTextureArea(
+								i * Region.SIZE,
+								j * Region.SIZE,
+								Region.SIZE,
+								Region.SIZE);
+						this.regionModifiedArray[arrayIndex] = 0;
+					}
+				}
+			}
+		}
+	}
+	
+	/*
 	public void addTextureUpdate(int x, int z, int w, int h) {
 		synchronized (this.textureUpdateQueue) {
 			this.textureUpdateQueue.add(new Rect(x, z, w, h));
@@ -125,4 +199,5 @@ public class MapTexture extends Texture {
 			this.textureUpdateQueue.clear();
 		}
 	}
+	*/
 }

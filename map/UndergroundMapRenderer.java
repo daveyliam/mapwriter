@@ -2,6 +2,7 @@ package mapwriter.map;
 
 import mapwriter.Mw;
 import mapwriter.Render;
+import mapwriter.Texture;
 import mapwriter.map.mapmode.MapMode;
 import net.minecraft.block.Block;
 

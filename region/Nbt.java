@@ -1,5 +1,6 @@
 package mapwriter.region;
 
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -343,6 +344,7 @@ public class Nbt {
 			break;
 			
 		case TAG_COMPOUND:
+			@SuppressWarnings("unchecked")
 			HashMap<String, Nbt> childrenMap = (HashMap<String, Nbt>) this.data;
 			for (Nbt child : childrenMap.values()) {
 				if (child != null) {

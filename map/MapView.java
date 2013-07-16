@@ -3,11 +3,11 @@ package mapwriter.map;
 import java.util.ArrayList;
 
 import mapwriter.Mw;
+import mapwriter.MwUtil;
 import mapwriter.map.mapmode.MapMode;
 
 public class MapView {
 	
-	private double aspect = 1.0;
 	private int zoomLevel = 0;
 	private int dimension = 0;
 	private int textureSize = 2048;
@@ -16,12 +16,24 @@ public class MapView {
 	private double x = 0.0;
 	private double z = 0.0;
 	
-	private int aspectW = 1;
-	private int aspectH = 1;
+	// width and height of map to display in pixels
+	private int mapW = 1;
+	private int mapH = 1;
 	
-	// calculated before every frame drawn by updateView
+	// the width and height of the map in blocks at zoom level 0.
+	// updated when map width, map height, or texture size changes.
+	private int baseW = 1;
+	private int baseH = 1;
+	
+	// the width and height of the map in blocks at the current
+	// zoom level.
 	public double w = 1.0;
 	public double h = 1.0;
+	
+	// the last coordinate the view was updated at.
+	// if the view moves 256 blocks away from this position a texture update is triggered.
+	public int lastUpdateX = 0;
+	public int lastUpdateZ = 0;
 	
 	public void setViewCentre(double vX, double vZ) {
 		this.x = vX;
@@ -51,12 +63,23 @@ public class MapView {
 	}
 	
 	public int setZoomLevel(int zoomLevel) {
+		MwUtil.log("MapView.setZoomLevel(%d)", zoomLevel);
 		int prevZoomLevel = this.zoomLevel;
 		this.zoomLevel = Math.min(Math.max(Mw.minZoom, zoomLevel), Mw.maxZoom);
 		if (prevZoomLevel != this.zoomLevel) {
-			this.update();
+			this.updateZoom();
 		}
 		return this.zoomLevel;
+	}
+	
+	private void updateZoom() {
+		if (this.zoomLevel >= 0) {
+			this.w = this.baseW << this.zoomLevel;
+			this.h = this.baseH << this.zoomLevel;
+		} else {
+			this.w = this.baseW >> (-this.zoomLevel);
+			this.h = this.baseH >> (-this.zoomLevel);
+		}
 	}
 	
 	public int adjustZoomLevel(int n) {
@@ -110,17 +133,16 @@ public class MapView {
 		return this.dimension;
 	}
 	
-	public void setAspect(int w, int h) {
-		this.aspect = (double) w / (double) h;
-		if ((this.aspectW != w) || (this.aspectH != h)) {
-			this.update();
+	public void setMapWH(int w, int h) {
+		if ((this.mapW != w) || (this.mapH != h)) {
+			this.mapW = w;
+			this.mapH = h;
+			this.updateBaseWH();
 		}
-		this.aspectW = w;
-		this.aspectH = h;
 	}
 	
-	public void setAspect(MapMode mapMode) {
-		this.setAspect(mapMode.w, mapMode.h);
+	public void setMapWH(MapMode mapMode) {
+		this.setMapWH(mapMode.wPixels, mapMode.hPixels);
 	}
 	
 	public double getMinX() {
@@ -159,19 +181,28 @@ public class MapView {
 	public void setTextureSize(int n) {
 		if (this.textureSize != n) {
 			this.textureSize = n;
-			this.update();
+			this.updateBaseWH();
 		}
 	}
 	
-	public void update() {
-		double viewSize;
-		if (this.zoomLevel >= 0) {
-			viewSize = (this.textureSize >> 1) << (this.zoomLevel);
-		} else {
-			viewSize = (this.textureSize >> 1) >> (-this.zoomLevel);
+	private void updateBaseWH() {
+		int w = this.mapW;
+		int h = this.mapH;
+		int halfTextureSize = this.textureSize / 2;
+		
+		// if we cannot display the map at 1x1 pixel per block, then
+		// try 2x2 pixels per block, then 4x4 and so on
+		while ((w > halfTextureSize) ||  (h > halfTextureSize)) {
+			w /= 2;
+			h /= 2;
 		}
-		this.w = (this.aspect < 1.0) ? viewSize * this.aspect : viewSize;
-		this.h = (this.aspect > 1.0) ? viewSize / this.aspect : viewSize;
+		
+		MwUtil.log("MapView.updateBaseWH: map = %dx%d, tsize = %d, base = %dx%d", this.mapW, this.mapH, this.textureSize, w, h);
+		
+		this.baseW = w;
+		this.baseH = h;
+		
+		this.updateZoom();
 	}
 	
 	public boolean isBlockWithinView(double bX, double bZ, boolean circular) {

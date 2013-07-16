@@ -2,17 +2,11 @@ package mapwriter.region;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
 
-import mapwriter.Mw;
-import mapwriter.MwUtil;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
-import net.minecraft.world.chunk.storage.RegionFile;
-import net.minecraft.world.chunk.storage.RegionFileCache;
-
 public class MwChunk {
+	public static final int SIZE = 16;
+	
 	public final int x;
 	public final int z;
 	public final int dimension;
@@ -48,35 +42,25 @@ public class MwChunk {
 		return String.format("(%d, %d) dim%d", this.x, this.z, this.dimension);
 	}
 	
-	public static File getRegionFileName(int x, int z, int dimension, File worldDir) {
-		File dimensionDir = MwUtil.getDimensionDir(worldDir, dimension);
-		File regionDir = new File(dimensionDir, "region");
-        return new File(regionDir, "r." + (x >> 5) + "." + (z >> 5) + ".mca");
-	}
-	
-	public static boolean regionFileExists(int x, int z, int dimension, File worldDir) {
-		return getRegionFileName(x, z, dimension, worldDir).isFile();
-	}
-	
 	// load from anvil file
-	public static MwChunk read(int x, int z, int dimension, File worldDir) {
+	public static MwChunk read(int x, int z, int dimension, RegionFile regionFile) {
 		
-		boolean error = true;
 		byte[] biomeArray = null;
 		byte[][] msbArray = new byte[16][];
 		byte[][] lsbArray = new byte[16][];
 		byte[][] metaArray = new byte[16][];
 		
-		File dimensionDir = MwUtil.getDimensionDir(worldDir, dimension);
-		//MwUtil.log("MwChunk.read: (%d, %d)", this.x, this.z);
-		//File regionDir = new File(dimensionDir, "region");
-        File regionFileName = getRegionFileName(x, z, dimension, worldDir);
         DataInputStream dis = null;
-        if (regionFileName.isFile()) {
-        	RegionFile regionFile = RegionFileCache.createOrLoadRegionFile(dimensionDir, x, z);
-        	dis = regionFile.getChunkDataInputStream(x & 31, z & 31);
+        if (!regionFile.isOpen()) {
+        	if (regionFile.exists()) {
+        		regionFile.open();
+        	}
         }
 		
+        if (regionFile.isOpen()) {
+        	dis = regionFile.getChunkDataInputStream(x & 31, z & 31);
+        }
+        
 		if (dis != null) {
 			try {
 				
@@ -109,8 +93,8 @@ public class MwChunk {
 				
 				int xNbt = level.getChild("xPos").getInt();
 				int zNbt = level.getChild("zPos").getInt();
-				if ((xNbt != x) || (zNbt != z)) {
-					MwUtil.log("warning: chunk (%d, %d) has NBT coords (%d, %d)", x, z, xNbt, zNbt);
+				if (((xNbt & 31) != x) || ((zNbt & 31) != z)) {
+					RegionManager.logWarning("chunk (%d, %d) has NBT coords (%d, %d)", x, z, xNbt & 31, zNbt & 31);
 				}
 				
 				Nbt sections = level.getChild("Sections");
@@ -127,44 +111,20 @@ public class MwChunk {
 				}
 				biomeArray = level.getChild("Biomes").getByteArray();
 				
-				error = false;
-				
 			} catch (IOException e) {
-				MwUtil.log("%s: could not read chunk (%d, %d) from region file\n", e, x, z);
-				error = true;
+				RegionManager.logError("%s: could not read chunk (%d, %d) from region file\n", e, x, z);
 			} finally {
 				try { dis.close(); }
 				catch (IOException e) {
-					MwUtil.log("MwChunk.read: %s while closing input stream", e);
+					RegionManager.logError("MwChunk.read: %s while closing input stream", e);
 				}
 			}
-			//MwUtil.log("MwChunk.read: chunk (%d, %d) empty=%b", this.x, this.z, empty);
+			//this.log("MwChunk.read: chunk (%d, %d) empty=%b", this.x, this.z, empty);
 		} else {
-			//MwUtil.log("MwChunk.read: chunk (%d, %d) input stream is null", this.x, this.z); 
+			//this.log("MwChunk.read: chunk (%d, %d) input stream is null", this.x, this.z); 
 		}
+		
 		return new MwChunk(x, z, dimension, msbArray, lsbArray, metaArray, biomeArray, null);
-	}
-	
-	// create from Minecraft chunk
-	public static MwChunk copyFromChunk(Chunk chunk) {
-		byte[][] msbArray = new byte[16][];
-		byte[][] lsbArray = new byte[16][];
-		byte[][] metaArray = new byte[16][];
-		
-		ExtendedBlockStorage[] storageArrays = chunk.getBlockStorageArray();
-		if (storageArrays != null) {
-			for (ExtendedBlockStorage storage : storageArrays) {
-				if (storage != null) {
-					int y = (storage.getYLocation() >> 4) & 0xf;
-					lsbArray[y] = storage.getBlockLSBArray();
-					msbArray[y] = (storage.getBlockMSBArray() != null) ? storage.getBlockMSBArray().data : null;
-					metaArray[y] = (storage.getMetadataArray() != null) ? storage.getMetadataArray().data : null;
-				}
-			}
-		}
-		
-		return new MwChunk(chunk.xPosition, chunk.zPosition, chunk.worldObj.provider.dimensionId,
-				msbArray, lsbArray, metaArray, chunk.getBiomeArray(), chunk.heightMap);
 	}
 	
 	private int[] genHeightMap() {
@@ -208,11 +168,11 @@ public class MwChunk {
 				((msb & 0x0f) << 12) | ((lsb & 0xff) << 4) | (meta & 0x0f);
 	}
 	
-	public int getCheckSum() {
+	/*public int getCheckSum() {
 		// start checksum with x and z coordinates
 		int sum = ((this.z & 0xffff) << 16) | (this.x & 0xffff);
-		for (int z = 0; z < Mw.CHUNK_SIZE; z++) {
-			for (int x = 0; x < Mw.CHUNK_SIZE; x++) {
+		for (int z = 0; z < MwChunk.SIZE; z++) {
+			for (int x = 0; x < MwChunk.SIZE; x++) {
 				// get the uppermost non air block in the chunk column.
 				// won't work well for dimensions with a ceiling.
 				int y = this.getHeight(x, z);
@@ -225,7 +185,7 @@ public class MwChunk {
 			}
 		}
 		return sum;
-	}
+	}*/
 	
 	public Nbt getNbt() {
 		Nbt sections = new Nbt(Nbt.TAG_LIST, "Sections", null);
@@ -263,28 +223,32 @@ public class MwChunk {
 		return root;
 	}
 	
-	public synchronized boolean write(File worldDir) {
+	public synchronized boolean write(RegionFile regionFile) {
 		boolean error = false;
-		File dimensionDir = MwUtil.getDimensionDir(worldDir, this.dimension);
-		RegionFile regionFile = RegionFileCache.createOrLoadRegionFile(dimensionDir, this.x, this.z);
-		DataOutputStream dos = regionFile.getChunkDataOutputStream(this.x & 31, this.z & 31);
-		
-		if (dos != null) {
-			Nbt chunkNbt = this.getNbt();
-			try {
-				//MwUtil.log("writing chunk (%d, %d) to region file", this.x, this.z);
-				chunkNbt.writeElement(dos);
-			} catch (IOException e) {
-				MwUtil.log("%s: could not write chunk (%d, %d) to region file", e, this.x, this.z);
-				error = true;
-			} finally {
-				try { dos.close(); }
-				catch (IOException e) {
-					MwUtil.log("MwChunk.write: %s while closing output stream", e);
+		if (!regionFile.isOpen()) {
+        	error = regionFile.open();
+        }
+		if (!error) {
+			DataOutputStream dos = regionFile.getChunkDataOutputStream(this.x & 31, this.z & 31);
+			if (dos != null) {
+				Nbt chunkNbt = this.getNbt();
+				try {
+					//RegionManager.logInfo("writing chunk (%d, %d) to region file", this.x, this.z);
+					chunkNbt.writeElement(dos);
+				} catch (IOException e) {
+					RegionManager.logError("%s: could not write chunk (%d, %d) to region file", e, this.x, this.z);
+					error = true;
+				} finally {
+					try { dos.close(); }
+					catch (IOException e) {
+						RegionManager.logError("%s while closing chunk data output stream", e);
+					}
 				}
+			} else {
+				RegionManager.logError("error: could not get output stream for chunk (%d, %d)", this.x, this.z);
 			}
 		} else {
-			MwUtil.log("error: could not get output stream for chunk (%d, %d)", this.x, this.z);
+			RegionManager.logError("error: could not open region file for chunk (%d, %d)", this.x, this.z);
 		}
 		
 		return error;

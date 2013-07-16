@@ -118,6 +118,10 @@ public class Render {
 		return GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT);
 	}
 	
+	public static int getBoundTextureId() {
+		return GL11.glGetInteger(GL11.GL_TEXTURE_BINDING_2D);
+	}
+	
 	public static void printBoundTextureInfo(int texture) {
 		int w = getTextureWidth();
 		int h = getTextureHeight();
@@ -255,7 +259,7 @@ public class Render {
 	
 	public static void drawString(int x, int y, int colour, String formatString, Object...args) {
 		Minecraft mc = Minecraft.getMinecraft();
-		mc.renderEngine.resetBoundTexture();
+		//mc.renderEngine.resetBoundTexture();
 		FontRenderer fr = mc.fontRenderer;
 		String s = String.format(formatString, args);
 		fr.drawStringWithShadow(s, x, y, colour);
@@ -263,7 +267,7 @@ public class Render {
 	
 	public static void drawCentredString(int x, int y, int colour, String formatString, Object...args) {
 		Minecraft mc = Minecraft.getMinecraft();
-		mc.renderEngine.resetBoundTexture();
+		//mc.renderEngine.resetBoundTexture();
 		FontRenderer fr = mc.fontRenderer;
 		String s = String.format(formatString, args);
 		int w = fr.getStringWidth(s);

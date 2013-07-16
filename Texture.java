@@ -1,19 +1,16 @@
-package mapwriter.map;
+package mapwriter;
 
 import java.nio.IntBuffer;
-
-import mapwriter.MwUtil;
-import mapwriter.Render;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
 public class Texture {
 	
-	int id;
-	final int w;
-	final int h;
-	final IntBuffer pixelBuf;
+	private int id;
+	public final int w;
+	public final int h;
+	private final IntBuffer pixelBuf;
 	
 	// allocate new texture and fill from IntBuffer
 	public Texture(int w, int h, int fillColour, int minFilter, int maxFilter, int textureWrap) {
