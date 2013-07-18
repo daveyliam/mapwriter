@@ -543,6 +543,25 @@ public class Mw {
 				// open map gui
 				this.mc.displayGuiScreen(new MwGui(this));
 			
+			} else if (kb == MwKeyHandler.keyNewMarker) {
+				// open new marker dialog
+				String group = this.markerManager.getVisibleGroupName();
+        		if (group.equals("none")) {
+        			group = "group";
+        		}
+				this.mc.displayGuiScreen(
+					new MwGuiMarkerDialog(
+						null,
+						this.markerManager,
+						"",
+						group,
+						this.playerXInt,
+						this.playerYInt,
+						this.playerZInt,
+						this.playerDimension
+					)
+				);
+			
 			} else if (kb == MwKeyHandler.keyNextGroup) {
 				// toggle marker mode
 				this.markerManager.nextGroup();

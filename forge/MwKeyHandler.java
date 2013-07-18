@@ -15,6 +15,7 @@ public class MwKeyHandler extends KeyHandler {
 	private Mw mw;
 	
 	public static KeyBinding keyMapGui = new KeyBinding("Open Map GUI", Keyboard.KEY_M);
+	public static KeyBinding keyNewMarker = new KeyBinding("New Marker", Keyboard.KEY_INSERT);
 	public static KeyBinding keyMapMode = new KeyBinding("Next Map Mode", Keyboard.KEY_N);
 	public static KeyBinding keyNextGroup = new KeyBinding("Next Marker Group", Keyboard.KEY_COMMA);
 	public static KeyBinding keyTeleport = new KeyBinding("Teleport to Marker", Keyboard.KEY_PERIOD);
@@ -22,9 +23,9 @@ public class MwKeyHandler extends KeyHandler {
 	public static KeyBinding keyZoomOut = new KeyBinding("Map Zoom Out", Keyboard.KEY_NEXT);
 	
 	private static KeyBinding[] keyBindings = new KeyBinding[] {
-		keyMapGui, keyMapMode, keyNextGroup, keyTeleport, keyZoomIn, keyZoomOut};
+		keyMapGui, keyNewMarker, keyMapMode, keyNextGroup, keyTeleport, keyZoomIn, keyZoomOut};
 	private static boolean[] keyBooleans = new boolean[] {
-		false, false, false, false, false, false};
+		false, false, false, false, false, false, false};
 	
 	public MwKeyHandler(Mw mw) {
 		super(keyBindings, keyBooleans);

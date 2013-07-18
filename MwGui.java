@@ -6,7 +6,6 @@ import java.io.File;
 import mapwriter.forge.MwKeyHandler;
 import mapwriter.map.MapView;
 import mapwriter.map.Marker;
-import mapwriter.map.MarkerManager;
 import mapwriter.map.StandardMapRenderer;
 import mapwriter.map.mapmode.FullScreenMapMode;
 import mapwriter.map.mapmode.MapMode;
@@ -25,9 +24,7 @@ public class MwGui extends GuiScreen {
     private MapMode mapMode;
     private MapView mapView;
     private StandardMapRenderer map;
-    
-    private TextDialog currentTextDialog = null;
-    
+        
     private static final int menuY = 5;
     private static final int menuX = 5;
     
@@ -74,140 +71,6 @@ public class MwGui extends GuiScreen {
     	}
     }
     
-    class MarkerTextDialog extends TextDialog {
-    	private final MarkerManager markerManager;
-    	private Marker editingMarker;
-    	private String markerName = "name";
-        private String markerGroup = "group";
-        private int markerX = 0;
-        private int markerY = 80;
-        private int markerZ = 0;
-        private int state = 0;
-        
-    	public MarkerTextDialog(MarkerManager markerManager, String markerName, String markerGroup, int x, int y, int z) {
-    		super(MwGui.this.width, MwGui.this.height, MwGui.this.fontRenderer,
-    				"Marker Name:", markerName, "marker must have a name");
-    		this.markerManager = markerManager;
-    		this.markerName = markerName;
-    		this.markerGroup = markerGroup;
-    		this.markerX = x;
-    		this.markerY = y;
-    		this.markerZ = z;
-    		this.editingMarker = null;
-    	}
-    	
-    	public MarkerTextDialog(MarkerManager markerManager, Marker editingMarker) {
-    		super(MwGui.this.width, MwGui.this.height, MwGui.this.fontRenderer,
-    				"Edit Marker Name:", editingMarker.name, "marker must have a name");
-    		this.markerManager = markerManager;
-    		this.editingMarker = editingMarker;
-    		this.markerName = editingMarker.name;
-    		this.markerGroup = editingMarker.groupName;
-    		this.markerX = editingMarker.x;
-    		this.markerY = editingMarker.y;
-    		this.markerZ = editingMarker.z;
-    	}
-    	
-    	@Override
-    	public void submit() {
-    		switch(this.state) {
-    		case 0:
-    			this.markerName = this.getInputAsString();
-    			if (this.inputValid) {
-    				this.title = "Marker Group:";
-    				this.setText(this.markerGroup);
-    				this.error = "marker must have a group name";
-    				this.state++;
-    			}
-    			break;
-    		case 1:
-    			this.markerGroup = this.getInputAsString();
-    			if (this.inputValid) {
-    				this.title = "Marker X:";
-    				this.setText("" + this.markerX);
-    				this.error = "invalid value";
-    				this.state++;
-    			}
-    			break;
-    		case 2:
-    			this.markerX = this.getInputAsInt();
-    			if (this.inputValid) {
-    				this.title = "Marker Y:";
-    				this.setText("" + this.markerY);
-    				this.error = "invalid value";
-    				this.state++;
-    			}
-    			break;
-    		case 3:
-    			this.markerY = this.getInputAsInt();
-    			if (this.inputValid) {
-    				this.title = "Marker Z:";
-    				this.setText("" + this.markerZ);
-    				this.error = "invalid value";
-    				this.state++;
-    			}
-    			break;
-    		case 4:
-    			this.markerZ = this.getInputAsInt();
-    			if (this.inputValid) {
-    				this.closed = true;
-    				int colour = Marker.getCurrentColour();
-    	    		if (this.editingMarker != null) {
-    	    			colour = this.editingMarker.colour;
-    	    			this.markerManager.delMarker(this.editingMarker);
-    	    			this.editingMarker = null;
-    	    		}
-    	    		this.markerManager.addMarker(this.markerName, this.markerGroup,
-    						this.markerX, this.markerY, this.markerZ,
-    						MwGui.this.mapView.getDimension(), colour);
-    				this.markerManager.setVisibleGroupName(this.markerGroup);
-    				this.markerManager.update();
-    			}
-    			break;
-    		}
-    	}
-    }
-    
-    class TeleportTextDialog extends TextDialog {
-    	int teleportX, teleportZ;
-    	
-    	public TeleportTextDialog(int x, int y, int z) {
-    		super(MwGui.this.width, MwGui.this.height, MwGui.this.fontRenderer,
-    				"Teleport Height:", "" + y, "invalid height");
-    		this.teleportX = x;
-    		this.teleportZ = z;
-    	}
-    	
-    	public void submit() {
-    		int height = this.getInputAsInt();
-    		if (this.inputValid) {
-	    		height = Math.min(Math.max(0, height), 255);
-	    		MwGui.this.mw.defaultTeleportHeight = height;
-	    		this.closed = true;
-	    		MwGui.this.mw.teleportToMapPos(MwGui.this.mapView, this.teleportX, height, this.teleportZ);
-	    		MwGui.this.exitGui();
-    		}
-    	}
-    }
-    
-    class DimensionTextDialog extends TextDialog {
-    	public DimensionTextDialog(int dimension) {
-    		super(MwGui.this.width, MwGui.this.height, MwGui.this.fontRenderer,
-    				"Set dimension to:", "" + dimension, "invalid dimension");
-    	}
-    	
-    	public void submit() {
-    		int dimension = this.getInputAsInt();
-    		if (this.inputValid) {
-	    		this.closed = true;
-	    		MwGui.this.mapView.setDimension(dimension);
-	    		MwGui.this.mw.overlayManager.overlayView.setDimension(dimension);
-	    		MwGui.this.mw.addDimension(dimension);
-    		}
-    	}
-    }
-    
-    
     public MwGui(Mw mw) {
     	this.mw = mw;
     	this.mapMode = new FullScreenMapMode(mw.config);
@@ -227,9 +90,6 @@ public class MwGui extends GuiScreen {
     // called when gui is displayed and every time the screen
     // is resized
     public void initGui() {
-		if (this.currentTextDialog != null) {
-			this.currentTextDialog.update(this.width, this.height, this.fontRenderer);
-		}
     }
 
     // called when a button is pressed
@@ -322,105 +182,109 @@ public class MwGui extends GuiScreen {
     // key is the lwjgl key code.
     protected void keyTyped(char c, int key) {
     	//MwUtil.log("MwGui.keyTyped(%c, %d)", c, key);
-    	if (this.currentTextDialog == null) {
-    		// normal state
-    		switch(key) {
-    		case Keyboard.KEY_ESCAPE:
-    			this.exitGui();
-    			break;
-    			
-    		case Keyboard.KEY_DELETE:
-	        	this.deleteSelectedMarker();	        	
-	        	break;
-	        	
-    		case Keyboard.KEY_SPACE:
-	        	// next marker group
-	        	this.mw.markerManager.nextGroup();
+		switch(key) {
+		case Keyboard.KEY_ESCAPE:
+			this.exitGui();
+			break;
+			
+		case Keyboard.KEY_DELETE:
+        	this.deleteSelectedMarker();	        	
+        	break;
+        	
+		case Keyboard.KEY_SPACE:
+        	// next marker group
+        	this.mw.markerManager.nextGroup();
+        	this.mw.markerManager.update();
+        	break;
+        	
+		case Keyboard.KEY_C:
+        	// cycle selected marker colour
+        	if (this.mw.markerManager.selectedMarker != null) {
+        		this.mw.markerManager.selectedMarker.colourNext();
+        	}
+        	break;
+        
+		case Keyboard.KEY_N:
+        	// select next visible marker
+        	this.mw.markerManager.selectNextMarker();
+        	break;
+        	
+		case Keyboard.KEY_HOME:
+        	// centre map on player
+        	this.mapView.setViewCentreScaled(this.mw.playerX, this.mw.playerZ, this.mw.playerDimension);
+        	break;
+        
+		case Keyboard.KEY_END:
+        	// centre map on selected marker
+        	if (this.mw.markerManager.selectedMarker != null) {
+        		this.mapView.setViewCentreScaled(
+        			this.mw.markerManager.selectedMarker.x,
+        			this.mw.markerManager.selectedMarker.z,
+        			0
+        		);
+        	}
+        	break;
+        	
+		case Keyboard.KEY_P:
+        	this.mergeMapViewToImage();
+			this.exitGui();
+			break;
+			
+		case Keyboard.KEY_T:
+        	if (this.mw.markerManager.selectedMarker != null) {
+        		this.mw.teleportToMarker(this.mw.markerManager.selectedMarker);
+        		this.exitGui();
+        	} else {
+        		this.mc.displayGuiScreen(
+        			new MwGuiTeleportDialog(
+        				this,
+        				this.mw,
+        				this.mapView,
+        				this.mouseBlockX,
+        				this.mw.defaultTeleportHeight,
+        				this.mouseBlockZ
+        			)
+        		);
+        	}
+        	break;
+		
+		case Keyboard.KEY_LEFT:
+			this.mapView.panView(-Mw.PAN_FACTOR, 0);
+			break;
+		case Keyboard.KEY_RIGHT:
+			this.mapView.panView(Mw.PAN_FACTOR, 0);
+			break;
+		case Keyboard.KEY_UP:
+			this.mapView.panView(0, -Mw.PAN_FACTOR);
+			break;
+		case Keyboard.KEY_DOWN:
+			this.mapView.panView(0, Mw.PAN_FACTOR);
+			break;
+		
+		case Keyboard.KEY_R:
+			this.regenerateView();
+			this.exitGui();
+			break;
+			
+		//case Keyboard.KEY_9:
+		//	MwUtil.log("refreshing maptexture");
+		//	this.mw.mapTexture.updateTexture();
+		//	break;
+		
+		default:
+			if (key == MwKeyHandler.keyMapGui.keyCode) {
+				// exit on the next tick
+    			this.exit = 1;
+    		} else if (key == MwKeyHandler.keyZoomIn.keyCode) {
+    			this.mapView.adjustZoomLevel(-1);
+    		} else if (key == MwKeyHandler.keyZoomOut.keyCode) {
+    			this.mapView.adjustZoomLevel(1);
+    		} else if (key == MwKeyHandler.keyNextGroup.keyCode) {
+    			this.mw.markerManager.nextGroup();
 	        	this.mw.markerManager.update();
-	        	break;
-	        	
-    		case Keyboard.KEY_C:
-	        	// cycle selected marker colour
-	        	if (this.mw.markerManager.selectedMarker != null) {
-	        		this.mw.markerManager.selectedMarker.colourNext();
-	        	}
-	        	break;
-	        
-    		case Keyboard.KEY_N:
-	        	// select next visible marker
-	        	this.mw.markerManager.selectNextMarker();
-	        	break;
-	        	
-    		case Keyboard.KEY_HOME:
-	        	// centre map on player
-	        	this.mapView.setViewCentreScaled(this.mw.playerX, this.mw.playerZ, this.mw.playerDimension);
-	        	break;
-	        
-    		case Keyboard.KEY_END:
-	        	// centre map on selected marker
-	        	if (this.mw.markerManager.selectedMarker != null) {
-	        		this.mapView.setViewCentreScaled(
-	        				this.mw.markerManager.selectedMarker.x,
-	        				this.mw.markerManager.selectedMarker.z,
-	        				0);
-	        	}
-	        	break;
-	        	
-    		case Keyboard.KEY_P:
-	        	this.mergeMapViewToImage();
-				this.exitGui();
-				break;
-				
-    		case Keyboard.KEY_T:
-	        	if (this.mw.markerManager.selectedMarker != null) {
-	        		this.mw.teleportToMarker(this.mw.markerManager.selectedMarker);
-	        		this.exitGui();
-	        	} else {
-	        		this.currentTextDialog = new TeleportTextDialog(this.mouseBlockX, this.mw.defaultTeleportHeight, this.mouseBlockZ);
-	        	}
-	        	break;
-    		
-    		case Keyboard.KEY_LEFT:
-    			this.mapView.panView(-Mw.PAN_FACTOR, 0);
-    			break;
-    		case Keyboard.KEY_RIGHT:
-    			this.mapView.panView(Mw.PAN_FACTOR, 0);
-    			break;
-    		case Keyboard.KEY_UP:
-    			this.mapView.panView(0, -Mw.PAN_FACTOR);
-    			break;
-    		case Keyboard.KEY_DOWN:
-    			this.mapView.panView(0, Mw.PAN_FACTOR);
-    			break;
-    		
-    		case Keyboard.KEY_R:
-    			this.regenerateView();
-    			this.exitGui();
-    			break;
-    			
-    		//case Keyboard.KEY_9:
-    		//	MwUtil.log("refreshing maptexture");
-    		//	this.mw.mapTexture.updateTexture();
-    		//	break;
-    		
-    		default:
-    			if (key == MwKeyHandler.keyMapGui.keyCode) {
-    				// exit on the next tick
-        			this.exit = 1;
-        		} else if (key == MwKeyHandler.keyZoomIn.keyCode) {
-        			this.mapView.adjustZoomLevel(-1);
-        		} else if (key == MwKeyHandler.keyZoomOut.keyCode) {
-        			this.mapView.adjustZoomLevel(1);
-        		} else if (key == MwKeyHandler.keyNextGroup.keyCode) {
-        			this.mw.markerManager.nextGroup();
-    	        	this.mw.markerManager.update();
-        		}
-    			break;
-	        }
-    	} else {
-    		// currently in text dialog
-    		this.currentTextDialog.keyTyped(c, key);
-    	}
+    		}
+			break;
+        }
     }
     
     // override GuiScreen's handleMouseInput to process
@@ -449,11 +313,16 @@ public class MwGui extends GuiScreen {
     	
     	if (button == 0) {
     		if (this.dimensionLabel.posWithin(x, y)) {
-    			if (this.currentTextDialog == null) {
-    				this.currentTextDialog = new DimensionTextDialog(this.mapView.getDimension());
-    			}
+    			this.mc.displayGuiScreen(
+        			new MwGuiDimensionDialog(
+        				this,
+        				this.mw,
+        				this.mapView,
+        				this.mapView.getDimension()
+        			)
+        		);
     		} else if (this.optionsLabel.posWithin(x, y)) {
-    			this.mc.displayGuiScreen(new MwGuiOptions(this.mw, this));
+    			this.mc.displayGuiScreen(new MwGuiOptions(this, this.mw));
     		} else {
 	    		this.mouseLeftHeld = 1;
 	    		this.mouseLeftDragStartX = x;
@@ -471,35 +340,47 @@ public class MwGui extends GuiScreen {
     		
     	} else if (button == 1) {
     		//this.mouseRightHeld = 1;
-    		if (this.currentTextDialog == null) {
-    			if ((marker != null) && (prevMarker == marker)) {
-        			// right clicked previously selected marker.
-        			// edit the marker
-        			this.currentTextDialog = new MarkerTextDialog(this.mw.markerManager, marker);
-        			
-        		} else if (marker == null) {
-        			// open new marker dialog
-        			String group = this.mw.markerManager.getVisibleGroupName();
-            		if (group.equals("none")) {
-            			group = "group";
-            		}
-            		
-            		int mx, my, mz;
-            		if (this.isPlayerNearScreenPos(x, y)) {
-            			// marker at player's locations
-            			mx = this.mw.playerXInt;
-            			my = this.mw.playerYInt;
-            			mz = this.mw.playerZInt;
-            		
-            		} else {
-            			// marker at mouse pointer location
-            			mx = this.mouseBlockX;
-            			my = (this.mouseBlockY > 0) ? this.mouseBlockY : this.mw.defaultTeleportHeight;
-            			mz = this.mouseBlockZ;
-            		}
-        			this.currentTextDialog = new MarkerTextDialog(this.mw.markerManager, "", group,
-        					mx, my, mz);
+			if ((marker != null) && (prevMarker == marker)) {
+    			// right clicked previously selected marker.
+    			// edit the marker
+				this.mc.displayGuiScreen(
+        			new MwGuiMarkerDialog(
+        				this,
+        				this.mw.markerManager,
+        				marker
+        			)
+        		);
+    			
+    		} else if (marker == null) {
+    			// open new marker dialog
+    			String group = this.mw.markerManager.getVisibleGroupName();
+        		if (group.equals("none")) {
+        			group = "group";
         		}
+        		
+        		int mx, my, mz;
+        		if (this.isPlayerNearScreenPos(x, y)) {
+        			// marker at player's locations
+        			mx = this.mw.playerXInt;
+        			my = this.mw.playerYInt;
+        			mz = this.mw.playerZInt;
+        		
+        		} else {
+        			// marker at mouse pointer location
+        			mx = this.mouseBlockX;
+        			my = (this.mouseBlockY > 0) ? this.mouseBlockY : this.mw.defaultTeleportHeight;
+        			mz = this.mouseBlockZ;
+        		}
+        		this.mc.displayGuiScreen(
+        			new MwGuiMarkerDialog(
+        				this,
+        				this.mw.markerManager,
+        				"",
+        				group,
+        				mx, my, mz,
+        				this.mapView.getDimension()
+        			)
+        		);
     		}
     	}
     	this.viewXStart = this.mapView.getX();
@@ -698,15 +579,6 @@ public class MwGui extends GuiScreen {
         // help message on mouse over
 		if (this.helpLabel.posWithin(mouseX, mouseY)) {
 		    this.drawHelp();
-		}
-        
-        // draw text dialog
-		if (this.currentTextDialog != null) {
-			if (!this.currentTextDialog.closed) {
-				this.currentTextDialog.draw();
-			} else {
-				this.currentTextDialog = null;
-			}
 		}
         
         super.drawScreen(mouseX, mouseY, f);
