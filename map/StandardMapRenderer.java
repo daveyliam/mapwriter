@@ -32,6 +32,10 @@ public class StandardMapRenderer implements MapRenderer {
 	
 	public void draw() {
 		int regionZoomLevel = Math.max(0, this.mapView.getZoomLevel());
+		int dimension = this.mapView.getDimension();
+		
+		boolean drawTexture = ((regionZoomLevel == this.mw.mapTexture.loadedZoomLevel) && (dimension == this.mw.mapTexture.loadedDimension));
+		
 		double tSize = (double) (this.mw.mapTexture.textureSize << regionZoomLevel);
 		
 		double u = (this.mapView.getMinX() % tSize) / tSize;
@@ -49,10 +53,15 @@ public class StandardMapRenderer implements MapRenderer {
 			Render.setCircularStencil(0, 0, this.mapMode.h / 2.0);
 		}
 		
-		Render.setColourWithAlphaPercent(0xffffff, this.mapMode.alphaPercent);
-		this.mw.mapTexture.bind();
-		Render.drawTexturedRect(this.mapMode.x, this.mapMode.y, this.mapMode.w, this.mapMode.h,
-				u, v, u + w, v + h);
+		if (drawTexture) {
+			Render.setColourWithAlphaPercent(0xffffff, this.mapMode.alphaPercent);
+			this.mw.mapTexture.bind();
+			Render.drawTexturedRect(this.mapMode.x, this.mapMode.y, this.mapMode.w, this.mapMode.h,
+					u, v, u + w, v + h);
+		} else {
+			Render.setColourWithAlphaPercent(0x000000, this.mapMode.alphaPercent);
+			Render.drawRect(this.mapMode.x, this.mapMode.y, this.mapMode.w, this.mapMode.h);
+		}
 		
 		if (this.mapMode.circular) {
 			Render.disableStencil();

@@ -1,6 +1,5 @@
 package mapwriter.map;
 
-import mapwriter.MwUtil;
 import mapwriter.Task;
 import mapwriter.region.MwChunk;
 import mapwriter.region.RegionManager;
@@ -50,6 +49,6 @@ public class MapUpdateViewTask extends Task {
 		// update GL texture of mapTexture if updated
 		this.mapTexture.updateGLTexture();
 		
-		MwUtil.log("MapUpdateViewTask: loaded %d regions", this.loadedCount);
+		//MwUtil.log("MapUpdateViewTask: loaded %d regions", this.loadedCount);
 	}
 }

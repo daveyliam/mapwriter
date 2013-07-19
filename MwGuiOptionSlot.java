@@ -1,19 +1,15 @@
 package mapwriter;
 
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSlot;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.ResourceLocation;
 
 public class MwGuiOptionSlot extends GuiSlot {
 	
-	private GuiScreen parentScreen;
+	//private GuiScreen parentScreen;
 	private Minecraft mc;
 	private Mw mw;
 	
@@ -49,7 +45,7 @@ public class MwGuiOptionSlot extends GuiSlot {
 	public MwGuiOptionSlot(GuiScreen parentScreen, Minecraft mc, Mw mw) {
 		// GuiSlot(minecraft, width, height, top, bottom, slotHeight)
 		super(mc, parentScreen.width, parentScreen.height, 16, parentScreen.height - 32, 25);
-		this.parentScreen = parentScreen;
+		//this.parentScreen = parentScreen;
 		this.mw = mw;
 		this.mc = mc;
 		for (int i = 0; i < this.buttons.length; i++) {

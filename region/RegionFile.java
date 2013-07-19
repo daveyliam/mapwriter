@@ -208,7 +208,7 @@ public class RegionFile {
 				}
 			}
 			
-			this.printInfo();
+			//this.printInfo();
 			
 		} catch (Exception e) {
 			this.fin = null;

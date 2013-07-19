@@ -3,7 +3,6 @@ package mapwriter.map;
 import java.util.ArrayList;
 
 import mapwriter.Mw;
-import mapwriter.MwUtil;
 import mapwriter.map.mapmode.MapMode;
 
 public class MapView {
@@ -65,7 +64,7 @@ public class MapView {
 	}
 	
 	public int setZoomLevel(int zoomLevel) {
-		MwUtil.log("MapView.setZoomLevel(%d)", zoomLevel);
+		//MwUtil.log("MapView.setZoomLevel(%d)", zoomLevel);
 		int prevZoomLevel = this.zoomLevel;
 		this.zoomLevel = Math.min(Math.max(Mw.minZoom, zoomLevel), Mw.maxZoom);
 		if (prevZoomLevel != this.zoomLevel) {
@@ -203,7 +202,7 @@ public class MapView {
 			h /= 2;
 		}
 		
-		MwUtil.log("MapView.updateBaseWH: map = %dx%d, tsize = %d, base = %dx%d", this.mapW, this.mapH, this.textureSize, w, h);
+		//MwUtil.log("MapView.updateBaseWH: map = %dx%d, tsize = %d, base = %dx%d", this.mapW, this.mapH, this.textureSize, w, h);
 		
 		this.baseW = w;
 		this.baseH = h;

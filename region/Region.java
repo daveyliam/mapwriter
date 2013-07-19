@@ -65,7 +65,7 @@ public class Region {
 	}
 	
 	public void close() {
-		RegionManager.logInfo("closing region %s", this);
+		//RegionManager.logInfo("closing region %s", this);
 		if (this.needsSaving()) {
 			this.saveToImage();
 		}
@@ -334,7 +334,7 @@ public class Region {
 		if (!this.cannotLoad) {
 			this.updateCount = 0;
 			
-			RegionManager.logInfo("loading region %s", this);
+			//RegionManager.logInfo("loading region %s", this);
 			if (this.zoomLevel == 0) {
 				this.loadFromRegionFile();
 			} else {
