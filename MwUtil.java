@@ -4,12 +4,15 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
+import java.util.regex.Pattern;
 
 import mapwriter.forge.MwForge;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 
 public class MwUtil {
+	
+	public final static Pattern patternInvalidChars = Pattern.compile("[^a-zA-Z0-9_]");
 	
 	public static void logInfo(String s, Object...args) {
 		MwForge.logger.info(String.format(s, args));
@@ -37,7 +40,7 @@ public class MwUtil {
 		s = s.replace(' ',  '_');
 		s = s.replace('/',  '_');
 		s = s.replace('\\',  '_');
-		return Mw.patternInvalidChars.matcher(s).replaceAll("");
+		return patternInvalidChars.matcher(s).replaceAll("");
 	}
 	
 	public static File getFreeFilename(File dir, String baseName, String ext) {

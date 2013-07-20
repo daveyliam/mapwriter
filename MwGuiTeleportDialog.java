@@ -18,6 +18,7 @@ public class MwGuiTeleportDialog extends MwGuiTextDialog {
         this.mapView = mapView;
         this.teleportX = x;
         this.teleportZ = z;
+        this.backToGameOnSubmit = true;
     }
     	
 	@Override

@@ -88,9 +88,9 @@ public class RegionManager {
 				error = true;
 			}
 		}
-		if (count > 0) {
-			RegionManager.logInfo("%d unused regions closed", count);
-		}
+		//if (count > 0) {
+		//	RegionManager.logInfo("%d unused regions closed", count);
+		//}
 		if (this.regionMap.size() > maxLoadedRegions) {
 			RegionManager.logWarning("unable to close enough regions (%d regions loaded, limit is %d)", this.regionMap.size(), maxLoadedRegions);
 		}
@@ -145,7 +145,7 @@ public class RegionManager {
 				boolean regionAlreadyLoaded = region.isLoaded();
 				region.updateZoomLevels();
 				if (!regionAlreadyLoaded) {
-					region.close();
+					this.unloadRegion(region);
 				}
 			}
 		}

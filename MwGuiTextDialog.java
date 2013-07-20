@@ -15,6 +15,7 @@ public class MwGuiTextDialog extends GuiScreen {
 	GuiTextField textField = null;
 	boolean inputValid = false;
 	boolean showError = false;
+	boolean backToGameOnSubmit = false;
 	static final int textDialogWidthPercent = 50;
 	static final int textDialogTitleY = 80;
 	static final int textDialogY = 92;
@@ -139,7 +140,11 @@ public class MwGuiTextDialog extends GuiScreen {
 		case Keyboard.KEY_RETURN:
 			// when enter pressed, submit current input
 			if (this.submit()) {
-				this.mc.displayGuiScreen(this.parentScreen);
+				if (!this.backToGameOnSubmit) {
+					this.mc.displayGuiScreen(this.parentScreen);
+				} else {
+					this.mc.displayGuiScreen(null);
+				}
 			}
 			break;
 			

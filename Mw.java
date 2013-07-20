@@ -2,7 +2,6 @@ package mapwriter;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.regex.Pattern;
 
 import mapwriter.forge.MwConfig;
 import mapwriter.forge.MwForge;
@@ -136,7 +135,6 @@ public class Mw {
 	public final static String catMarkers = "markers";
 	public final static String catOptions = "options";
 	public final static String worldDirConfigName = "mapwriter.cfg";
-	public final static Pattern patternInvalidChars = Pattern.compile("[^a-zA-Z0-9_]");
 	
 	// instances of components
 	public MapTexture mapTexture = null;
