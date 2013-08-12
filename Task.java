@@ -6,7 +6,7 @@ import java.util.concurrent.Future;
 public abstract class Task implements Runnable {
 	
 	// the task stores its own future
-	private Future<?> future;
+	private Future<?> future = null;
 
 	// called by processTaskQueue after the thread completes
 	public abstract void onComplete();
@@ -25,17 +25,19 @@ public abstract class Task implements Runnable {
 	}
 	
 	public final boolean isDone() {
-		return this.future.isDone();
+		return (this.future != null) ? this.future.isDone() : false;
 	}
 	
 	public final void printException() {
-		try {
-			this.future.get();
-		} catch (ExecutionException e) {
-			Throwable rootException = e.getCause();
-			rootException.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
+		if (this.future != null) {
+			try {
+				this.future.get();
+			} catch (ExecutionException e) {
+				Throwable rootException = e.getCause();
+				rootException.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }

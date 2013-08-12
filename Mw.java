@@ -77,6 +77,8 @@ logged in.
  * - Button to cycle through group selection
  * - Add marker in game hot key and GUI
  * - Save map as 8192x8192 tiles
+ * - Fix mergeToImage exception for w or h of 0
+ * - Add option to reduce map loading distance
  * - Dimension field on markers
  * - Rei's format marker reading and writing
  * - Save single player chunks to separate directory
@@ -107,10 +109,16 @@ public class Mw {
 	public boolean coordsEnabled = false;
 	public boolean teleportEnabled = true;
 	public int chunksPerTick = 3;
+	public int mapUpdateInterval = 100;
+	public int maxChunkDistance = 16;
 	public String teleportCommand = "tp";
 	public int defaultTeleportHeight = 80;
 	public static int maxZoom = 5;
 	public static int minZoom = -5;
+	
+	//public String blockColourLoadFileName = "block_colours.txt";
+	public String blockColourLoadFileName = null;
+	public String blockColourSaveFileName = "block_colours.txt";
 	
 	private int textureSize = 2048;
 	public int configTextureSize = 2048;
@@ -189,6 +197,7 @@ public class Mw {
 		this.chunksPerTick = this.config.getOrSetInt(catOptions, "chunksPerTick", this.chunksPerTick, 1, 64);
 		this.teleportCommand = this.config.get(catOptions, "teleportCommand", this.teleportCommand).getString();
 		this.coordsEnabled = this.config.getOrSetBoolean(catOptions, "coordsEnabled", this.coordsEnabled);
+		this.maxChunkDistance = this.config.getOrSetInt(catOptions, "maxChunkDistance", this.maxChunkDistance, 1, 16);
 		
 		maxZoom = this.config.getOrSetInt(catOptions, "zoomOutLevels", maxZoom, 1, 256);
 		minZoom = -this.config.getOrSetInt(catOptions, "zoomInLevels", -minZoom, 1, 256);
@@ -212,6 +221,7 @@ public class Mw {
 		this.config.setBoolean(catOptions, "linearTextureScaling", this.linearTextureScalingEnabled);
 		this.config.setInt(catOptions, "textureSize", this.configTextureSize);
 		this.config.setBoolean(catOptions, "coordsEnabled", this.coordsEnabled);
+		this.config.setInt(catOptions, "maxChunkDistance", this.maxChunkDistance);
 		
 		// save config
 		this.config.save();
@@ -304,7 +314,23 @@ public class Mw {
 	}
 	
 	public void reloadBlockColours() {
-		BlockColours bc = BlockColourGen.genBlockColours(this, this.config);
+		BlockColours bc;
+		if (this.blockColourLoadFileName == null) {
+			// generate block colours from current texture pack
+			bc = BlockColourGen.genBlockColours(this, this.config);
+			
+			if (this.blockColourSaveFileName != null) {
+				File f = new File(this.worldDir, this.blockColourSaveFileName);
+				MwUtil.logInfo("saving block colours to '%s'", f);
+				bc.saveToFile(f);
+			}
+			
+		} else {
+			// load block colours from file
+			File f = new File(this.worldDir, this.blockColourLoadFileName);
+			bc = BlockColours.loadFromFile(f);
+		}
+		
 		this.blockColours = bc;
 	}
 	
@@ -394,7 +420,7 @@ public class Mw {
 		
 		// mapTexture depends on config being loaded
 		this.mapTexture = new MapTexture(this.textureSize, this.linearTextureScalingEnabled);
-		this.blockColours = BlockColourGen.genBlockColours(this, this.config);
+		this.reloadBlockColours();
 		// region manager depends on config, mapTexture, and block colours
 		this.regionManager = new RegionManager(this.worldDir, this.imageDir, this.blockColours);
 		// overlay manager depends on mapTexture

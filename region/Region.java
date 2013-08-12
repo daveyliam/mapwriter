@@ -35,7 +35,7 @@ public class Region {
 	private boolean cannotLoad = false;
 	int updateCount = 0;
 	int lastAccessedTick = 0;
-	int refCount = 0;
+	public int refCount = 0;
 	private int[] pixels = null;
 	
 	public Region(RegionManager regionManager, int x, int z, int zoomLevel, int dimension) {

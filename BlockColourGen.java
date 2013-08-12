@@ -283,7 +283,6 @@ public class BlockColourGen {
 	private static void genBiomeColours() {
 		// generate array of foliage, grass, and water colour multipliers
 		// for each biome.
-		bc.clearBiomeArrays();
 		
 		for (int i = 0; i < BiomeGenBase.biomeList.length; i++) {
 			if (BiomeGenBase.biomeList[i] != null) {

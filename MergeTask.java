@@ -14,7 +14,7 @@ public class MergeTask extends Task {
 	final RegionManager regionManager;
 	final File outputFile;
 	final int x, z, w, h, dimension;
-	String msg;
+	String msg = "";
 	
 	public MergeTask(RegionManager regionManager, int x, int z, int w, int h, int dimension, File outputFile) {
 		this.regionManager = regionManager;
@@ -35,7 +35,7 @@ public class MergeTask extends Task {
 				ImageIO.write(mergedImage, "png", this.outputFile);
 				this.msg = String.format("successfully wrote merged image to %s", this.outputFile);
 			} catch (IOException e) {
-				this.msg = String.format("MergeTask: error: could not write image to %s", this.outputFile);
+				this.msg = String.format("merge error: could not write image to %s", this.outputFile);
 			}
 		}
 	}

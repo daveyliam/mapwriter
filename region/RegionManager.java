@@ -15,7 +15,7 @@ public class RegionManager {
 	
 	//private int regionArraySize;
 	//private Region[] regionArray;
-	private int currentTick = 0;
+	private int currentPruneTick = 0;
 	
 	public static void logInfo(String s, Object...args) {
 		if (logger != null) {
@@ -65,7 +65,7 @@ public class RegionManager {
 	}
 	
 	public Region getLeastAccessedRegion() {
-		int minLastAccessedTick = this.currentTick;
+		int minLastAccessedTick = this.currentPruneTick;
 		Region leastAccessedRegion = null;
 		for (Region region : this.regionMap.values()) {
 	        if ((region != null) && (region.refCount <= 0) && (region.lastAccessedTick < minLastAccessedTick)) {
@@ -94,12 +94,12 @@ public class RegionManager {
 		if (this.regionMap.size() > maxLoadedRegions) {
 			RegionManager.logWarning("unable to close enough regions (%d regions loaded, limit is %d)", this.regionMap.size(), maxLoadedRegions);
 		}
-		this.currentTick++;
+		this.currentPruneTick++;
 		return count;
 	}
 	
 	public int getCurrentTick() {
-		return this.currentTick;
+		return this.currentPruneTick;
 	}
 	
 	public File getDimensionDir(int dimension) {

@@ -113,8 +113,12 @@ public class MapTexture extends Texture {
 		int index = this.getRegionIndex(x, z, zoomLevel);
 		Region currentRegion = this.regionArray[index];
 		if ((currentRegion == null) || (!currentRegion.equals(x, z, zoomLevel, dimension))) {
+			if (currentRegion != null) {
+				currentRegion.refCount--;
+			}
 			Region newRegion = regionManager.getRegion(x, z, zoomLevel, dimension);
 			this.regionArray[index] = newRegion;
+			newRegion.refCount++;
 			this.setRegionModified(index);
 			this.updateTextureFromRegion(newRegion, newRegion.x, newRegion.z, newRegion.size, newRegion.size);
 			//MwUtil.log("regionArray[%d] = %s", newRegion.index, newRegion);

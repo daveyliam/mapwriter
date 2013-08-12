@@ -45,6 +45,7 @@ public class MapUpdateViewTask extends Task {
 		this.mapTexture.loadedMaxX = this.maxX;
 		this.mapTexture.loadedMaxZ = this.maxZ;
 		this.mapTexture.loadedZoomLevel = this.zoomLevel;
+		this.mapTexture.loadedDimension = this.dimension;
 		
 		// update GL texture of mapTexture if updated
 		this.mapTexture.updateGLTexture();

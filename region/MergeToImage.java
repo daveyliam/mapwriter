@@ -9,17 +9,26 @@ public class MergeToImage {
 	
 	public static BufferedImage merge(RegionManager regionManager, int xCentre, int zCentre, int w, int h, int dimension) {
 		
-		w = Math.min(Math.max(0, w), MAX_WIDTH - Region.SIZE);
-		h = Math.min(Math.max(0, h), MAX_HEIGHT - Region.SIZE);
+		// round up to nearest 512 block boundary
+		w = ((w + Region.SIZE - 1) & Region.MASK);
+		h = ((h + Region.SIZE - 1) & Region.MASK);
 		
-		int rXMin = (xCentre - (w / 2)) >> Region.SHIFT;
-		int rZMin = (zCentre - (h / 2)) >> Region.SHIFT;
-		int rXMax = (xCentre + (w / 2)) >> Region.SHIFT;
-		int rZMax = (zCentre + (h / 2)) >> Region.SHIFT;
+		// clamp to an integer between 512 and 8192 inclusive
+		w = Math.min(Math.max(Region.SIZE, w), MAX_WIDTH);
+		h = Math.min(Math.max(Region.SIZE, h), MAX_HEIGHT);
 		
-		RegionManager.logInfo("merging area (%d,%d) -> (%d,%d)",
-				rXMin << Region.SHIFT, rZMin << Region.SHIFT,
-				rXMax << Region.SHIFT, rZMax << Region.SHIFT);
+		int xMin = xCentre - (w / 2);
+		int zMin = zCentre - (h / 2);
+		
+		// round to nearest region boundary
+		xMin = Math.round(((float) xMin) / ((float) Region.SIZE)) * Region.SIZE;
+		zMin = Math.round(((float) zMin) / ((float) Region.SIZE)) * Region.SIZE;
+		
+		int xMax = xMin + w;
+		int zMax = zMin + h;
+		
+		RegionManager.logInfo("merging area starting at (%d,%d), %dx%d blocks",
+				xMin, zMin, w, h);
 		
 		int pixels[] = new int[Region.SIZE * Region.SIZE];
 		
@@ -28,12 +37,13 @@ public class MergeToImage {
 		BufferedImage mergedImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 		
 		// copy region PNGs to the image
-		for (int rZ = rZMin; rZ <= rZMax; rZ++) {
-			for (int rX = rXMin; rX <= rXMax; rX++) {
+		for (int z = zMin; z < zMax; z += Region.SIZE) {
+			for (int x = xMin; x < xMax; x += Region.SIZE) {
 				//MwUtil.log("merging region (%d,%d)", rX << Mw.REGION_SHIFT, rZ << Mw.REGION_SHIFT);
 				Arrays.fill(pixels, 0);
 				
-				Region region = regionManager.getRegion(rX << Region.SHIFT, rZ << Region.SHIFT, 0, dimension);
+				// get region pixels
+				Region region = regionManager.getRegion(x, z, 0, dimension);
 				int[] regionPixels = region.getPixels();
 				if (regionPixels != null) {
 					for (int i = 0; (i < pixels.length) && (i < regionPixels.length); i++) {
@@ -43,9 +53,8 @@ public class MergeToImage {
 					Arrays.fill(pixels, 0xff000000);
 				}
 				
-				int dstX = (rX - rXMin) << Region.SHIFT;
-				int dstZ = (rZ - rZMin) << Region.SHIFT;
-				mergedImage.setRGB(dstX, dstZ, Region.SIZE, Region.SIZE, pixels, 0, Region.SIZE);
+				// copy region pixels to the output image
+				mergedImage.setRGB(x - xMin, z - zMin, Region.SIZE, Region.SIZE, pixels, 0, Region.SIZE);
 			}
 		}
 		
