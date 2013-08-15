@@ -350,7 +350,7 @@ public class Region {
 	
 	public void saveToImage() {
 		int[] pixels = this.getPixels();
-		if (this.isLoaded()) {
+		if (pixels != null) {
 			BufferedImage img = new BufferedImage(Region.SIZE, Region.SIZE, BufferedImage.TYPE_INT_ARGB);
 			img.setRGB(0, 0, Region.SIZE, Region.SIZE,
 				pixels, 0, Region.SIZE);

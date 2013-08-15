@@ -119,8 +119,10 @@ public class MapTexture extends Texture {
 			Region newRegion = regionManager.getRegion(x, z, zoomLevel, dimension);
 			this.regionArray[index] = newRegion;
 			newRegion.refCount++;
-			this.setRegionModified(index);
 			this.updateTextureFromRegion(newRegion, newRegion.x, newRegion.z, newRegion.size, newRegion.size);
+			// oops! this needs to be after updateTextureFromRegion otherwise the GL texture will be updated
+			// and the regionModified flag cleared before the region is actually loaded.
+			this.setRegionModified(index);
 			//MwUtil.log("regionArray[%d] = %s", newRegion.index, newRegion);
 			alreadyLoaded = false;
 		}
@@ -172,7 +174,6 @@ public class MapTexture extends Texture {
 					int arrayIndex = (j * this.textureRegions) + i;
 					if (this.regionModifiedArray[arrayIndex] > 0) {
 						// update the texture for this region
-						//MwUtil.log("updating GL texture (%d, %d, %d %d)", i * Region.SIZE, j * Region.SIZE, Region.SIZE, Region.SIZE);
 						this.updateTextureArea(
 								i * Region.SIZE,
 								j * Region.SIZE,

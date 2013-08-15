@@ -134,9 +134,6 @@ public class MapMode {
 			this.h = size;
 		}
 		
-		this.wPixels = (int) Math.round(((double) this.w) * this.screenScalingFactor);
-		this.hPixels = (int) Math.round(((double) this.h) * this.screenScalingFactor);
-		
 		int halfW = this.w / 2;
 		int halfH = this.h / 2;
 		this.xTranslation = x + halfW;
@@ -148,6 +145,9 @@ public class MapMode {
 			this.w = this.h;
 			this.x = -halfH;
 		}
+		
+		this.wPixels = (int) Math.round(((double) this.w) * this.screenScalingFactor);
+		this.hPixels = (int) Math.round(((double) this.h) * this.screenScalingFactor);
 		
 		// calculate coords display location
 		this.textX = 0;
