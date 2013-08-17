@@ -99,7 +99,8 @@ public class Mw {
 	public String worldName = "default";
 	private String serverName = "default";
 	private int serverPort = 0;
-	private File saveDir = null;
+	private final File configDir;
+	private final File saveDir;
 	public File worldDir = null;
 	public File imageDir = null;
 	//private boolean closing = false;
@@ -115,10 +116,9 @@ public class Mw {
 	public int defaultTeleportHeight = 80;
 	public static int maxZoom = 5;
 	public static int minZoom = -5;
+	public boolean useSavedBlockColours = false;
 	
-	//public String blockColourLoadFileName = "block_colours.txt";
-	public String blockColourLoadFileName = null;
-	public String blockColourSaveFileName = "block_colours.txt";
+	public String blockColourSaveFileName = "MapWriterBlockColours.txt";
 	
 	private int textureSize = 2048;
 	public int configTextureSize = 2048;
@@ -163,6 +163,7 @@ public class Mw {
 		
 		// create base save directory
 		this.saveDir = new File(Minecraft.getMinecraft().mcDataDir, "saves");
+		this.configDir = new File(Minecraft.getMinecraft().mcDataDir, "config");
 		
 		this.ready = false;
 		
@@ -193,6 +194,7 @@ public class Mw {
 	public void loadConfig() {
 		this.config.load();
 		this.linearTextureScalingEnabled = this.config.getOrSetBoolean(catOptions, "linearTextureScaling", true);
+		this.useSavedBlockColours = this.config.getOrSetBoolean(catOptions, "useSavedBlockColours", false);
 		this.teleportEnabled = this.config.getOrSetBoolean(catOptions, "teleportEnabled", this.teleportEnabled);
 		this.chunksPerTick = this.config.getOrSetInt(catOptions, "chunksPerTick", this.chunksPerTick, 1, 64);
 		this.teleportCommand = this.config.get(catOptions, "teleportCommand", this.teleportCommand).getString();
@@ -219,6 +221,7 @@ public class Mw {
 	public void saveConfig() {
 		this.worldConfig.setIntList(catWorld, "dimensionList", this.dimensionList);
 		this.config.setBoolean(catOptions, "linearTextureScaling", this.linearTextureScalingEnabled);
+		this.config.setBoolean(catOptions, "useSavedBlockColours", this.useSavedBlockColours);
 		this.config.setInt(catOptions, "textureSize", this.configTextureSize);
 		this.config.setBoolean(catOptions, "coordsEnabled", this.coordsEnabled);
 		this.config.setInt(catOptions, "maxChunkDistance", this.maxChunkDistance);
@@ -315,23 +318,23 @@ public class Mw {
 	
 	public void reloadBlockColours() {
 		BlockColours bc;
-		if (this.blockColourLoadFileName == null) {
-			// generate block colours from current texture pack
-			bc = BlockColourGen.genBlockColours(this, this.config);
-			
-			if (this.blockColourSaveFileName != null) {
-				File f = new File(this.worldDir, this.blockColourSaveFileName);
-				MwUtil.logInfo("saving block colours to '%s'", f);
-				bc.saveToFile(f);
-			}
-			
-		} else {
+		File f = new File(this.configDir, this.blockColourSaveFileName);
+		if (this.useSavedBlockColours && f.isFile()) {
 			// load block colours from file
-			File f = new File(this.worldDir, this.blockColourLoadFileName);
+			MwUtil.logInfo("loading block colours from %s", f);
 			bc = BlockColours.loadFromFile(f);
+		} else {
+			// generate block colours from current texture pack
+			MwUtil.logInfo("generating block colours");
+			bc = BlockColourGen.genBlockColours(this, this.config);
 		}
-		
 		this.blockColours = bc;
+	}
+	
+	public void saveCurrentBlockColours() {
+		File f = new File(this.configDir, this.blockColourSaveFileName);
+		MwUtil.logInfo("saving block colours to '%s'", f);
+		this.blockColours.saveToFile(f);
 	}
 	
 	public void reloadMapTexture() {

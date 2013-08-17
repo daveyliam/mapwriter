@@ -6,7 +6,7 @@ MapWriter: A minimap mod for Minecraft
 
 Instructions for development:
 
-1) Set up your Forge/MCP envoronment.
+1) Set up your Forge/MCP environment.
 
 2) Move or copy the mapwriter folder to forge/mcp/src/minecraft/
    

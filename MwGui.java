@@ -170,12 +170,13 @@ public class MwGui extends GuiScreen {
 				(int) this.mapView.getMinX(),
 				(int) this.mapView.getMinZ()));
 		this.mw.reloadBlockColours();
-		this.mw.regionManager.reloadRegions(
+		this.mw.executor.addTask(new ReloadRegionsTask(
+				this.mw,
 				(int) this.mapView.getMinX(),
 				(int) this.mapView.getMinZ(),
 				(int) this.mapView.getWidth(),
 				(int) this.mapView.getHeight(),
-				this.mapView.getDimension());
+				this.mapView.getDimension()));
     }
     
     // c is the ascii equivalent of the key typed.

@@ -329,18 +329,22 @@ public class Region {
 		}
 	}
 	
+	public void reload() {
+		this.updateCount = 0;
+		
+		//RegionManager.logInfo("loading region %s", this);
+		if (this.zoomLevel == 0) {
+			this.loadFromRegionFile();
+		} else {
+			this.loadFromImageFile();
+		}
+		//this.updateZoomLevels(this.x, this.z, this.size, this.size);
+	}
+	
 	private void load() {
 		// all updates will be overwritten
 		if (!this.cannotLoad) {
-			this.updateCount = 0;
-			
-			//RegionManager.logInfo("loading region %s", this);
-			if (this.zoomLevel == 0) {
-				this.loadFromRegionFile();
-			} else {
-				this.loadFromImageFile();
-			}
-			//this.updateZoomLevels(this.x, this.z, this.size, this.size);
+			this.reload();
 		}
 		
 		// this should be the only place that cannotLoad can be set to true.

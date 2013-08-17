@@ -16,7 +16,7 @@ public class MwGuiOptionSlot extends GuiSlot {
 	private int mouseX = 0;
 	private int mouseY = 0;
 	
-	private GuiButton[] buttons = new GuiButton[5];
+	private GuiButton[] buttons = new GuiButton[6];
 	
     static final ResourceLocation WIDGET_TEXTURE_LOC = new ResourceLocation("textures/gui/widgets.png");
 	
@@ -37,6 +37,8 @@ public class MwGuiOptionSlot extends GuiSlot {
 		case 4:
 			this.buttons[i].displayString = "Trail Markers: " + (this.mw.playerTrail.enabled);
 			break;
+		case 5:
+			this.buttons[i].displayString = "Map Colours: " + (this.mw.useSavedBlockColours ? "Frozen" : "Auto");
 		default:
 			break;
 		}
@@ -91,6 +93,16 @@ public class MwGuiOptionSlot extends GuiSlot {
 			// player trail
 			this.mw.playerTrail.enabled = !this.mw.playerTrail.enabled;
 			break;
+		case 5:
+			// map colours
+			this.mw.useSavedBlockColours = !this.mw.useSavedBlockColours;
+			if (this.mw.useSavedBlockColours) {
+				// save current map colours
+				this.mw.saveCurrentBlockColours();
+			} else {
+				// use auto generated colours
+				this.mw.reloadBlockColours();
+			}
 		default:
 			break;
 		}

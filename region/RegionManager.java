@@ -9,7 +9,7 @@ public class RegionManager {
 	
 	public final File worldDir;
 	public final File imageDir;
-	public final BlockColours blockColours;
+	public BlockColours blockColours;
 	public static Logger logger;
 	public final static int maxLoadedRegions = 64;
 	
@@ -137,12 +137,13 @@ public class RegionManager {
 		w = (w + Region.SIZE) & Region.MASK;
 		h = (h + Region.SIZE) & Region.MASK;
 		
-		logInfo("recreating zoom levels for regions from (%d, %d) to (%d, %d)", xStart, zStart, xStart + w, zStart + h);
+		logInfo("reloading regions from (%d, %d) to (%d, %d)", xStart, zStart, xStart + w, zStart + h);
 		
 		for (int rX = xStart; rX < (xStart + w); rX += Region.SIZE) {
 			for (int rZ = zStart; rZ < (zStart + h); rZ += Region.SIZE) {
 				Region region = this.getRegion(rX, rZ, 0, dimension);
 				boolean regionAlreadyLoaded = region.isLoaded();
+				region.reload();
 				region.updateZoomLevels();
 				if (!regionAlreadyLoaded) {
 					this.unloadRegion(region);
