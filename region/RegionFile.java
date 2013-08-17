@@ -100,17 +100,22 @@ public class RegionFile {
 		for (i = 2; i < this.filledSectorArray.size(); i++) {
 			if (this.filledSectorArray.get(i)) {
 				// sector filled
-				if (length >= requiredLength) {
-					// end of free section
-					if (length < closestLength) {
-						closestLength = length;
-						closestStart = start;
-						if (closestLength == requiredLength) {
-							break;
-						}
+				// if the length of the empty block we found is greater than or
+				// equal to the required length, and is closer to the required
+				// length than the previous found length, then set this as the
+				// new closest length.
+				// the idea is to use an empty block of exactly the required
+				// length, rather than one that is larger.
+				if ((length >= requiredLength) && (length < closestLength)) {
+					closestLength = length;
+					closestStart = start;
+					// if we find an empty block of exactly the correct length
+					// then exit the loop.
+					if (closestLength == requiredLength) {
+						break;
 					}
-					length = 0;
 				}
+				length = 0;
 			} else {
 				// sector empty
 				if (length == 0) {
@@ -125,7 +130,7 @@ public class RegionFile {
 			closestStart = i;
 		}
 		
-		return (closestStart != 0) ? new Section(closestStart, requiredLength) : null;
+		return new Section(closestStart, requiredLength);
 	}
 	
 	public void printInfo() {
