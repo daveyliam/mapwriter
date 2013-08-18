@@ -49,7 +49,7 @@ public class Region {
 		this.z = z & (-this.size);
 		
 		this.key = getKey(this.x, this.z, this.zoomLevel, this.dimension);
-		this.imageFile = this.getImageFile(regionManager.imageDir);
+		this.imageFile = getImageFile(regionManager.imageDir, this.x, this.z, this.zoomLevel, this.dimension);
 		File regionFileName = getRegionFile(regionManager.worldDir, this.x, this.z, this.dimension);
 		this.regionFile = new RegionFile(regionFileName);
 		
@@ -117,13 +117,13 @@ public class Region {
 		return dir;
 	}
 	
-	private File getImageFile(File imageDir) {
-		File dimDir = addDimensionDirToPath(imageDir, this.dimension);
-		File zoomDir = new File(dimDir, "z" + this.zoomLevel);
+	public static File getImageFile(File imageDir, int x, int z, int zoomLevel, int dimension) {
+		File dimDir = addDimensionDirToPath(imageDir, dimension);
+		File zoomDir = new File(dimDir, "z" + zoomLevel);
 		
 		String filename = String.format("%d.%d.png",
-				this.x >> (Region.SHIFT + this.zoomLevel),
-				this.z >> (Region.SHIFT + this.zoomLevel));
+				x >> (Region.SHIFT + zoomLevel),
+				z >> (Region.SHIFT + zoomLevel));
 		
 		return new File(zoomDir, filename);
 	}
@@ -355,7 +355,7 @@ public class Region {
 	public void saveToImage() {
 		int[] pixels = this.getPixels();
 		if (pixels != null) {
-			BufferedImage img = new BufferedImage(Region.SIZE, Region.SIZE, BufferedImage.TYPE_INT_ARGB);
+			BufferedImage img = new BufferedImage(Region.SIZE, Region.SIZE, BufferedImage.TYPE_INT_RGB);
 			img.setRGB(0, 0, Region.SIZE, Region.SIZE,
 				pixels, 0, Region.SIZE);
 			
