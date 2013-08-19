@@ -96,12 +96,13 @@ public class MwGuiOptionSlot extends GuiSlot {
 		case 5:
 			// map colours
 			this.mw.useSavedBlockColours = !this.mw.useSavedBlockColours;
+			// reload block colours before saving in case player changed
+			// texture packs before pressing button.
+			this.mw.reloadBlockColours();
+			
 			if (this.mw.useSavedBlockColours) {
 				// save current map colours
 				this.mw.saveCurrentBlockColours();
-			} else {
-				// use auto generated colours
-				this.mw.reloadBlockColours();
 			}
 		default:
 			break;
