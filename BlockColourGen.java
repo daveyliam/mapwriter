@@ -189,9 +189,17 @@ public class BlockColourGen {
 		BlockType blockType = bc.getBlockType(blockAndMeta);
 		switch (blockType) {
 		case NORMAL:
-			int renderColour = block.getRenderColor(blockAndMeta & 0xf);
-			if (renderColour != 0xffffff) {
-				blockColour = Render.multiplyColours(blockColour, 0xff000000 | renderColour);
+			// fix crash when mods don't implement getRenderColor for all
+			// block meta values.
+			try {
+				int renderColour = block.getRenderColor(blockAndMeta & 0xf);
+				if (renderColour != 0xffffff) {
+					blockColour = Render.multiplyColours(blockColour, 0xff000000 | renderColour);
+				}
+			} catch (ArrayIndexOutOfBoundsException e) {
+				// do nothing
+			} catch (NullPointerException e) {
+				// do nothing
 			}
 			break;
 		case LEAVES:
