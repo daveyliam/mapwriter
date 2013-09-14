@@ -68,7 +68,7 @@ public class RegionManager {
 		int minLastAccessedTick = this.currentPruneTick;
 		Region leastAccessedRegion = null;
 		for (Region region : this.regionMap.values()) {
-	        if ((region != null) && (region.refCount <= 0) && (region.lastAccessedTick < minLastAccessedTick)) {
+	        if ((region != null) && (region.getRefCount() <= 0) && (region.lastAccessedTick < minLastAccessedTick)) {
 				minLastAccessedTick = region.lastAccessedTick;
 				leastAccessedRegion = region;
 			}
@@ -152,7 +152,7 @@ public class RegionManager {
 		}
 	}
 	
-	public void writeChunkArray(MwChunk[] chunkArray) {
+	public void saveChunkArray(MwChunk[] chunkArray) {
 		for (MwChunk chunk : chunkArray) {
 			if (chunk != null) {
 				Region region = this.getRegion(chunk.x << 4, chunk.z << 4, 0, chunk.dimension);

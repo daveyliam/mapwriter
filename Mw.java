@@ -109,14 +109,12 @@ public class Mw {
 	public boolean linearTextureScalingEnabled = true;
 	public boolean coordsEnabled = false;
 	public boolean teleportEnabled = true;
-	public int chunksPerTick = 3;
-	public int mapUpdateInterval = 100;
-	public int maxChunkDistance = 16;
 	public String teleportCommand = "tp";
 	public int defaultTeleportHeight = 80;
 	public static int maxZoom = 5;
 	public static int minZoom = -5;
 	public boolean useSavedBlockColours = false;
+	public int maxChunkSaveDistSq = 256 * 256;
 	
 	public String blockColourSaveFileName = "MapWriterBlockColours.txt";
 	
@@ -196,10 +194,9 @@ public class Mw {
 		this.linearTextureScalingEnabled = this.config.getOrSetBoolean(catOptions, "linearTextureScaling", true);
 		this.useSavedBlockColours = this.config.getOrSetBoolean(catOptions, "useSavedBlockColours", false);
 		this.teleportEnabled = this.config.getOrSetBoolean(catOptions, "teleportEnabled", this.teleportEnabled);
-		this.chunksPerTick = this.config.getOrSetInt(catOptions, "chunksPerTick", this.chunksPerTick, 1, 64);
 		this.teleportCommand = this.config.get(catOptions, "teleportCommand", this.teleportCommand).getString();
 		this.coordsEnabled = this.config.getOrSetBoolean(catOptions, "coordsEnabled", this.coordsEnabled);
-		this.maxChunkDistance = this.config.getOrSetInt(catOptions, "maxChunkDistance", this.maxChunkDistance, 1, 16);
+		this.maxChunkSaveDistSq = this.config.getOrSetInt(catOptions, "maxChunkSaveDistSq", this.maxChunkSaveDistSq, 1, 512 * 512);
 		
 		maxZoom = this.config.getOrSetInt(catOptions, "zoomOutLevels", maxZoom, 1, 256);
 		minZoom = -this.config.getOrSetInt(catOptions, "zoomInLevels", -minZoom, 1, 256);
@@ -224,7 +221,7 @@ public class Mw {
 		this.config.setBoolean(catOptions, "useSavedBlockColours", this.useSavedBlockColours);
 		this.config.setInt(catOptions, "textureSize", this.configTextureSize);
 		this.config.setBoolean(catOptions, "coordsEnabled", this.coordsEnabled);
-		this.config.setInt(catOptions, "maxChunkDistance", this.maxChunkDistance);
+		this.config.setInt(catOptions, "maxChunkSaveDistSq", this.maxChunkSaveDistSq);
 		
 		// save config
 		this.config.save();

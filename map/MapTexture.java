@@ -113,12 +113,13 @@ public class MapTexture extends Texture {
 		int index = this.getRegionIndex(x, z, zoomLevel);
 		Region currentRegion = this.regionArray[index];
 		if ((currentRegion == null) || (!currentRegion.equals(x, z, zoomLevel, dimension))) {
-			if (currentRegion != null) {
-				currentRegion.refCount--;
-			}
+			// modifying the refCount here may be causing problems unloading regions
+			//if (currentRegion != null) {
+			//	currentRegion.refCount--;
+			//}
 			Region newRegion = regionManager.getRegion(x, z, zoomLevel, dimension);
 			this.regionArray[index] = newRegion;
-			newRegion.refCount++;
+			//newRegion.refCount++;
 			this.updateTextureFromRegion(newRegion, newRegion.x, newRegion.z, newRegion.size, newRegion.size);
 			// oops! this needs to be after updateTextureFromRegion otherwise the GL texture will be updated
 			// and the regionModified flag cleared before the region is actually loaded.

@@ -35,7 +35,7 @@ public class Region {
 	private boolean cannotLoad = false;
 	int updateCount = 0;
 	int lastAccessedTick = 0;
-	public int refCount = 0;
+	private int refCount = 0;
 	private int[] pixels = null;
 	
 	public Region(RegionManager regionManager, int x, int z, int zoomLevel, int dimension) {
@@ -82,6 +82,10 @@ public class Region {
 	
 	public boolean isLoaded() {
 		return (this.pixels != null);
+	}
+	
+	public int getRefCount() {
+		return this.refCount;
 	}
 	
 	public int[] allocatePixels() {
@@ -193,7 +197,7 @@ public class Region {
 		this.setAccessed();
 	}
 	
-	public void setAccessed() {
+	private void setAccessed() {
 		this.lastAccessedTick = this.regionManager.getCurrentTick();
 	}
 	

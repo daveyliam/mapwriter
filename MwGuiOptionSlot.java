@@ -16,7 +16,7 @@ public class MwGuiOptionSlot extends GuiSlot {
 	private int mouseX = 0;
 	private int mouseY = 0;
 	
-	private GuiButton[] buttons = new GuiButton[6];
+	private GuiButton[] buttons = new GuiButton[7];
 	
     static final ResourceLocation WIDGET_TEXTURE_LOC = new ResourceLocation("textures/gui/widgets.png");
 	
@@ -39,6 +39,10 @@ public class MwGuiOptionSlot extends GuiSlot {
 			break;
 		case 5:
 			this.buttons[i].displayString = "Map Colours: " + (this.mw.useSavedBlockColours ? "Frozen" : "Auto");
+			break;
+		case 6:
+			this.buttons[i].displayString = "Max Draw Distance: " + Math.round(Math.sqrt(this.mw.maxChunkSaveDistSq));
+			break;
 		default:
 			break;
 		}
@@ -104,6 +108,16 @@ public class MwGuiOptionSlot extends GuiSlot {
 				// save current map colours
 				this.mw.saveCurrentBlockColours();
 			}
+			break;
+		case 6:
+			// toggle max chunk save dist
+			int d = Math.round((float) Math.sqrt(this.mw.maxChunkSaveDistSq));
+			d += 32;
+			if (d > 256) {
+				d = 64;
+			}
+			this.mw.maxChunkSaveDistSq = d * d;
+			break;
 		default:
 			break;
 		}
