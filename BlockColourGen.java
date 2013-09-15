@@ -217,11 +217,14 @@ public class BlockColourGen {
 		MwUtil.log("generating block map colours from textures");
 
 		// copy terrain texture to MwRender pixel bytebuffer
-		//int terrainTextureID = Minecraft.getMinecraft().renderEngine.getTexture("/terrain.png");
+		
 		// bind the terrain texture
-		Minecraft.getMinecraft().func_110434_K().func_110577_a(TextureMap.field_110575_b);
+		//Minecraft.getMinecraft().func_110434_K().func_110577_a(TextureMap.field_110575_b);
 		// get the bound texture id
-		int terrainTextureId = Render.getBoundTextureId();
+		//int terrainTextureId = Render.getBoundTextureId();
+		
+		int terrainTextureId = Minecraft.getMinecraft().renderEngine.getTexture(TextureMap.locationBlocksTexture).getGlTextureId();
+		
 		// create texture object from the currently bound GL texture
 		if (terrainTextureId == 0) {
 			MwUtil.log("error: could get terrain texture ID");

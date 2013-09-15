@@ -16,7 +16,16 @@ public class MwGuiOptionSlot extends GuiSlot {
 	private int mouseX = 0;
 	private int mouseY = 0;
 	
-	private GuiButton[] buttons = new GuiButton[7];
+	private int miniMapPositionIndex = 0;
+	private String[] miniMapPositionStringArray = {
+		"unchanged",
+		"top right",
+		"top left",
+		"bottom right",
+		"bottom left"
+	};
+	
+	private GuiButton[] buttons = new GuiButton[9];
 	
     static final ResourceLocation WIDGET_TEXTURE_LOC = new ResourceLocation("textures/gui/widgets.png");
 	
@@ -42,6 +51,12 @@ public class MwGuiOptionSlot extends GuiSlot {
 			break;
 		case 6:
 			this.buttons[i].displayString = "Max Draw Distance: " + Math.round(Math.sqrt(this.mw.maxChunkSaveDistSq));
+			break;
+		case 7:
+			this.buttons[i].displayString = "Mini map size: " + this.mw.overlayManager.smallMapMode.heightPercent;
+			break;
+		case 8:
+			this.buttons[i].displayString = "Mini map position: " + this.miniMapPositionStringArray[this.miniMapPositionIndex];
 			break;
 		default:
 			break;
@@ -118,6 +133,35 @@ public class MwGuiOptionSlot extends GuiSlot {
 			}
 			this.mw.maxChunkSaveDistSq = d * d;
 			break;
+		case 7:
+			this.mw.overlayManager.smallMapMode.toggleHeightPercent();
+			break;
+		case 8:
+			this.miniMapPositionIndex++;
+			if (this.miniMapPositionIndex >= this.miniMapPositionStringArray.length) {
+				// don't go back to the "unchanged" setting
+				this.miniMapPositionIndex = 1;
+			}
+			switch (this.miniMapPositionIndex) {
+			case 1:
+				// top right position
+				this.mw.overlayManager.smallMapMode.setMargins(10, -1, -1, 10);
+				break;
+			case 2:
+				// top left position
+				this.mw.overlayManager.smallMapMode.setMargins(10, -1, 10, -1);
+				break;
+			case 3:
+				// bottom right position
+				this.mw.overlayManager.smallMapMode.setMargins(-1, 40, -1, 10);
+				break;
+			case 4:
+				// bottom left position
+				this.mw.overlayManager.smallMapMode.setMargins(-1, 40, 10, -1);
+				break;
+			default:
+				break;
+			}
 		default:
 			break;
 		}

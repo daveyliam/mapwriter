@@ -78,9 +78,19 @@ public class MapMode {
 		this.trailMarkerSize = Math.max(1, this.markerSize - 1);
 	}
 	
-	public void close() {
+	public void saveConfig() {
+		this.config.setBoolean(this.configCategory, "enabled", this.enabled);
+		this.config.setInt(this.configCategory, "heightPercent", this.heightPercent);
+		this.config.setInt(this.configCategory, "marginTop", this.marginTop);
+		this.config.setInt(this.configCategory, "marginBottom", this.marginBottom);
+		this.config.setInt(this.configCategory, "marginLeft", this.marginLeft);
+		this.config.setInt(this.configCategory, "marginRight", this.marginRight);
 		this.config.setBoolean(this.configCategory, "rotate", this.rotate);
 		this.config.setBoolean(this.configCategory, "circular", this.circular);
+	}
+	
+	public void close() {
+		this.saveConfig();
 	}
 	
 	public void setScreenRes(int dw, int dh, int sw, int sh, double scaling) {
@@ -98,6 +108,27 @@ public class MapMode {
 		Minecraft mc = Minecraft.getMinecraft();
 		ScaledResolution sRes = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
 		this.setScreenRes(mc.displayWidth, mc.displayHeight, sRes.getScaledWidth(), sRes.getScaledHeight(), sRes.getScaleFactor());
+	}
+	
+	public void setMargins(int marginTop, int marginBottom, int marginLeft, int marginRight) {
+		this.marginTop = marginTop;
+		this.marginBottom = marginBottom;
+		this.marginLeft = marginLeft;
+		this.marginRight = marginRight;
+		this.update();
+	}
+	
+	public void setHeightPercent(int heightPercent) {
+		this.heightPercent = heightPercent;
+		this.update();
+	}
+	
+	public void toggleHeightPercent() {
+		int i = (this.heightPercent / 5) + 1;
+		if (i > 12) {
+			i = 1;
+		}
+		this.setHeightPercent(i * 5);
 	}
 	
 	private void update() {
