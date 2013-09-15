@@ -114,7 +114,7 @@ public class Mw {
 	public static int maxZoom = 5;
 	public static int minZoom = -5;
 	public boolean useSavedBlockColours = false;
-	public int maxChunkSaveDistSq = 256 * 256;
+	public int maxChunkSaveDistSq = 128 * 128;
 	
 	public String blockColourSaveFileName = "MapWriterBlockColours.txt";
 	
@@ -196,7 +196,7 @@ public class Mw {
 		this.teleportEnabled = this.config.getOrSetBoolean(catOptions, "teleportEnabled", this.teleportEnabled);
 		this.teleportCommand = this.config.get(catOptions, "teleportCommand", this.teleportCommand).getString();
 		this.coordsEnabled = this.config.getOrSetBoolean(catOptions, "coordsEnabled", this.coordsEnabled);
-		this.maxChunkSaveDistSq = this.config.getOrSetInt(catOptions, "maxChunkSaveDistSq", this.maxChunkSaveDistSq, 1, 512 * 512);
+		this.maxChunkSaveDistSq = this.config.getOrSetInt(catOptions, "maxChunkSaveDistSq", this.maxChunkSaveDistSq, 1, 256 * 256);
 		
 		maxZoom = this.config.getOrSetInt(catOptions, "zoomOutLevels", maxZoom, 1, 256);
 		minZoom = -this.config.getOrSetInt(catOptions, "zoomInLevels", -minZoom, 1, 256);
