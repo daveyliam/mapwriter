@@ -211,6 +211,10 @@ public class MapView {
 		this.updateZoom();
 	}
 	
+	public int getPixelsPerBlock() {
+		return this.mapW / this.baseW;
+	}
+	
 	public boolean isBlockWithinView(double bX, double bZ, boolean circular) {
 		boolean inside;
 		if (!circular) {

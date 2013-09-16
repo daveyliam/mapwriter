@@ -38,10 +38,26 @@ public class StandardMapRenderer implements MapRenderer {
 		
 		double tSize = (double) (this.mw.mapTexture.textureSize << regionZoomLevel);
 		
-		double u = (this.mapView.getMinX() % tSize) / tSize;
-		double v = (this.mapView.getMinZ() % tSize) / tSize;
-		double w = this.mapView.getWidth() / tSize;
-		double h = this.mapView.getHeight() / tSize;
+		// if the texture UV coordinates do not line up with the texture pixels then the texture
+		// will look blurry when it is rendered.
+		// to fix this we round the texture coordinates to the nearest pixel boundary.
+		// this is unnecessary when zoomed in as the texture will be upscaled and look blurry
+		// anyway, so it is disabled in this case.
+		// also the rounding causes the map to noticeably (and unpleasantly) 'snap' to texture
+		// pixel boundaries when zoomed in.
+		
+		double u, v, w, h;
+		if (this.mapView.getZoomLevel() >= 0) {
+			u = Math.round(this.mapView.getMinX() % tSize) / tSize;
+			v = Math.round(this.mapView.getMinZ() % tSize) / tSize;
+			w = Math.round(this.mapView.getWidth()) / tSize;
+			h = Math.round(this.mapView.getHeight()) / tSize;
+		} else {
+			u = (this.mapView.getMinX() % tSize) / tSize;
+			v = (this.mapView.getMinZ() % tSize) / tSize;
+			w = this.mapView.getWidth() / tSize;
+			h = this.mapView.getHeight() / tSize;
+		}
 		
 		GL11.glPushMatrix();
 		GL11.glLoadIdentity();
