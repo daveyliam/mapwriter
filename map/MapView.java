@@ -11,8 +11,6 @@ public class MapView {
 	private int dimension = 0;
 	private int textureSize = 2048;
 	
-	private int dimensionUpdates = 0;
-	
 	// the position of the centre of the 'view' of the map using game (block) coordinates
 	private double x = 0.0;
 	private double z = 0.0;
@@ -108,22 +106,25 @@ public class MapView {
 	}
 	
 	public void setDimension(int dimension) {
-		int zoomLevelChange = 0;
-		double scale = 1.0;
-		// don't change the zoom when we are first starting up
-		if (this.dimensionUpdates > 0) {
-			if ((this.dimension != -1) && (dimension == -1)) {
-				zoomLevelChange = -3;
-				scale = 0.125;
-			} else if ((this.dimension == -1) && (dimension != -1)) {
-				zoomLevelChange = 3;
-				scale = 8.0;
-			}
+		double scale = 8.0;
+		if ((this.dimension != -1) && (dimension == -1)) {
+			scale = 0.125;
+		} else if ((this.dimension == -1) && (dimension != -1)) {
+			scale = 8.0;
 		}
-		this.dimensionUpdates++;
 		this.dimension = dimension;
-		this.setZoomLevel(this.getZoomLevel() + zoomLevelChange);
 		this.setViewCentre(this.x * scale, this.z * scale);
+	}
+	
+	public void setDimensionAndAdjustZoom(int dimension) {
+		int zoomLevelChange = 0;
+		if ((this.dimension != -1) && (dimension == -1)) {
+			zoomLevelChange = -3;
+		} else if ((this.dimension == -1) && (dimension != -1)) {
+			zoomLevelChange = 3;
+		}
+		this.setZoomLevel(this.getZoomLevel() + zoomLevelChange);
+		this.setDimension(dimension);
 	}
 	
 	public void nextDimension(ArrayList<Integer> dimensionList, int n) {
@@ -131,7 +132,7 @@ public class MapView {
 		i = Math.max(0,  i);
 		int size = dimensionList.size();
 		int dimension = dimensionList.get((i + size + n) % size);
-		this.setDimension(dimension);
+		this.setDimensionAndAdjustZoom(dimension);
 	}
 	
 	public int getDimension() {
