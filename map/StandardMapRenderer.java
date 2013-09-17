@@ -34,8 +34,6 @@ public class StandardMapRenderer implements MapRenderer {
 		int regionZoomLevel = Math.max(0, this.mapView.getZoomLevel());
 		int dimension = this.mapView.getDimension();
 		
-		boolean drawTexture = ((regionZoomLevel == this.mw.mapTexture.loadedZoomLevel) && (dimension == this.mw.mapTexture.loadedDimension));
-		
 		double tSize = (double) (this.mw.mapTexture.textureSize << regionZoomLevel);
 		
 		// if the texture UV coordinates do not line up with the texture pixels then the texture
@@ -69,7 +67,10 @@ public class StandardMapRenderer implements MapRenderer {
 			Render.setCircularStencil(0, 0, this.mapMode.h / 2.0);
 		}
 		
-		if (drawTexture) {
+		// don't draw the map texture if the requested zoom level and dimension does not match
+		// the zoom level and dimension of the regions currently loaded into the texture.
+		// this prevents the map showing old regions while the new ones are loading.
+		if ((regionZoomLevel == this.mw.mapTexture.loadedZoomLevel) && (dimension == this.mw.mapTexture.loadedDimension)) {
 			Render.setColourWithAlphaPercent(0xffffff, this.mapMode.alphaPercent);
 			this.mw.mapTexture.bind();
 			Render.drawTexturedRect(this.mapMode.x, this.mapMode.y, this.mapMode.w, this.mapMode.h,
