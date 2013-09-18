@@ -34,7 +34,8 @@ public class StandardMapRenderer implements MapRenderer {
 		int regionZoomLevel = Math.max(0, this.mapView.getZoomLevel());
 		int dimension = this.mapView.getDimension();
 		
-		double tSize = (double) (this.mw.mapTexture.textureSize << regionZoomLevel);
+		double tSize = (double) this.mw.mapTexture.textureSize;
+		double zoomScale = (double) (1 << regionZoomLevel);
 		
 		// if the texture UV coordinates do not line up with the texture pixels then the texture
 		// will look blurry when it is rendered.
@@ -45,16 +46,18 @@ public class StandardMapRenderer implements MapRenderer {
 		// pixel boundaries when zoomed in.
 		
 		double u, v, w, h;
-		if (this.mapView.getZoomLevel() >= 0) {
-			u = Math.round(this.mapView.getMinX() % tSize) / tSize;
-			v = Math.round(this.mapView.getMinZ() % tSize) / tSize;
-			w = Math.round(this.mapView.getWidth()) / tSize;
-			h = Math.round(this.mapView.getHeight()) / tSize;
+		
+		if ((!this.mapMode.circular) && (this.mw.mapPixelSnapEnabled) && (this.mapView.getZoomLevel() >= 0)) {
+			u = (Math.round(this.mapView.getMinX() / zoomScale) / tSize) % 1.0;
+			v = (Math.round(this.mapView.getMinZ() / zoomScale) / tSize) % 1.0;
+			w = Math.round(this.mapView.getWidth() / zoomScale) / tSize;
+			h = Math.round(this.mapView.getHeight() / zoomScale) / tSize;
 		} else {
-			u = (this.mapView.getMinX() % tSize) / tSize;
-			v = (this.mapView.getMinZ() % tSize) / tSize;
-			w = this.mapView.getWidth() / tSize;
-			h = this.mapView.getHeight() / tSize;
+			double tSizeInBlocks = tSize * zoomScale;
+			u = (this.mapView.getMinX() / tSizeInBlocks) % 1.0;
+			v = (this.mapView.getMinZ() / tSizeInBlocks) % 1.0;
+			w = this.mapView.getWidth() / tSizeInBlocks;
+			h = this.mapView.getHeight() / tSizeInBlocks;
 		}
 		
 		GL11.glPushMatrix();

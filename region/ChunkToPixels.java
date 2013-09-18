@@ -36,6 +36,8 @@ public class ChunkToPixels {
 	
 	public static double getPixelHeightShading(int[] pixels, int offset, int scanSize) {
 		int samples = 0;
+		// the height (Y position) of the first opaque block in the column is stored in
+		// the pixel's alpha channel
 		int height = (pixels[offset] >> 24) & 0xff;
 		int heightDiff = 0;
 		
@@ -70,17 +72,35 @@ public class ChunkToPixels {
 	}
 	
 	public static void getMapPixels(BlockColours bc, MwChunk chunk, int[] pixels, int offset, int scanSize) {
+		// if the dimension has a roof caveMap should be enabled
 		boolean caveMap = (chunk.dimension == -1);
 		
-		// opaque layer
 		for (int z = 0; z < MwChunk.SIZE; z++) {
 			for (int x = 0; x < MwChunk.SIZE; x++) {
 				
+				// yStart is block height to start rendering at, it is the first opaque block looking downwards from yEnd.
+				// yEnd is the block height to stop rendering at.
+				// for normal maps yEnd is found by searching from the maximum height downwards until the first non air
+				// block is found.
+				// for cave maps yEnd is found by first looking for the first non opaque block (skipping the ceiling),
+				// and then looking for the first non air block.
 				int yEnd = (caveMap) ? getFirstNonOpaqueBlockY(bc, chunk, x, chunk.maxHeight - 1, z) : chunk.maxHeight - 1;
 				int yStart = getFirstOpaqueBlockY(bc, chunk, x, yEnd, z);
 				
 				int biome = chunk.getBiome(x, z);
 				
+				// for every block in the column starting from the lowest:
+				//  - get the block colour
+				//  - get the biome shading
+				//  - extract colour components as doubles in the range [0.0, 1.0]
+				//  - the shaded block colour is simply the block colour multiplied
+				//    by the biome shading for each component
+				//  - this shaded block colour is alpha blended with the running
+				//    colour for this column
+				//
+				// so the final map colour is an alpha blended stack of all the
+				// individual shaded block colours in the sequence [yStart .. yEnd]
+				//
 				double r = 0.0;
 				double g = 0.0;
 				double b = 0.0;
@@ -88,24 +108,29 @@ public class ChunkToPixels {
 					int blockAndMeta = chunk.getBlockAndMetadata(x, y, z);
 					
 					int c1 = bc.getColour(blockAndMeta);
-					int c2 = bc.getBiomeColour(blockAndMeta, biome);
-					
-					double c1A = (double) ((c1 >> 24) & 0xff) / 255.0;
-					double c1R = (double) ((c1 >> 16) & 0xff) / 255.0;
-					double c1G = (double) ((c1 >> 8)  & 0xff) / 255.0;
-					double c1B = (double) ((c1 >> 0)  & 0xff) / 255.0;
-					
-					double c2R = (double) ((c2 >> 16) & 0xff) / 255.0;
-					double c2G = (double) ((c2 >> 8)  & 0xff) / 255.0;
-					double c2B = (double) ((c2 >> 0)  & 0xff) / 255.0;
-					
-					// alpha blend and multiply
-					r = r * (1.0 - c1A) + ((c1R * c2R) * c1A);
-					g = g * (1.0 - c1A) + ((c1G * c2G) * c1A);
-					b = b * (1.0 - c1A) + ((c1B * c2B) * c1A);
+					int alpha = (c1 >> 24) & 0xff;
+					// no need to process block if it is transparent
+					if (alpha > 0) {
+						int c2 = bc.getBiomeColour(blockAndMeta, biome);
+						
+						// extract colour components as normalized doubles
+						double c1A = (double) (alpha) / 255.0;
+						double c1R = (double) ((c1 >> 16) & 0xff) / 255.0;
+						double c1G = (double) ((c1 >> 8)  & 0xff) / 255.0;
+						double c1B = (double) ((c1 >> 0)  & 0xff) / 255.0;
+						
+						double c2R = (double) ((c2 >> 16) & 0xff) / 255.0;
+						double c2G = (double) ((c2 >> 8)  & 0xff) / 255.0;
+						double c2B = (double) ((c2 >> 0)  & 0xff) / 255.0;
+						
+						// alpha blend and multiply
+						r = r * (1.0 - c1A) + ((c1R * c2R) * c1A);
+						g = g * (1.0 - c1A) + ((c1G * c2G) * c1A);
+						b = b * (1.0 - c1A) + ((c1B * c2B) * c1A);
+					}
 				}
 				
-				// shade heights
+				// get height shading based on neighboring pixel heights
 				int pixel = ((yStart & 0xff) << 24);
 				int pixelOffset = offset + (z * scanSize) + x;
 				pixels[pixelOffset] = pixel;
@@ -120,6 +145,7 @@ public class ChunkToPixels {
 					}
 				}*/
 				
+				// apply the height shading
 				r = Math.min(Math.max(0.0, r * shading), 1.0);
 				g = Math.min(Math.max(0.0, g * shading), 1.0);
 				b = Math.min(Math.max(0.0, b * shading), 1.0);

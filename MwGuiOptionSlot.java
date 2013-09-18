@@ -25,7 +25,7 @@ public class MwGuiOptionSlot extends GuiSlot {
 		"bottom left"
 	};
 	
-	private GuiButton[] buttons = new GuiButton[9];
+	private GuiButton[] buttons = new GuiButton[10];
 	
     static final ResourceLocation WIDGET_TEXTURE_LOC = new ResourceLocation("textures/gui/widgets.png");
 	
@@ -57,6 +57,9 @@ public class MwGuiOptionSlot extends GuiSlot {
 			break;
 		case 8:
 			this.buttons[i].displayString = "Mini map position: " + this.miniMapPositionStringArray[this.miniMapPositionIndex];
+			break;
+		case 9:
+			this.buttons[i].displayString = "Map pixel snapping: " + (this.mw.mapPixelSnapEnabled ? "enabled" : "disabled");
 			break;
 		default:
 			break;
@@ -166,6 +169,10 @@ public class MwGuiOptionSlot extends GuiSlot {
 			default:
 				break;
 			}
+		case 9:
+			// map scroll pixel snapping
+			this.mw.mapPixelSnapEnabled = !this.mw.mapPixelSnapEnabled;
+			break;
 		default:
 			break;
 		}

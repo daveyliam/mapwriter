@@ -104,11 +104,12 @@ public class ChunkManager {
 		public void run() {
 			for (MwChunk chunk : this.chunkList) {
 				if (chunk != null) {
+					// update the chunk in the region pixels
 					this.regionManager.updateChunk(chunk);
+					// copy updated region pixels to maptexture
 					this.mapTexture.updateChunk(this.regionManager, chunk);
 				}
 			}
-			// copy updated pixels to maptexture
 			// unload least accessed regions
 			this.regionManager.pruneRegions();
 		}
