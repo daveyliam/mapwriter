@@ -2,6 +2,8 @@ package mapwriter.map;
 
 import java.util.ArrayList;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import mapwriter.MwUtil;
 import mapwriter.forge.MwConfig;
 import mapwriter.map.mapmode.MapMode;
@@ -203,6 +205,23 @@ public class MarkerManager {
 			}
 		}
 		return count;
+	}
+
+	// filtering via guava's Iterables.filter so make note these
+	// markers are returned as a view of the original collection they are not cloned
+	// changes to these effect the markers in markerList
+	public Marker[] getMarkersInGroup(final String group) {
+		if (group.equals("all")) {
+			return this.markerList.toArray(new Marker[0]);
+		} else {
+			Iterable<Marker> matchingGroups = Iterables.filter(markerList, new Predicate<Marker>() {
+                @Override
+                public boolean apply(final Marker input) {
+                    return input.groupName.equals(group);
+                }
+            });
+			return Iterables.toArray(matchingGroups, Marker.class);
+		}
 	}
 	
 	public void selectNextMarker() {
