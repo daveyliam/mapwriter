@@ -24,7 +24,9 @@ public class MwGui extends GuiScreen {
     private MapMode mapMode;
     private MapView mapView;
     private StandardMapRenderer map;
-        
+    
+	private final static double PAN_FACTOR = 0.3D;
+    
     private static final int menuY = 5;
     private static final int menuX = 5;
     
@@ -250,16 +252,16 @@ public class MwGui extends GuiScreen {
         	break;
 		
 		case Keyboard.KEY_LEFT:
-			this.mapView.panView(-Mw.PAN_FACTOR, 0);
+			this.mapView.panView(-PAN_FACTOR, 0);
 			break;
 		case Keyboard.KEY_RIGHT:
-			this.mapView.panView(Mw.PAN_FACTOR, 0);
+			this.mapView.panView(PAN_FACTOR, 0);
 			break;
 		case Keyboard.KEY_UP:
-			this.mapView.panView(0, -Mw.PAN_FACTOR);
+			this.mapView.panView(0, -PAN_FACTOR);
 			break;
 		case Keyboard.KEY_DOWN:
-			this.mapView.panView(0, Mw.PAN_FACTOR);
+			this.mapView.panView(0, PAN_FACTOR);
 			break;
 		
 		case Keyboard.KEY_R:

@@ -25,7 +25,7 @@ public class MwGuiOptionSlot extends GuiSlot {
 		"bottom left"
 	};
 	
-	private GuiButton[] buttons = new GuiButton[10];
+	private GuiButton[] buttons = new GuiButton[11];
 	
     static final ResourceLocation WIDGET_TEXTURE_LOC = new ResourceLocation("textures/gui/widgets.png");
 	
@@ -60,6 +60,9 @@ public class MwGuiOptionSlot extends GuiSlot {
 			break;
 		case 9:
 			this.buttons[i].displayString = "Map pixel snapping: " + (this.mw.mapPixelSnapEnabled ? "enabled" : "disabled");
+			break;
+		case 10:
+			this.buttons[i].displayString = "Max Death Markers: " + this.mw.maxDeathMarkers;
 			break;
 		default:
 			break;
@@ -172,6 +175,13 @@ public class MwGuiOptionSlot extends GuiSlot {
 		case 9:
 			// map scroll pixel snapping
 			this.mw.mapPixelSnapEnabled = !this.mw.mapPixelSnapEnabled;
+			break;
+		case 10:
+			// max death markers
+			this.mw.maxDeathMarkers++;
+			if (this.mw.maxDeathMarkers > 10) {
+				this.mw.maxDeathMarkers = 0;
+			}
 			break;
 		default:
 			break;

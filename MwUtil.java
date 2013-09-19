@@ -4,6 +4,9 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.regex.Pattern;
 
 import mapwriter.forge.MwForge;
@@ -101,5 +104,10 @@ public class MwUtil {
 		
 		// add 1 to get the power of two result
 		return v + 1;
+	}
+	
+	public static String getCurrentDateString() {
+		DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmm");
+		return dateFormat.format(new Date());
 	}
 }

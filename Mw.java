@@ -76,37 +76,31 @@ logged in.
 /* TODO list
  * 
  * - Button to cycle through group selection
- * - Add marker in game hot key and GUI
  * - Save map as 8192x8192 tiles
- * - Fix mergeToImage exception for w or h of 0
- * - Add option to reduce map loading distance
- * - Dimension field on markers
  * - Rei's format marker reading and writing
- * - Save single player chunks to separate directory
- * - Convert to use own anvil writer implementation
- * - Allow using default texture pack for map with custom texture pack in game
  * - Cave map
- * - Death markers
  */
 
 public class Mw {
 	
 	public Minecraft mc = null;
 	
-	public boolean ready = false;
-	public boolean multiplayer = false;
-	public int tickCounter = 0;
-	//private int chunkCount = 0;
+	// server information
 	public String worldName = "default";
 	private String serverName = "default";
 	private int serverPort = 0;
+	
+	// configuration files (global and world specific)
+	public MwConfig config;
+	public MwConfig worldConfig = null;
+	
+	// directories
 	private final File configDir;
 	private final File saveDir;
 	public File worldDir = null;
 	public File imageDir = null;
-	//private boolean closing = false;
-	public MwConfig config;
-	public MwConfig worldConfig = null;
+	
+	// configuration options
 	public boolean linearTextureScalingEnabled = true;
 	public boolean coordsEnabled = false;
 	public boolean teleportEnabled = true;
@@ -117,11 +111,15 @@ public class Mw {
 	public boolean useSavedBlockColours = false;
 	public int maxChunkSaveDistSq = 128 * 128;
 	public boolean mapPixelSnapEnabled = true;
-	
-	public String blockColourSaveFileName = "MapWriterBlockColours.txt";
-	
 	private int textureSize = 2048;
 	public int configTextureSize = 2048;
+	public int maxDeathMarkers = 3;
+	
+	// flags and counters
+	private boolean onPlayerDeathAlreadyFired = false;
+	public boolean ready = false;
+	public boolean multiplayer = false;
+	public int tickCounter = 0;
 	
 	// list of available dimensions
 	public ArrayList<Integer> dimensionList = new ArrayList<Integer>();
@@ -138,11 +136,11 @@ public class Mw {
 	public double mapRotationDegrees = 0.0;
 	
 	// constants
-	public final static double PAN_FACTOR = 0.3D;
 	public final static String catWorld = "world";
 	public final static String catMarkers = "markers";
 	public final static String catOptions = "options";
 	public final static String worldDirConfigName = "mapwriter.cfg";
+	public final static String blockColourSaveFileName = "MapWriterBlockColours.txt";
 	
 	// instances of components
 	public MapTexture mapTexture = null;
@@ -200,6 +198,7 @@ public class Mw {
 		this.coordsEnabled = this.config.getOrSetBoolean(catOptions, "coordsEnabled", this.coordsEnabled);
 		this.maxChunkSaveDistSq = this.config.getOrSetInt(catOptions, "maxChunkSaveDistSq", this.maxChunkSaveDistSq, 1, 256 * 256);
 		this.mapPixelSnapEnabled = this.config.getOrSetBoolean(catOptions, "mapPixelSnapEnabled", this.mapPixelSnapEnabled);
+		this.maxDeathMarkers = this.config.getOrSetInt(catOptions, "maxDeathMarkers", 3, 0, 1000);
 		
 		maxZoom = this.config.getOrSetInt(catOptions, "zoomOutLevels", maxZoom, 1, 256);
 		minZoom = -this.config.getOrSetInt(catOptions, "zoomInLevels", -minZoom, 1, 256);
@@ -226,6 +225,7 @@ public class Mw {
 		this.config.setBoolean(catOptions, "coordsEnabled", this.coordsEnabled);
 		this.config.setInt(catOptions, "maxChunkSaveDistSq", this.maxChunkSaveDistSq);
 		this.config.setBoolean(catOptions, "mapPixelSnapEnabled", this.mapPixelSnapEnabled);
+		this.config.setInt(catOptions, "maxDeathMarkers", this.maxDeathMarkers);
 		
 		// save config
 		this.config.save();
@@ -319,7 +319,7 @@ public class Mw {
 	
 	public void reloadBlockColours() {
 		BlockColours bc;
-		File f = new File(this.configDir, this.blockColourSaveFileName);
+		File f = new File(this.configDir, blockColourSaveFileName);
 		if (this.useSavedBlockColours && f.isFile()) {
 			// load block colours from file
 			MwUtil.logInfo("loading block colours from %s", f);
@@ -333,7 +333,7 @@ public class Mw {
 	}
 	
 	public void saveCurrentBlockColours() {
-		File f = new File(this.configDir, this.blockColourSaveFileName);
+		File f = new File(this.configDir, blockColourSaveFileName);
 		MwUtil.logInfo("saving block colours to '%s'", f);
 		this.blockColours.saveToFile(f);
 	}
@@ -409,6 +409,7 @@ public class Mw {
 		}
 		
 		this.tickCounter = 0;
+		this.onPlayerDeathAlreadyFired = false;
 		
 		this.loadConfig();
 		//this.multiplayer = !this.mc.isIntegratedServerRunning();
@@ -503,13 +504,20 @@ public class Mw {
 		if (this.ready && (this.mc.thePlayer != null)) {
 			
 			this.updatePlayer();
-			if (this.mc.currentScreen == null) {
-				this.overlayManager.overlayView.setViewCentreScaled(this.playerX, this.playerZ, this.playerDimension);
-				this.overlayManager.drawCurrentMap();
+			// check if the game over screen is being displayed and if so 
+			// (thanks to Christian Ehrhardt for this method of checking when the player is dead)
+			if (this.mc.currentScreen instanceof GuiGameOver) {
+				if (!this.onPlayerDeathAlreadyFired) {
+					this.onPlayerDeath();
+					this.onPlayerDeathAlreadyFired = true;
+				}
 			} else {
-				// detect player death by watching for mc.currentScreen to be an instance of GuiGameOver
-				if (this.mc.currentScreen instanceof GuiGameOver) {
-					this.onPlayerDeath(new Marker("diedHere", "playerDeaths", this.playerXInt, this.playerYInt, this.playerZInt, this.overlayManager.overlayView.getDimension(), 0xffff0000));
+				// if the player is not dead
+				this.onPlayerDeathAlreadyFired = false;
+				// if in game (no gui screen) center the minimap on the player and render it.
+				if (this.mc.currentScreen == null) {
+					this.overlayManager.overlayView.setViewCentreScaled(this.playerX, this.playerZ, this.playerDimension);
+					this.overlayManager.drawCurrentMap();
 				}
 			}
 			
@@ -550,23 +558,20 @@ public class Mw {
 	
 	// from onTick when mc.currentScreen is an instance of GuiGameOver
 	// it's the only option to detect death client side
-	public void onPlayerDeath(Marker marker) {
-		if (this.ready) {
-			// cap death markers at 3 ... this is not ideal and should
-			// probably be configurable by user
-			if (this.markerManager.countMarkersInGroup("playerDeaths") > 2) {
-				Marker[] deathMarkers = this.markerManager.getMarkersInGroup("playerDeaths");
-				this.markerManager.delMarker(deathMarkers[0]);
+	public void onPlayerDeath() {
+		if (this.ready && (this.maxDeathMarkers > 0)) {
+			this.updatePlayer();
+			boolean error = false;
+			while (!error && (this.markerManager.countMarkersInGroup("playerDeaths") >= this.maxDeathMarkers)) {
+				// delete the first marker found in the group "playerDeaths".
+				// as new markers are only ever appended to the marker list this will delete the
+				// earliest death marker added.
+				// delMarker returns false if the marker could not be deleted.
+				error = !this.markerManager.delMarker(null, "playerDeaths");
 			}
-
-			// only add the marker once, ignore further requests while the
-			// user sits in the death screen
-			if (!this.markerManager.markerList.contains(marker)) {
-				this.markerManager.addMarker(marker);
-				this.markerManager.setVisibleGroupName("playerDeaths");
-				this.markerManager.update();
-			}
-
+			this.markerManager.addMarker(MwUtil.getCurrentDateString(), "playerDeaths", this.playerXInt, this.playerYInt, this.playerZInt, this.playerDimension, 0xffff0000);
+			this.markerManager.setVisibleGroupName("playerDeaths");
+			this.markerManager.update();
 		}
 	}
 	
