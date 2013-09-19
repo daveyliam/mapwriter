@@ -15,6 +15,7 @@ import mapwriter.map.Trail;
 import mapwriter.region.BlockColours;
 import mapwriter.region.RegionManager;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGameOver;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.network.packet.Packet1Login;
 import net.minecraft.server.integrated.IntegratedServer;
@@ -505,6 +506,11 @@ public class Mw {
 			if (this.mc.currentScreen == null) {
 				this.overlayManager.overlayView.setViewCentreScaled(this.playerX, this.playerZ, this.playerDimension);
 				this.overlayManager.drawCurrentMap();
+			} else {
+				// detect player death by watching for mc.currentScreen to be an instance of GuiGameOver
+				if (this.mc.currentScreen instanceof GuiGameOver) {
+					this.onPlayerDeath(new Marker("diedHere", "playerDeaths", this.playerXInt, this.playerYInt, this.playerZInt, this.overlayManager.overlayView.getDimension(), 0xffff0000));
+				}
 			}
 			
 			// process background tasks
@@ -542,20 +548,27 @@ public class Mw {
 		}
 	}
 	
-	// not currently called by anything.
-	// need to find a entity death event that works client side.
-	/*public void onPlayerDeath() {
+	// from onTick when mc.currentScreen is an instance of GuiGameOver
+	// it's the only option to detect death client side
+	public void onPlayerDeath(Marker marker) {
 		if (this.ready) {
-			this.updatePlayer();
-			boolean error = false;
-			while (!error && (this.markerManager.countMarkersInGroup("playerDeaths") > 2)) {
-				error = this.markerManager.delMarker("diedHere", "playerDeaths");
+			// cap death markers at 3 ... this is not ideal and should
+			// probably be configurable by user
+			if (this.markerManager.countMarkersInGroup("playerDeaths") > 2) {
+				Marker[] deathMarkers = this.markerManager.getMarkersInGroup("playerDeaths");
+				this.markerManager.delMarker(deathMarkers[0]);
 			}
-			this.markerManager.addMarker("diedHere", "playerDeaths", this.playerXInt, this.playerYInt, this.playerZInt, 0xffff0000);
-			this.markerManager.setVisibleGroupName("playerDeaths");
-			this.markerManager.update();
+
+			// only add the marker once, ignore further requests while the
+			// user sits in the death screen
+			if (!this.markerManager.markerList.contains(marker)) {
+				this.markerManager.addMarker(marker);
+				this.markerManager.setVisibleGroupName("playerDeaths");
+				this.markerManager.update();
+			}
+
 		}
-	}*/
+	}
 	
 	public void onKeyDown(KeyBinding kb) {
 		// make sure not in GUI element (e.g. chat box)
@@ -573,9 +586,9 @@ public class Mw {
 			} else if (kb == MwKeyHandler.keyNewMarker) {
 				// open new marker dialog
 				String group = this.markerManager.getVisibleGroupName();
-        		if (group.equals("none")) {
-        			group = "group";
-        		}
+				if (group.equals("none")) {
+					group = "group";
+				}
 				this.mc.displayGuiScreen(
 					new MwGuiMarkerDialog(
 						null,
