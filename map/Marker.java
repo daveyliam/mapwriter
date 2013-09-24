@@ -6,12 +6,12 @@ import mapwriter.Render;
 import mapwriter.map.mapmode.MapMode;
 
 public class Marker {
-	public String name;
+	public final String name;
+	public final String groupName;
 	public int x;
 	public int y;
 	public int z;
 	public int dimension;
-	public String groupName;
 	public int colour;
 	
 	public Point.Double screenPos = new Point.Double(0, 0);

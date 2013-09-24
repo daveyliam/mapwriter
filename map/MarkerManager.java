@@ -133,11 +133,14 @@ public class MarkerManager {
 	public boolean delMarker(String name, String group) {
 		Marker markerToDelete = null;
 		for (Marker marker : this.markerList) {
-			if (((name == null) || marker.name.equals(name)) && ((group == null) || marker.groupName.equals(group))) {
+			if (((name == null) || marker.name.equals(name)) &&
+				((group == null) || marker.groupName.equals(group))) {
 				markerToDelete = marker;
 				break;
 			}
 		}
+		// will return false if a marker matching the criteria is not found
+		// (i.e. if markerToDelete is null)
 		return this.delMarker(markerToDelete);
 	}
 	
@@ -248,6 +251,10 @@ public class MarkerManager {
 			int dz = marker.z - z;
 			int d = (dx * dx) + (dz * dz);
 			double angle = Math.atan2(dz, dx);
+			// use cos instead of abs as it will wrap at 2 * Pi.
+			// cos will be closer to 1.0 the closer desiredAngle and angle are.
+			// 0.8 is the threshold corresponding to a maximum of
+			// acos(0.8) = 37 degrees difference between the two angles.
 			if ((Math.cos(desiredAngle - angle) > 0.8D) && (d < nearestDistance) && (d > 4)) {
 				nearestMarker = marker;
 				nearestDistance = d;

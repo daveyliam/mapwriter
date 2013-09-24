@@ -22,3 +22,7 @@ Reobfuscation and Packaging:
 
 3) Create a zip file of the 'forge/mcp/src/minecraft/mapwriter' folder.
 
+
+Acknowledgements:
+
+* Christian Ehrhardt for the code to get death markers working.

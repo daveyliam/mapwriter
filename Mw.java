@@ -561,13 +561,12 @@ public class Mw {
 	public void onPlayerDeath() {
 		if (this.ready && (this.maxDeathMarkers > 0)) {
 			this.updatePlayer();
-			boolean error = false;
-			while (!error && (this.markerManager.countMarkersInGroup("playerDeaths") >= this.maxDeathMarkers)) {
+			int deleteCount = this.markerManager.countMarkersInGroup("playerDeaths") - this.maxDeathMarkers + 1;
+			for (int i = 0; i < deleteCount; i++) {
 				// delete the first marker found in the group "playerDeaths".
 				// as new markers are only ever appended to the marker list this will delete the
 				// earliest death marker added.
-				// delMarker returns false if the marker could not be deleted.
-				error = !this.markerManager.delMarker(null, "playerDeaths");
+				this.markerManager.delMarker(null, "playerDeaths");
 			}
 			this.markerManager.addMarker(MwUtil.getCurrentDateString(), "playerDeaths", this.playerXInt, this.playerYInt, this.playerZInt, this.playerDimension, 0xffff0000);
 			this.markerManager.setVisibleGroupName("playerDeaths");
