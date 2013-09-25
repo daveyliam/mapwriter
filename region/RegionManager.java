@@ -11,7 +11,7 @@ public class RegionManager {
 	public final File imageDir;
 	public BlockColours blockColours;
 	public static Logger logger;
-	public final static int maxLoadedRegions = 64;
+	public final static int maxLoadedRegions = 128;
 	
 	//private int regionArraySize;
 	//private Region[] regionArray;
