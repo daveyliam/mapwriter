@@ -2,6 +2,7 @@ package mapwriter.region;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 public class RegionManager {
@@ -15,7 +16,7 @@ public class RegionManager {
 	
 	//private int regionArraySize;
 	//private Region[] regionArray;
-	private int currentPruneTick = 0;
+	private int currentTick = 0;
 	
 	public static void logInfo(String s, Object...args) {
 		if (logger != null) {
@@ -64,8 +65,32 @@ public class RegionManager {
 		region.close();
 	}
 	
+	private static int incrStatsCounter(HashMap<String, Integer> h, String key) {
+		int n = 1;
+		if (h.containsKey(key)) {
+			n = h.get(key) + 1;
+		}
+		h.put(key, n);
+		return n;
+	}
+	
+	public void printLoadedRegionStats() {
+		logInfo("loaded region listing:");
+		HashMap<String, Integer> stats = new HashMap<String, Integer>();
+		for (Region region : this.regionMap.values()) {
+			logInfo("  %s %d %d", region, region.lastAccessedTick, region.getRefCount());
+			incrStatsCounter(stats, String.format("dim%d", region.dimension));
+			incrStatsCounter(stats, String.format("zoom%d", region.zoomLevel));
+			incrStatsCounter(stats, "total");
+		}
+		logInfo("loaded region stats:");
+		for (Entry<String, Integer> e : stats.entrySet()) {
+			logInfo("  %s: %d", e.getKey(), e.getValue());
+		}
+	}
+	
 	public Region getLeastAccessedRegion() {
-		int minLastAccessedTick = this.currentPruneTick;
+		int minLastAccessedTick = this.currentTick;
 		Region leastAccessedRegion = null;
 		for (Region region : this.regionMap.values()) {
 	        if ((region != null) && (region.getRefCount() <= 0) && (region.lastAccessedTick < minLastAccessedTick)) {
@@ -77,29 +102,29 @@ public class RegionManager {
 	}
 	
 	public int pruneRegions() {
-		int count = 0;
-		boolean error = false;
-		while ((!error) && (this.regionMap.size() > maxLoadedRegions)) {
+		int unloadedCount = 0;
+		int unloadAttemptCount = this.regionMap.size() - maxLoadedRegions;
+		for (int i = 0; i < unloadAttemptCount; i++) {
 			Region region = this.getLeastAccessedRegion();
 			if (region != null) {
 				this.unloadRegion(region);
-				count++;
-			} else {
-				error = true;
+				unloadedCount++;
 			}
 		}
-		//if (count > 0) {
-		//	RegionManager.logInfo("%d unused regions closed", count);
+		
+		//if (unloadedCount > 0) {
+		//	this.printLoadedRegionStats();
 		//}
+		
 		if (this.regionMap.size() > maxLoadedRegions) {
 			RegionManager.logWarning("unable to close enough regions (%d regions loaded, limit is %d)", this.regionMap.size(), maxLoadedRegions);
+			this.printLoadedRegionStats();
 		}
-		this.currentPruneTick++;
-		return count;
+		return unloadedCount;
 	}
 	
 	public int getCurrentTick() {
-		return this.currentPruneTick;
+		return this.currentTick;
 	}
 	
 	public File getDimensionDir(int dimension) {
@@ -119,6 +144,8 @@ public class RegionManager {
 			// add region
 			region = new Region(this, x, z, zoomLevel, dimension);
 			this.regionMap.put(region.key, region);
+			this.currentTick++;
+			//this.printLoadedRegionStats();
 		}
 		return region;
 	}
