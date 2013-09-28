@@ -8,19 +8,6 @@ public class ChunkToPixels {
 	public static final double brightenAmplitude = 0.7;
 	public static final double darkenAmplitude = 1.4;
 	
-	public static int getFirstOpaqueBlockY(BlockColours bc, MwChunk chunk, int x, int y, int z) {
-		boolean found = false;
-		// search in a column downwards for the first opaque block (alpha = 0xff)
-		for (; (y >= 0) && !found; y--) {
-			int blockAndMeta = chunk.getBlockAndMetadata(x, y, z);
-			int colour = bc.getColour(blockAndMeta);
-			if (((colour >> 24) & 0xff) == 0xff) {
-				found = true;
-			}
-		}
-		return y + 1;
-	}
-	
 	public static int getFirstNonOpaqueBlockY(BlockColours bc, MwChunk chunk, int x, int y, int z) {
 		boolean found = false;
 		// search in a column downwards for the first non opaque block (alpha != 0xff)
@@ -34,11 +21,13 @@ public class ChunkToPixels {
 		return y + 1;
 	}
 	
-	public static double getPixelHeightShading(int[] pixels, int offset, int scanSize) {
+	// get the height shading of a pixel.
+	// requires the pixel to the west and the pixel to the north to have their
+	// heights stored in the alpha channel to work.
+	// the "height" of a pixel is the y value of the first opaque block in
+	// the block column that created the pixel.
+	public static double getPixelHeightShading(int[] pixels, int offset, int scanSize, int height) {
 		int samples = 0;
-		// the height (Y position) of the first opaque block in the column is stored in
-		// the pixel's alpha channel
-		int height = (pixels[offset] >> 24) & 0xff;
 		int heightDiff = 0;
 		
 		// if (pixelX > 0)
@@ -78,18 +67,17 @@ public class ChunkToPixels {
 		for (int z = 0; z < MwChunk.SIZE; z++) {
 			for (int x = 0; x < MwChunk.SIZE; x++) {
 				
-				// yStart is block height to start rendering at, it is the first opaque block looking downwards from yEnd.
-				// yEnd is the block height to stop rendering at.
-				// for normal maps yEnd is found by searching from the maximum height downwards until the first non air
-				// block is found.
-				// for cave maps yEnd is found by first looking for the first non opaque block (skipping the ceiling),
-				// and then looking for the first non air block.
-				int yEnd = (caveMap) ? getFirstNonOpaqueBlockY(bc, chunk, x, chunk.maxHeight - 1, z) : chunk.maxHeight - 1;
-				int yStart = getFirstOpaqueBlockY(bc, chunk, x, yEnd, z);
+				// calculate the colour of a pixel by alpha blending the colour of each block
+				// in a column until an opaque block is reached.
+				// y is topmost block height to start rendering at.
+				// for maps without a ceiling y is simply the height of the highest block in that chunk.
+				// for maps with a ceiling y is the height of the first non opaque block starting from
+				// the ceiling.
+				int y = (caveMap) ? getFirstNonOpaqueBlockY(bc, chunk, x, chunk.maxHeight - 1, z) : chunk.maxHeight - 1;
 				
 				int biome = chunk.getBiome(x, z);
 				
-				// for every block in the column starting from the lowest:
+				// for every block in the column starting from the highest:
 				//  - get the block colour
 				//  - get the biome shading
 				//  - extract colour components as doubles in the range [0.0, 1.0]
@@ -101,10 +89,15 @@ public class ChunkToPixels {
 				// so the final map colour is an alpha blended stack of all the
 				// individual shaded block colours in the sequence [yStart .. yEnd]
 				//
+				// note that the "front to back" alpha blending algorithm is used
+				// rather than the more common "back to front".
+				//
+				
+				double a = 1.0;
 				double r = 0.0;
 				double g = 0.0;
 				double b = 0.0;
-				for (int y = yStart; y <= yEnd; y++) {
+				for (; y > 0; y--) {
 					int blockAndMeta = chunk.getBlockAndMetadata(x, y, z);
 					
 					int c1 = bc.getColour(blockAndMeta);
@@ -119,22 +112,28 @@ public class ChunkToPixels {
 						double c1G = (double) ((c1 >> 8)  & 0xff) / 255.0;
 						double c1B = (double) ((c1 >> 0)  & 0xff) / 255.0;
 						
+						// c2A is implicitly 1.0 (opaque)
 						double c2R = (double) ((c2 >> 16) & 0xff) / 255.0;
 						double c2G = (double) ((c2 >> 8)  & 0xff) / 255.0;
 						double c2B = (double) ((c2 >> 0)  & 0xff) / 255.0;
 						
 						// alpha blend and multiply
-						r = r * (1.0 - c1A) + ((c1R * c2R) * c1A);
-						g = g * (1.0 - c1A) + ((c1G * c2G) * c1A);
-						b = b * (1.0 - c1A) + ((c1B * c2B) * c1A);
+						r = r + (a * c1A * c1R * c2R);
+						g = g + (a * c1A * c1G * c2G);
+						b = b + (a * c1A * c1B * c2B);
+						a = a * (1.0 - c1A);
+					}
+					// break when an opaque block is encountered
+					if (alpha == 0xff) {
+						break;
 					}
 				}
 				
-				// get height shading based on neighboring pixel heights
-				int pixel = ((yStart & 0xff) << 24);
+				// get height shading based on neighboring pixel heights.
+				// need to first add a dummy colour value with the block
+				// height in the alpha channel.
 				int pixelOffset = offset + (z * scanSize) + x;
-				pixels[pixelOffset] = pixel;
-				double shading = 1.0 + getPixelHeightShading(pixels, pixelOffset, scanSize);
+				double shading = 1.0 + getPixelHeightShading(pixels, pixelOffset, scanSize, y);
 				
 				/*
 				// darken blocks depending on how far away they are from this depth slice
@@ -151,7 +150,7 @@ public class ChunkToPixels {
 				b = Math.min(Math.max(0.0, b * shading), 1.0);
 				
 				// now we have our final RGB values as doubles, convert to a packed ARGB pixel.
-				pixels[offset + (z * scanSize) + x] = (pixel & 0xff000000) |
+				pixels[pixelOffset] = ((y & 0xff) << 24) |
 						((((int) (r * 255.0)) & 0xff) << 16) |
 						((((int) (g * 255.0)) & 0xff) << 8) |
 						((((int) (b * 255.0)) & 0xff));
