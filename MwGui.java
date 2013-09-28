@@ -416,7 +416,6 @@ public class MwGui extends GuiScreen {
     	} else if (this.dimensionLabel.posWithin(x, y)) {
     		int n = (direction > 0) ? 1 : -1;
 	    	this.mapView.nextDimension(this.mw.dimensionList, n);
-	    	this.mw.overlayManager.overlayView.setDimensionAndAdjustZoom(this.mapView.getDimension());
 	    	
     	} else if (this.groupLabel.posWithin(x, y)) {
     		int n = (direction > 0) ? 1 : -1;

@@ -106,7 +106,7 @@ public class MapView {
 	}
 	
 	public void setDimension(int dimension) {
-		double scale = 8.0;
+		double scale = 1.0;
 		if ((this.dimension != -1) && (dimension == -1)) {
 			scale = 0.125;
 		} else if ((this.dimension == -1) && (dimension != -1)) {
