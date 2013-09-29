@@ -2,6 +2,7 @@ package mapwriter;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import mapwriter.forge.MwConfig;
 import mapwriter.forge.MwForge;
@@ -114,6 +115,7 @@ public class Mw {
 	private int textureSize = 2048;
 	public int configTextureSize = 2048;
 	public int maxDeathMarkers = 3;
+	public int chunksPerTick = 5;
 	
 	// flags and counters
 	private boolean onPlayerDeathAlreadyFired = false;
@@ -122,7 +124,7 @@ public class Mw {
 	public int tickCounter = 0;
 	
 	// list of available dimensions
-	public ArrayList<Integer> dimensionList = new ArrayList<Integer>();
+	public List<Integer> dimensionList = new ArrayList<Integer>();
 	
 	// player position and heading
 	public double playerX = 0.0;
@@ -198,7 +200,8 @@ public class Mw {
 		this.coordsEnabled = this.config.getOrSetBoolean(catOptions, "coordsEnabled", this.coordsEnabled);
 		this.maxChunkSaveDistSq = this.config.getOrSetInt(catOptions, "maxChunkSaveDistSq", this.maxChunkSaveDistSq, 1, 256 * 256);
 		this.mapPixelSnapEnabled = this.config.getOrSetBoolean(catOptions, "mapPixelSnapEnabled", this.mapPixelSnapEnabled);
-		this.maxDeathMarkers = this.config.getOrSetInt(catOptions, "maxDeathMarkers", 3, 0, 1000);
+		this.maxDeathMarkers = this.config.getOrSetInt(catOptions, "maxDeathMarkers", this.maxDeathMarkers, 0, 1000);
+		this.chunksPerTick = this.config.getOrSetInt(catOptions, "chunksPerTick", this.chunksPerTick, 1, 500);
 		
 		maxZoom = this.config.getOrSetInt(catOptions, "zoomOutLevels", maxZoom, 1, 256);
 		minZoom = -this.config.getOrSetInt(catOptions, "zoomInLevels", -minZoom, 1, 256);
@@ -226,6 +229,7 @@ public class Mw {
 		this.config.setInt(catOptions, "maxChunkSaveDistSq", this.maxChunkSaveDistSq);
 		this.config.setBoolean(catOptions, "mapPixelSnapEnabled", this.mapPixelSnapEnabled);
 		this.config.setInt(catOptions, "maxDeathMarkers", this.maxDeathMarkers);
+		this.config.setInt(catOptions, "chunksPerTick", this.chunksPerTick);
 		
 		// save config
 		this.config.save();
@@ -282,7 +286,7 @@ public class Mw {
 	}
 	
 	public void cleanDimensionList() {
-		ArrayList<Integer> dimensionListCopy = new ArrayList<Integer>(this.dimensionList);
+		List<Integer> dimensionListCopy = new ArrayList<Integer>(this.dimensionList);
 		this.dimensionList.clear();
 		for (int dimension : dimensionListCopy) {
 			this.addDimension(dimension);
@@ -528,6 +532,9 @@ public class Mw {
 			}
 			
 			this.chunkManager.onTick();
+			
+			// update GL texture of mapTexture if updated
+			this.mapTexture.processTextureUpdates();
 			
 			// let the renderEngine know we have changed the bound texture.
 	    	//this.mc.renderEngine.resetBoundTexture();

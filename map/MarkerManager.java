@@ -1,6 +1,7 @@
 package mapwriter.map;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import mapwriter.MwUtil;
 import mapwriter.forge.MwConfig;
@@ -8,10 +9,10 @@ import mapwriter.map.mapmode.MapMode;
 
 public class MarkerManager {
 	
-	public ArrayList<Marker> markerList = new ArrayList<Marker>();
-	public ArrayList<String> groupList = new ArrayList<String>();
+	public List<Marker> markerList = new ArrayList<Marker>();
+	public List<String> groupList = new ArrayList<String>();
 	
-	public ArrayList<Marker> visibleMarkerList = new ArrayList<Marker>();
+	public List<Marker> visibleMarkerList = new ArrayList<Marker>();
 	
 	private String visibleGroupName = "none";
 	

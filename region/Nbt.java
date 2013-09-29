@@ -6,6 +6,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Nbt {
 
@@ -56,7 +58,7 @@ public class Nbt {
 				this.data = new ArrayList<Nbt>();
 			}
 			@SuppressWarnings("unchecked")
-			ArrayList<Nbt> childrenList = (ArrayList<Nbt>) this.data;
+			List<Nbt> childrenList = (List<Nbt>) this.data;
 			childrenList.add(child);
 		}
 		
@@ -66,7 +68,7 @@ public class Nbt {
 				this.data = new HashMap<String, Nbt>();
 			}
 			@SuppressWarnings("unchecked")
-			HashMap<String, Nbt> childrenMap = (HashMap<String, Nbt>) this.data;
+			Map<String, Nbt> childrenMap = (Map<String, Nbt>) this.data;
 			childrenMap.put(child.name, child);
 		}
 	}
@@ -79,7 +81,7 @@ public class Nbt {
 		Nbt child = null;
 		if ((this.tagID == TAG_LIST) && (this.data != null)) {
 			@SuppressWarnings("unchecked")
-			ArrayList<Nbt> childrenList = (ArrayList<Nbt>) this.data;
+			List<Nbt> childrenList = (List<Nbt>) this.data;
 			if ((index >= 0) && (index < childrenList.size())) {
 				child = childrenList.get(index);
 			}
@@ -92,7 +94,7 @@ public class Nbt {
 		Nbt child = null;
 		if ((this.tagID == TAG_COMPOUND) && (this.data != null)) {
 			@SuppressWarnings("unchecked")
-			HashMap<String, Nbt> childrenMap = (HashMap<String, Nbt>) this.data;
+			Map<String, Nbt> childrenMap = (Map<String, Nbt>) this.data;
 			child = childrenMap.get(name);
 		}
 		return (child != null) ? (child) : (nullElement);
@@ -103,7 +105,7 @@ public class Nbt {
 		int size = 0;
 		if ((this.tagID == TAG_LIST) && (this.data != null)) {
 			@SuppressWarnings("unchecked")
-			ArrayList<Nbt> childrenList = (ArrayList<Nbt>) this.data;
+			List<Nbt> childrenList = (List<Nbt>) this.data;
 			size = childrenList.size();
 		}
 		return size;
@@ -345,7 +347,7 @@ public class Nbt {
 			
 		case TAG_COMPOUND:
 			@SuppressWarnings("unchecked")
-			HashMap<String, Nbt> childrenMap = (HashMap<String, Nbt>) this.data;
+			Map<String, Nbt> childrenMap = (Map<String, Nbt>) this.data;
 			for (Nbt child : childrenMap.values()) {
 				if (child != null) {
 					child.writeElement(dos);

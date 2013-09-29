@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import mapwriter.forge.MwForge;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.world.chunk.Chunk;
 
 public class MwUtil {
 	
@@ -109,5 +110,11 @@ public class MwUtil {
 	public static String getCurrentDateString() {
 		DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmm");
 		return dateFormat.format(new Date());
+	}
+	
+	public static int distToChunkSq(int x, int z, Chunk chunk) {
+		int dx = (chunk.xPosition << 4) + 8 - x;
+		int dz = (chunk.zPosition << 4) + 8 - z;
+		return (dx * dx) + (dz * dz);
 	}
 }

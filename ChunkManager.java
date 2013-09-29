@@ -1,8 +1,5 @@
 package mapwriter;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-
 import mapwriter.map.MapTexture;
 import mapwriter.region.MwChunk;
 import mapwriter.region.RegionManager;
@@ -12,21 +9,18 @@ import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 public class ChunkManager {
 	public Mw mw;
 	private boolean closed = false;
-	private ArrayList<HashSet<Chunk>> chunkBuckets;
-	private boolean[] chunkViewedBitfield = new boolean[64 * 64];
+	private CircularList<Chunk> allChunkList = new CircularList<Chunk>();
+	private CircularList<Chunk> viewedChunkList = new CircularList<Chunk>();
 	
 	public ChunkManager(Mw mw) {
 		this.mw = mw;
-		this.chunkBuckets = new ArrayList<HashSet<Chunk>>();
-		for (int i = 0; i < 64; i++) {
-			this.chunkBuckets.add(new HashSet<Chunk>());
-		}
 	}
 	
 	public synchronized void close() {
 		this.closed = true;
 		this.saveChunks();
-		this.chunkBuckets.clear();
+		this.viewedChunkList.clear();
+		this.allChunkList.clear();
 	}
 	
 	// create MwChunk from Minecraft chunk.
@@ -53,56 +47,42 @@ public class ChunkManager {
 				msbArray, lsbArray, metaArray, chunk.getBiomeArray(), chunk.heightMap);
 	}
 	
-	public HashSet<Chunk> getChunkBucket(Chunk chunk) {
-		int index = ((chunk.zPosition & 7) << 3) | (chunk.xPosition & 7);
-		return this.chunkBuckets.get(index);
-	}
-	
-	private void setChunkViewed(Chunk chunk, boolean value) {
-		int i = ((chunk.zPosition & 63) << 6) + (chunk.xPosition & 63);
-		this.chunkViewedBitfield[i] = value;
-	}
-	
-	private boolean getChunkViewed(Chunk chunk) {
-		int i = ((chunk.zPosition & 63) << 6) + (chunk.xPosition & 63);
-		return this.chunkViewedBitfield[i];
-	}
-	
 	public synchronized void addChunk(Chunk chunk) {
-		if (!this.closed) {
-			this.getChunkBucket(chunk).add(chunk);
-			// clear viewed flag on chunk add
-			this.setChunkViewed(chunk, false);
+		if (!this.closed && (chunk != null)) {
+			this.allChunkList.add(chunk);
 		}
 	}
 	
 	public synchronized void removeChunk(Chunk chunk) {
-		if (!this.closed) {
-			this.getChunkBucket(chunk).remove(chunk);
-			this.addSaveChunkTask(chunk);
+		if (!this.closed && (chunk != null)) {
+			this.allChunkList.remove(chunk);
+			if (this.viewedChunkList.contains(chunk)) {
+				this.addSaveChunkTask(chunk);
+				this.viewedChunkList.remove(chunk);
+			}
 		}
 	}
 	
 	public synchronized void saveChunks() {
-		for (HashSet<Chunk> chunkBucket : this.chunkBuckets) {
-			this.addSaveChunkTask(chunkBucket);
+		for (Chunk chunk : this.viewedChunkList.getAll()) {
+			this.addSaveChunkTask(chunk);
 		}
 	}
 
 	public class MapUpdateChunksTask extends Task {
-		ArrayList<MwChunk> chunkList;
+		MwChunk[] chunkArray;
 		RegionManager regionManager;
 		MapTexture mapTexture;
 		
-		public MapUpdateChunksTask(MapTexture mapTexture, RegionManager regionManager, ArrayList<MwChunk> chunkList) {
+		public MapUpdateChunksTask(MapTexture mapTexture, RegionManager regionManager, MwChunk[] chunkArray) {
 			this.mapTexture = mapTexture;
 			this.regionManager = regionManager;
-			this.chunkList = chunkList;
+			this.chunkArray = chunkArray;
 		}
 		
 		@Override
 		public void run() {
-			for (MwChunk chunk : this.chunkList) {
+			for (MwChunk chunk : this.chunkArray) {
 				if (chunk != null) {
 					// update the chunk in the region pixels
 					this.regionManager.updateChunk(chunk);
@@ -116,49 +96,50 @@ public class ChunkManager {
 		
 		@Override
 		public void onComplete() {
-			// update GL texture of mapTexture if updated
-			this.mapTexture.updateGLTexture();
 		}
-	}
-	
-	public int playerDistToChunkSq(Chunk chunk) {
-		int dx = (chunk.xPosition << 4) + 8 - this.mw.playerXInt;
-		int dz = (chunk.zPosition << 4) + 8 - this.mw.playerZInt;
-		return (dx * dx) + (dz * dz);
 	}
 	
 	public void onTick() {
 		if (!this.closed) {
-			int chunkBucketIndex = this.mw.tickCounter & 63;
-			HashSet<Chunk> chunkBucket = this.chunkBuckets.get(chunkBucketIndex);
-			ArrayList<MwChunk> chunkList = new ArrayList<MwChunk>();
-			for (Chunk chunk : chunkBucket) {
-				// if this chunk is within a certain distance to the player then
-				// set the 'viewed' flag for this chunk
-				if (this.playerDistToChunkSq(chunk) <= this.mw.maxChunkSaveDistSq) {
-					this.setChunkViewed(chunk, true);
-				}
-				// only update chunk if it has been viewed
-				if (this.getChunkViewed(chunk)) {
-					chunkList.add(copyToMwChunk(chunk));
+			int chunksToUpdate = Math.min(this.allChunkList.size(), this.mw.chunksPerTick);
+			
+			for (int i = 0; i < chunksToUpdate; i++) {
+				Chunk chunk = this.allChunkList.getNext();
+				if (chunk != null) {
+					// if this chunk is within a certain distance to the player then
+					// add it to the viewed set
+					if (MwUtil.distToChunkSq(this.mw.playerXInt, this.mw.playerZInt, chunk) <= this.mw.maxChunkSaveDistSq) {
+						this.viewedChunkList.add(chunk);
+					}
 				}
 			}
-			this.mw.executor.addTask(new MapUpdateChunksTask(this.mw.mapTexture, this.mw.regionManager, chunkList));
+			
+			chunksToUpdate = Math.min(this.viewedChunkList.size(), this.mw.chunksPerTick);
+			MwChunk[] chunkArray = new MwChunk[chunksToUpdate];
+			for (int i = 0; i < chunksToUpdate; i++) {
+				Chunk chunk = this.viewedChunkList.getNext();
+				if (chunk != null) {
+					chunkArray[i] = copyToMwChunk(chunk);
+				} else {
+					chunkArray[i] = null;
+				}
+			}
+			this.mw.executor.addTask(new MapUpdateChunksTask(this.mw.mapTexture, this.mw.regionManager, chunkArray));
 		}
 	}
 	
 	private class SaveChunkTask extends Task {
 		private final RegionManager regionManager;
-		private final MwChunk[] chunkArray;
+		private final MwChunk mwChunk;
 		
-		public SaveChunkTask(RegionManager regionManager, MwChunk[] chunkArray) {
+		public SaveChunkTask(RegionManager regionManager, MwChunk mwChunk) {
 			this.regionManager = regionManager;
-			this.chunkArray = chunkArray;
+			this.mwChunk = mwChunk;
 		}
 
 		@Override
 		public void run() {
-			this.regionManager.saveChunkArray(this.chunkArray);
+			this.regionManager.saveChunk(this.mwChunk);
 		}
 
 		@Override
@@ -167,23 +148,8 @@ public class ChunkManager {
 	}
 	
 	private void addSaveChunkTask(Chunk chunk) {
-		if ((chunk != null) && (!chunk.isEmpty()) && (this.getChunkViewed(chunk))) {
-			MwChunk[] chunkArray = new MwChunk[1];
-			chunkArray[0] = copyToMwChunk(chunk);
-			this.mw.executor.addTask(new SaveChunkTask(this.mw.regionManager, chunkArray));
+		if (!chunk.isEmpty()) {
+			this.mw.executor.addTask(new SaveChunkTask(this.mw.regionManager, copyToMwChunk(chunk)));
 		}
-	}
-	
-	private void addSaveChunkTask(HashSet<Chunk> chunkSet) {
-		MwChunk[] chunkArray = new MwChunk[chunkSet.size()];
-		int i = 0;
-		for (Chunk chunk : chunkSet) {
-			// only save chunks that are not empty and have been viewed
-			if ((chunk != null) && (!chunk.isEmpty()) && (i < chunkArray.length) && (this.getChunkViewed(chunk))) {
-				MwChunk mwChunk = copyToMwChunk(chunk);
-				chunkArray[i++] = mwChunk;
-			}
-		}
-		this.mw.executor.addTask(new SaveChunkTask(this.mw.regionManager, chunkArray));
 	}
 }

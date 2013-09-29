@@ -8,6 +8,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
 
@@ -319,7 +320,7 @@ public class BlockColours {
 		}
 	}
 	
-	private static String getMostOccurringKey(HashMap<String, Integer> map, String defaultItem) {
+	private static String getMostOccurringKey(Map<String, Integer> map, String defaultItem) {
 		// find the most commonly occurring key in a hash map.
 		// only return a key if there is more than 1.
 		int maxCount = 1;
@@ -344,7 +345,7 @@ public class BlockColours {
 	// the block, and all non matching items added afterwards.
 	private static void writeMinimalBlockLines(Writer fout, String lineStart, String[] items, String defaultItem) throws IOException {
 		
-		HashMap<String, Integer> frequencyMap = new HashMap<String, Integer>();
+		Map<String, Integer> frequencyMap = new HashMap<String, Integer>();
 		
 		// first count the number of occurrences of each item.
 		for (String item : items) {

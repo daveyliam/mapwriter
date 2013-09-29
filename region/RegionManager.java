@@ -2,11 +2,12 @@ package mapwriter.region;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 public class RegionManager {
-	private final HashMap<Long, Region> regionMap;
+	private final Map<Long, Region> regionMap;
 	
 	public final File worldDir;
 	public final File imageDir;
@@ -65,7 +66,7 @@ public class RegionManager {
 		region.close();
 	}
 	
-	private static int incrStatsCounter(HashMap<String, Integer> h, String key) {
+	private static int incrStatsCounter(Map<String, Integer> h, String key) {
 		int n = 1;
 		if (h.containsKey(key)) {
 			n = h.get(key) + 1;
@@ -76,7 +77,7 @@ public class RegionManager {
 	
 	public void printLoadedRegionStats() {
 		logInfo("loaded region listing:");
-		HashMap<String, Integer> stats = new HashMap<String, Integer>();
+		Map<String, Integer> stats = new HashMap<String, Integer>();
 		for (Region region : this.regionMap.values()) {
 			logInfo("  %s %d %d", region, region.lastAccessedTick, region.getRefCount());
 			incrStatsCounter(stats, String.format("dim%d", region.dimension));
@@ -179,12 +180,8 @@ public class RegionManager {
 		}
 	}
 	
-	public void saveChunkArray(MwChunk[] chunkArray) {
-		for (MwChunk chunk : chunkArray) {
-			if (chunk != null) {
-				Region region = this.getRegion(chunk.x << 4, chunk.z << 4, 0, chunk.dimension);
-				chunk.write(region.regionFile);
-			}
-		}
+	public void saveChunk(MwChunk chunk) {
+		Region region = this.getRegion(chunk.x << 4, chunk.z << 4, 0, chunk.dimension);
+		chunk.write(region.regionFile);
 	}
 }

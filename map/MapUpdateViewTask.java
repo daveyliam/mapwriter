@@ -47,9 +47,6 @@ public class MapUpdateViewTask extends Task {
 		this.mapTexture.loadedZoomLevel = this.zoomLevel;
 		this.mapTexture.loadedDimension = this.dimension;
 		
-		// update GL texture of mapTexture if updated
-		this.mapTexture.updateGLTexture();
-		
 		//MwUtil.log("MapUpdateViewTask: loaded %d regions", this.loadedCount);
 	}
 }

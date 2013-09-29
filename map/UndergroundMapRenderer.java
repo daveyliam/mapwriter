@@ -1,5 +1,7 @@
 package mapwriter.map;
 
+import java.util.Arrays;
+
 import mapwriter.Mw;
 import mapwriter.Render;
 import mapwriter.Texture;
@@ -15,69 +17,121 @@ public class UndergroundMapRenderer implements MapRenderer {
 	
 	private double viewX = 0.0;
 	private double viewZ = 0.0;
-	private double viewW = 15.0;
-	private double viewH = 15.0;
+	private double viewW = 32.0;
+	private double viewH = 32.0;
+	
+	private int startX = 0;
+	private int startZ = 0;
+	private boolean[] processedBlockFlags = new boolean[256];
+	
+	private static final int textureSize = 1024;
 	
 	public UndergroundMapRenderer(Mw mw, MapMode mapMode) {
 		this.mw = mw;
 		this.mapMode = mapMode;
-		this.undergroundTexture = new Texture(16, 16, 0xff000000, GL11.GL_NEAREST, GL11.GL_NEAREST, GL11.GL_REPEAT);
+		this.undergroundTexture = new Texture(textureSize, textureSize, 0xff000000, GL11.GL_NEAREST, GL11.GL_NEAREST, GL11.GL_REPEAT);
 	}
 	
 	public void close() {
 		this.undergroundTexture.close();
 	}
 	
-	public void update() {
-		double px = this.mw.playerX;
-		double py = this.mw.playerY;
-		double pz = this.mw.playerZ;
-		
-		for (int z = 0; z < 16; z++) {
-			for (int x = 0; x < 16; x++) {
-				int airCount = 0;
-				int lavaCount = 0;
-				int waterCount = 0;
-				int bx = x + (int) Math.round(px - 8.0);
-				int bz = z + (int) Math.round(pz - 8.0);
-				for (int y = 0; y < 8; y++) {
-					int by = y + (int) (py - 4.0);
-					int blockID = this.mw.mc.theWorld.getBlockId(bx, by, bz);
-					if (blockID == 0) {
-							airCount++;
-					} else if ((blockID == Block.waterMoving.blockID) || (blockID == Block.waterStill.blockID)) {
-							waterCount++;
-					} else if ((blockID == Block.lavaMoving.blockID) || (blockID == Block.lavaStill.blockID)) {
-							lavaCount++;
-					}
-				}
-				int colour = 0;
-				if (lavaCount > 0) {
-					colour = 0xff000000 | ((lavaCount * 32) << 16);
-				} else if (waterCount > 0) {
-					colour = 0xff000000 | ((waterCount * 32));
-				} else {
-					colour = 0xff000000 | (((8 - airCount) * 20) << 8);
-				}
-				this.undergroundTexture.setRGB(bx & 0xf, bz & 0xf, colour);
+	private boolean getBlockProcessedFlag(int x, int z) {
+		int xi = x - this.startX + 8;
+		int zi = z - this.startZ + 8;
+		if (((xi & -16) == 0) && ((zi & -16) == 0)) {
+			return this.processedBlockFlags[(zi << 4) | xi];
+		} else {
+			return true;
+		}
+	}
+	
+	private void setBlockProcessedFlag(int x, int z, boolean flag) {
+		int xi = x - this.startX + 8;
+		int zi = z - this.startZ + 8;
+		if (((xi & -16) == 0) && ((zi & -16) == 0)) {
+			this.processedBlockFlags[(zi << 4) | xi] = flag;
+		}
+	}
+	
+	private void clearBlockProcessedFlags() {
+		Arrays.fill(this.processedBlockFlags, false);
+	}
+	
+	private int getBlockColour(int x, int y, int z) {
+		int airCount = 0;
+		int lavaCount = 0;
+		int waterCount = 0;
+		for (int yi = 0; yi < 8; yi++) {
+			int blockID = this.mw.mc.theWorld.getBlockId(x, y + yi, z);
+			if (blockID == 0) {
+					airCount++;
+			} else if ((blockID == Block.waterMoving.blockID) || (blockID == Block.waterStill.blockID)) {
+					waterCount++;
+			} else if ((blockID == Block.lavaMoving.blockID) || (blockID == Block.lavaStill.blockID)) {
+					lavaCount++;
 			}
 		}
+		int colour = 0;
+		if (lavaCount > 0) {
+			colour = 0xff000000 | ((lavaCount * 32) << 16);
+		} else if (waterCount > 0) {
+			colour = 0xff000000 | ((waterCount * 32));
+		} else {
+			colour = 0xff000000 | (((8 - airCount) * 20) << 8);
+		}
+		return colour;
+	}
+	
+	private void processBlock(int x, int y, int z) {
+		this.setBlockProcessedFlag(x, z, true);
+		
+		int colour = this.getBlockColour(x, y, z);
+		
+		this.undergroundTexture.setRGB(x & (textureSize - 1), z & (textureSize - 1), colour);
+		
+		int blockID = this.mw.mc.theWorld.getBlockId(x, y, z);
+		Block block = Block.blocksList[blockID];
+		if ((block == null) || !block.isOpaqueCube()) {
+			if (!this.getBlockProcessedFlag(x + 1, z)) {
+				this.processBlock(x + 1, y, z);
+			}
+			if (!this.getBlockProcessedFlag(x - 1, z)) {
+				this.processBlock(x - 1, y, z);
+			}
+			if (!this.getBlockProcessedFlag(x, z + 1)) {
+				this.processBlock(x, y, z + 1);
+			}
+			if (!this.getBlockProcessedFlag(x, z - 1)) {
+				this.processBlock(x, y, z - 1);
+			}
+		}
+	}
+	
+	public void update() {
+		int px = this.mw.playerXInt;
+		int py = this.mw.playerYInt;
+		int pz = this.mw.playerZInt;
+		
+		this.clearBlockProcessedFlags();
+		this.startX = px;
+		this.startZ = pz;
+		this.processBlock(px, py, pz);
+		
 		this.undergroundTexture.updateTexture();
 		
-		this.viewX = this.mw.playerX - 7.5;
-		this.viewZ = this.mw.playerZ - 7.5;
-		this.viewW = 15.0;
-		this.viewH = 15.0;
+		this.viewX = this.mw.playerX - (this.viewW / 2.0);
+		this.viewZ = this.mw.playerZ - (this.viewH / 2.0);
 		
 		this.mapMode.setScreenRes();
 	}
 
 	public void draw() {
 		// underground view mode
-		double tu1 = (this.viewX % 16.0) / 16.0;
-		double tv1 = (this.viewZ % 16.0) / 16.0;
-		double tu2 = tu1 + (this.viewW / 16.0);
-		double tv2 = tv1 + (this.viewH / 16.0);
+		double tu1 = (this.viewX / textureSize) % 1.0;
+		double tv1 = (this.viewZ / textureSize) % 1.0;
+		double tu2 = tu1 + (this.viewW / textureSize);
+		double tv2 = tv1 + (this.viewH / textureSize);
 		
 		GL11.glPushMatrix();
 		GL11.glLoadIdentity();

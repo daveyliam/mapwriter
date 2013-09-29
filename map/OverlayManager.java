@@ -1,6 +1,7 @@
 package mapwriter.map;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import mapwriter.Mw;
 import mapwriter.map.mapmode.LargeMapMode;
@@ -28,7 +29,7 @@ public class OverlayManager {
 	public UndergroundMapRenderer undergroundMap;
 	public StandardMapRenderer guiMap;
 	
-	private ArrayList<MapRenderer> mapList;
+	private List<MapRenderer> mapList;
 	private MapRenderer currentMap = null;
 	
 	public int modeIndex = 0;

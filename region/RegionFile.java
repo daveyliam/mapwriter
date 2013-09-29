@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
@@ -22,13 +23,13 @@ import java.util.zip.InflaterInputStream;
 
 public class RegionFile {
 	
-	final File file;
-	int lengthInSectors = 0;
-	RandomAccessFile fin = null;
+	private final File file;
+	private int lengthInSectors = 0;
+	private RandomAccessFile fin = null;
 	
-	Section[] chunkSectionsArray = new Section[4096];
-	int[] timestampArray = new int[4096];
-	ArrayList<Boolean> filledSectorArray = null;
+	private Section[] chunkSectionsArray = new Section[4096];
+	private int[] timestampArray = new int[4096];
+	private List<Boolean> filledSectorArray = null;
 	
 	private class Section {
 		final int startSector;

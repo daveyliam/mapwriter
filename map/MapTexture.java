@@ -1,6 +1,7 @@
 package mapwriter.map;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 import mapwriter.BackgroundExecutor;
 import mapwriter.Texture;
@@ -35,7 +36,19 @@ public class MapTexture extends Texture {
 	
 	// accessed from both render and background thread.
 	// make sure all methods using it are synchronized.
-	private int[] regionModifiedArray;
+	//private int[] regionModifiedArray;
+	
+	private class Rect {
+		final int x, y, w, h;
+		Rect(int x, int y, int w, int h) {
+			this.x = x;
+			this.y = y;
+			this.w = w;
+			this.h = h;
+		}
+	}
+	
+	private List<Rect> textureUpdateQueue = new ArrayList<Rect>();
 	
 	public MapTexture(int textureSize, boolean linearScaling) {
 		super(textureSize, textureSize, 0xff000000, GL11.GL_LINEAR, GL11.GL_LINEAR, GL11.GL_REPEAT);
@@ -45,8 +58,6 @@ public class MapTexture extends Texture {
 		this.textureRegions = textureSize >> Region.SHIFT;
 		this.textureSize = textureSize;
 		this.regionArray = new Region[this.textureRegions * this.textureRegions];
-		this.regionModifiedArray = new int[this.textureRegions * this.textureRegions];
-		Arrays.fill(this.regionModifiedArray, 0);
 	}
 	
 	public void requestView(MapView view, BackgroundExecutor executor, RegionManager regionManager) {
@@ -99,6 +110,8 @@ public class MapTexture extends Texture {
 		} else {
 			this.fillRect(tx, ty, tw, th, 0xff000000);
 		}
+		
+		this.addTextureUpdate(tx, ty, tw, th);
 	}
 	
 	public int getRegionIndex(int x, int z, int zoomLevel) {
@@ -121,9 +134,6 @@ public class MapTexture extends Texture {
 			this.regionArray[index] = newRegion;
 			//newRegion.refCount++;
 			this.updateTextureFromRegion(newRegion, newRegion.x, newRegion.z, newRegion.size, newRegion.size);
-			// oops! this needs to be after updateTextureFromRegion otherwise the GL texture will be updated
-			// and the regionModified flag cleared before the region is actually loaded.
-			this.setRegionModified(index);
 			//MwUtil.log("regionArray[%d] = %s", newRegion.index, newRegion);
 			alreadyLoaded = false;
 		}
@@ -152,42 +162,10 @@ public class MapTexture extends Texture {
 			Region region = this.regionArray[i];
 			if ((region != null) && (region.isChunkWithin(chunk))) {
 				this.updateTextureFromRegion(region, chunk.x << 4, chunk.z << 4, MwChunk.SIZE, MwChunk.SIZE);
-				this.setRegionModified(i);
 			}
 		}
 	}
 	
-	//public boolean rectWithinTexture(int tx, int ty, int tw, int th) {
-	//	return (tx >= 0) && ((tx + tw) <= this.textureSize) &&
-	//			(ty >= 0) && ((ty + th) <= this.textureSize);
-	//}
-	
-	public void setRegionModified(int index) {
-		synchronized (this.regionModifiedArray) {
-			this.regionModifiedArray[index]++;
-		}
-	}
-	
-	public void updateGLTexture() {
-		synchronized (this.regionModifiedArray) {
-			for (int j = 0; j < this.textureRegions; j++) {
-				for (int i = 0; i < this.textureRegions; i++) {
-					int arrayIndex = (j * this.textureRegions) + i;
-					if (this.regionModifiedArray[arrayIndex] > 0) {
-						// update the texture for this region
-						this.updateTextureArea(
-								i * Region.SIZE,
-								j * Region.SIZE,
-								Region.SIZE,
-								Region.SIZE);
-						this.regionModifiedArray[arrayIndex] = 0;
-					}
-				}
-			}
-		}
-	}
-	
-	/*
 	public void addTextureUpdate(int x, int z, int w, int h) {
 		synchronized (this.textureUpdateQueue) {
 			this.textureUpdateQueue.add(new Rect(x, z, w, h));
@@ -197,13 +175,10 @@ public class MapTexture extends Texture {
 	public void processTextureUpdates() {
 		synchronized (this.textureUpdateQueue) {
 			for (Rect rect : this.textureUpdateQueue) {
-				if (this.rectWithinTexture(rect.x, rect.y, rect.w, rect.h)) {
 					//MwUtil.log("MwMapTexture.processTextureUpdates: %d %d %d %d", rect.x, rect.y, rect.w, rect.h);
 					this.updateTextureArea(rect.x, rect.y, rect.w, rect.h);
-				}
 			}
 			this.textureUpdateQueue.clear();
 		}
 	}
-	*/
 }

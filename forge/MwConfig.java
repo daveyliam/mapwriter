@@ -1,7 +1,7 @@
 package mapwriter.forge;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.List;
 
 import mapwriter.MwUtil;
 import net.minecraftforge.common.Configuration;
@@ -91,7 +91,7 @@ public class MwConfig extends Configuration {
 		this.get(category, key, value).set(value);
 	}
 	
-	public void getIntList(String category, String key, ArrayList<Integer> list) {
+	public void getIntList(String category, String key, List<Integer> list) {
 		// convert List of integers to integer array to pass as default value
 		int size = list.size();
 		int[] array = new int[size];
@@ -118,7 +118,7 @@ public class MwConfig extends Configuration {
 		}
 	}
 	
-	public void setIntList(String category, String key, ArrayList<Integer> list) {
+	public void setIntList(String category, String key, List<Integer> list) {
 		// convert List of integers to integer array
 		int size = list.size();
 		String[] array = new String[size];

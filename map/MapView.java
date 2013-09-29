@@ -1,6 +1,6 @@
 package mapwriter.map;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import mapwriter.Mw;
 import mapwriter.map.mapmode.MapMode;
@@ -127,7 +127,7 @@ public class MapView {
 		this.setDimension(dimension);
 	}
 	
-	public void nextDimension(ArrayList<Integer> dimensionList, int n) {
+	public void nextDimension(List<Integer> dimensionList, int n) {
 		int i = dimensionList.indexOf(this.dimension);
 		i = Math.max(0,  i);
 		int size = dimensionList.size();
