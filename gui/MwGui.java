@@ -1,8 +1,12 @@
-package mapwriter;
+package mapwriter.gui;
 
 import java.awt.Point;
 import java.io.File;
 
+import mapwriter.MergeTask;
+import mapwriter.Mw;
+import mapwriter.MwUtil;
+import mapwriter.ReloadRegionsTask;
 import mapwriter.forge.MwKeyHandler;
 import mapwriter.map.MapView;
 import mapwriter.map.Marker;

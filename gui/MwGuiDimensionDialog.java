@@ -1,7 +1,8 @@
-package mapwriter;
+package mapwriter.gui;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import mapwriter.Mw;
 import mapwriter.map.MapView;
 import net.minecraft.client.gui.GuiScreen;
 

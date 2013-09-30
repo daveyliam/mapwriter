@@ -1,4 +1,4 @@
-package mapwriter;
+package mapwriter.gui;
 
 import org.lwjgl.input.Keyboard;
 

@@ -1,5 +1,6 @@
-package mapwriter;
+package mapwriter.gui;
 
+import mapwriter.Mw;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 

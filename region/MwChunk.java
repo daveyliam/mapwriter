@@ -16,11 +16,10 @@ public class MwChunk {
 	public final byte[][] metaArray;
 	
 	public final byte[] biomeArray;
-	public final int[] heightMap;
 	
 	public final int maxHeight;
 	
-	public MwChunk(int x, int z, int dimension, byte[][] msbArray, byte[][] lsbArray, byte[][] metaArray, byte[] biomeArray, int[] heightMap) {
+	public MwChunk(int x, int z, int dimension, byte[][] msbArray, byte[][] lsbArray, byte[][] metaArray, byte[] biomeArray) {
 		this.x = x;
 		this.z = z;
 		this.dimension = dimension;
@@ -35,7 +34,6 @@ public class MwChunk {
 			}
 		}
 		this.maxHeight = maxY << 4;
-		this.heightMap = (heightMap != null) ? heightMap : this.genHeightMap();
 	}
 	
 	public String toString() {
@@ -124,27 +122,7 @@ public class MwChunk {
 			//this.log("MwChunk.read: chunk (%d, %d) input stream is null", this.x, this.z); 
 		}
 		
-		return new MwChunk(x, z, dimension, msbArray, lsbArray, metaArray, biomeArray, null);
-	}
-	
-	private int[] genHeightMap() {
-		int[] heightMap = new int[256];
-		for (int z = 0; z < 16; z++) {
-			for (int x = 0; x < 16; x++) {
-				int height = 0;
-				for (int y = this.maxHeight - 1; (height == 0) && (y >= 0); y--) {
-					if (this.getBlockAndMetadata(x, y, z) != 0) {
-						height = y;
-					}
-				}
-				heightMap[(z << 4) | x] = height;
-			}
-		}
-		return heightMap;
-	}
-	
-	public int getHeight(int x, int z) {
-		return this.heightMap[((z & 0xf) << 4) | (x & 0xf)];
+		return new MwChunk(x, z, dimension, msbArray, lsbArray, metaArray, biomeArray);
 	}
 	
 	public boolean isEmpty() {
@@ -167,25 +145,6 @@ public class MwChunk {
 				((msb & 0xf0) << 8)  | ((lsb & 0xff) << 4) | ((meta & 0xf0) >> 4) :
 				((msb & 0x0f) << 12) | ((lsb & 0xff) << 4) | (meta & 0x0f);
 	}
-	
-	/*public int getCheckSum() {
-		// start checksum with x and z coordinates
-		int sum = ((this.z & 0xffff) << 16) | (this.x & 0xffff);
-		for (int z = 0; z < MwChunk.SIZE; z++) {
-			for (int x = 0; x < MwChunk.SIZE; x++) {
-				// get the uppermost non air block in the chunk column.
-				// won't work well for dimensions with a ceiling.
-				int y = this.getHeight(x, z);
-				int blockAndMeta = this.getBlockAndMetadata(x, y, z);
-				
-				// rotate left 5
-				sum = ((sum >> 27) & 0x1f) | (sum << 5);
-				// xor in height and block data
-				sum ^= ((y & 0xff) << 16) | (blockAndMeta & 0xffff);
-			}
-		}
-		return sum;
-	}*/
 	
 	public Nbt getNbt() {
 		Nbt sections = new Nbt(Nbt.TAG_LIST, "Sections", null);

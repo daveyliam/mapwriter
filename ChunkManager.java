@@ -1,5 +1,7 @@
 package mapwriter;
 
+import java.util.Map;
+
 import mapwriter.map.MapTexture;
 import mapwriter.region.MwChunk;
 import mapwriter.region.RegionManager;
@@ -9,8 +11,10 @@ import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 public class ChunkManager {
 	public Mw mw;
 	private boolean closed = false;
-	private CircularList<Chunk> allChunkList = new CircularList<Chunk>();
-	private CircularList<Chunk> viewedChunkList = new CircularList<Chunk>();
+	private CircularHashMap<Chunk, Integer> chunkMap = new CircularHashMap<Chunk, Integer>();
+	
+	private static final int VISIBLE_FLAG = 0x01;
+	private static final int VIEWED_FLAG = 0x02;
 	
 	public ChunkManager(Mw mw) {
 		this.mw = mw;
@@ -19,14 +23,14 @@ public class ChunkManager {
 	public synchronized void close() {
 		this.closed = true;
 		this.saveChunks();
-		this.viewedChunkList.clear();
-		this.allChunkList.clear();
+		this.chunkMap.clear();
 	}
 	
 	// create MwChunk from Minecraft chunk.
 	// only MwChunk's should be used in the background thread.
 	// TODO: make this a full copy of chunk data
 	public static MwChunk copyToMwChunk(Chunk chunk) {
+		
 		byte[][] msbArray = new byte[16][];
 		byte[][] lsbArray = new byte[16][];
 		byte[][] metaArray = new byte[16][];
@@ -44,28 +48,31 @@ public class ChunkManager {
 		}
 		
 		return new MwChunk(chunk.xPosition, chunk.zPosition, chunk.worldObj.provider.dimensionId,
-				msbArray, lsbArray, metaArray, chunk.getBiomeArray(), chunk.heightMap);
+				msbArray, lsbArray, metaArray, chunk.getBiomeArray());
 	}
 	
 	public synchronized void addChunk(Chunk chunk) {
 		if (!this.closed && (chunk != null)) {
-			this.allChunkList.add(chunk);
+			this.chunkMap.put(chunk, 0);
 		}
 	}
 	
 	public synchronized void removeChunk(Chunk chunk) {
 		if (!this.closed && (chunk != null)) {
-			this.allChunkList.remove(chunk);
-			if (this.viewedChunkList.contains(chunk)) {
+			int flags = this.chunkMap.get(chunk);
+			if ((flags & VIEWED_FLAG) != 0) {
 				this.addSaveChunkTask(chunk);
-				this.viewedChunkList.remove(chunk);
 			}
+			this.chunkMap.remove(chunk);
 		}
 	}
 	
 	public synchronized void saveChunks() {
-		for (Chunk chunk : this.viewedChunkList.getAll()) {
-			this.addSaveChunkTask(chunk);
+		for (Map.Entry<Chunk, Integer> entry : this.chunkMap.entrySet()) {
+			int flags = entry.getValue();
+			if ((flags & VIEWED_FLAG) != 0) {
+				this.addSaveChunkTask(entry.getKey());
+			}
 		}
 	}
 
@@ -101,29 +108,30 @@ public class ChunkManager {
 	
 	public void onTick() {
 		if (!this.closed) {
-			int chunksToUpdate = Math.min(this.allChunkList.size(), this.mw.chunksPerTick);
-			
+			int chunksToUpdate = Math.min(this.chunkMap.size(), this.mw.chunksPerTick);
+			MwChunk[] chunkArray = new MwChunk[chunksToUpdate];
 			for (int i = 0; i < chunksToUpdate; i++) {
-				Chunk chunk = this.allChunkList.getNext();
-				if (chunk != null) {
+				Map.Entry<Chunk, Integer> entry = this.chunkMap.getNextEntry();
+				if (entry != null) {
 					// if this chunk is within a certain distance to the player then
 					// add it to the viewed set
+					Chunk chunk = entry.getKey();
+					int flags = entry.getValue();
 					if (MwUtil.distToChunkSq(this.mw.playerXInt, this.mw.playerZInt, chunk) <= this.mw.maxChunkSaveDistSq) {
-						this.viewedChunkList.add(chunk);
+						flags |= (VISIBLE_FLAG | VIEWED_FLAG);
+					} else {
+						flags &= ~VISIBLE_FLAG;
+					}
+					entry.setValue(flags);
+					
+					if ((flags & VISIBLE_FLAG) != 0) {
+						chunkArray[i] = copyToMwChunk(chunk);
+					} else {
+						chunkArray[i] = null;
 					}
 				}
 			}
 			
-			chunksToUpdate = Math.min(this.viewedChunkList.size(), this.mw.chunksPerTick);
-			MwChunk[] chunkArray = new MwChunk[chunksToUpdate];
-			for (int i = 0; i < chunksToUpdate; i++) {
-				Chunk chunk = this.viewedChunkList.getNext();
-				if (chunk != null) {
-					chunkArray[i] = copyToMwChunk(chunk);
-				} else {
-					chunkArray[i] = null;
-				}
-			}
 			this.mw.executor.addTask(new MapUpdateChunksTask(this.mw.mapTexture, this.mw.regionManager, chunkArray));
 		}
 	}

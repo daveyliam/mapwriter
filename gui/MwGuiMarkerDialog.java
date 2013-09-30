@@ -1,4 +1,4 @@
-package mapwriter;
+package mapwriter.gui;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;

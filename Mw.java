@@ -7,6 +7,8 @@ import java.util.List;
 import mapwriter.forge.MwConfig;
 import mapwriter.forge.MwForge;
 import mapwriter.forge.MwKeyHandler;
+import mapwriter.gui.MwGui;
+import mapwriter.gui.MwGuiMarkerDialog;
 import mapwriter.map.MapTexture;
 import mapwriter.map.MapView;
 import mapwriter.map.Marker;
