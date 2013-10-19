@@ -125,11 +125,6 @@ public class MwGuiOptionSlot extends GuiSlot {
 			// reload block colours before saving in case player changed
 			// texture packs before pressing button.
 			this.mw.reloadBlockColours();
-			
-			if (this.mw.useSavedBlockColours) {
-				// save current map colours
-				this.mw.saveCurrentBlockColours();
-			}
 			break;
 		case 6:
 			// toggle max chunk save dist

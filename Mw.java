@@ -145,6 +145,7 @@ public class Mw {
 	public final static String catOptions = "options";
 	public final static String worldDirConfigName = "mapwriter.cfg";
 	public final static String blockColourSaveFileName = "MapWriterBlockColours.txt";
+	public final static String blockColourOverridesFileName = "MapWriterBlockColourOverrides.txt";
 	
 	// instances of components
 	public MapTexture mapTexture = null;
@@ -323,25 +324,47 @@ public class Mw {
 		}
 	}
 	
+	public void loadBlockColourOverrides(BlockColours bc) {
+		File f = new File(this.configDir, blockColourOverridesFileName);
+		if (f.isFile()) {
+			MwUtil.logError("loading block colour overrides file %s", f);
+			bc.loadFromFile(f);
+		} else {
+			MwUtil.logError("recreating block colour overrides file %s", f);
+			BlockColours.writeOverridesFile(f);
+			if (f.isFile()) {
+				bc.loadFromFile(f);
+			} else {
+				MwUtil.logError("could not load block colour overrides from file %s", f);
+			}
+		}
+	}
+	
+	public void saveBlockColours(BlockColours bc) {
+		File f = new File(this.configDir, blockColourSaveFileName);
+		MwUtil.logInfo("saving block colours to '%s'", f);
+		bc.saveToFile(f);
+	}
+	
 	public void reloadBlockColours() {
-		BlockColours bc;
+		BlockColours bc = new BlockColours();
 		File f = new File(this.configDir, blockColourSaveFileName);
 		if (this.useSavedBlockColours && f.isFile()) {
 			// load block colours from file
 			MwUtil.logInfo("loading block colours from %s", f);
-			bc = BlockColours.loadFromFile(f);
+			bc.loadFromFile(f);
+			this.loadBlockColourOverrides(bc);
 		} else {
 			// generate block colours from current texture pack
 			MwUtil.logInfo("generating block colours");
-			bc = BlockColourGen.genBlockColours(this, this.config);
+			// block type overrides need to be loaded before the block colours are generated
+			this.loadBlockColourOverrides(bc);
+			BlockColourGen.genBlockColours(bc);
+			// load overrides again to override block and biome colours
+			this.loadBlockColourOverrides(bc);
+			this.saveBlockColours(bc);
 		}
 		this.blockColours = bc;
-	}
-	
-	public void saveCurrentBlockColours() {
-		File f = new File(this.configDir, blockColourSaveFileName);
-		MwUtil.logInfo("saving block colours to '%s'", f);
-		this.blockColours.saveToFile(f);
 	}
 	
 	public void reloadMapTexture() {

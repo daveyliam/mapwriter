@@ -59,26 +59,13 @@ public class UndergroundMapRenderer implements MapRenderer {
 	}
 	
 	private int getBlockColour(int x, int y, int z) {
-		int airCount = 0;
-		int lavaCount = 0;
-		int waterCount = 0;
-		for (int yi = 0; yi < 8; yi++) {
-			int blockID = this.mw.mc.theWorld.getBlockId(x, y + yi, z);
-			if (blockID == 0) {
-					airCount++;
-			} else if ((blockID == Block.waterMoving.blockID) || (blockID == Block.waterStill.blockID)) {
-					waterCount++;
-			} else if ((blockID == Block.lavaMoving.blockID) || (blockID == Block.lavaStill.blockID)) {
-					lavaCount++;
-			}
-		}
 		int colour = 0;
-		if (lavaCount > 0) {
-			colour = 0xff000000 | ((lavaCount * 32) << 16);
-		} else if (waterCount > 0) {
-			colour = 0xff000000 | ((waterCount * 32));
-		} else {
-			colour = 0xff000000 | (((8 - airCount) * 20) << 8);
+		if (this.mw.mc.theWorld.getBlockId(x, y, z) == 0) {
+			for (y--; (y >= 0) && ((colour & 0xff000000) != 0xff000000); y--) {
+				int blockID = this.mw.mc.theWorld.getBlockId(x, y, z);
+				int meta = this.mw.mc.theWorld.getBlockMetadata(x, y, z);
+				colour = this.mw.blockColours.getColour(blockID, meta);
+			}
 		}
 		return colour;
 	}

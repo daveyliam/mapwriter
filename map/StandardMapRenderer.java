@@ -118,7 +118,7 @@ public class StandardMapRenderer implements MapRenderer {
 		// draw coordinates
 		if (mw.coordsEnabled && mapMode.coordsEnabled) {
 			Render.drawCentredString(mapMode.textX, mapMode.textY, mapMode.textColour,
-					"%d %d %d", mw.playerXInt, mw.playerYInt, mw.playerZInt);
+					"%d, %d, %d", mw.playerXInt, mw.playerYInt, mw.playerZInt);
 		}
 	}
 	

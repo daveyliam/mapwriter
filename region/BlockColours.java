@@ -49,8 +49,16 @@ public class BlockColours {
 		return this.bcArray[blockAndMeta & 0xffff];
 	}
 	
-	public int getColour(int blockID, int dv) {
-		return getColour(((blockID & 0xfff) << 4) | (dv & 0xf));
+	public void setColour(int blockAndMeta, int colour) {
+		this.bcArray[blockAndMeta & 0xffff] = colour;
+	}
+	
+	public int getColour(int blockID, int meta) {
+		return this.bcArray[((blockID & 0xfff) << 4) | (meta & 0xf)];
+	}
+	
+	public void setColour(int blockID, int meta, int colour) {
+		this.bcArray[((blockID & 0xfff) << 4) | (meta & 0xf)] = colour;
 	}
 	
 	private int getGrassColourMultiplier(int biome) {
@@ -151,29 +159,15 @@ public class BlockColours {
 	}
 	
 	public BlockType getBlockType(int blockId, int meta) {
-		return this.getBlockType(((blockId & 0xfff) << 4) | (meta & 0xf));
+		return this.blockTypeArray[((blockId & 0xfff) << 4) | (meta & 0xf)];
 	}
 	
 	public void setBlockType(int blockId, int meta, BlockType type) {
 		this.blockTypeArray[((blockId & 0xfff) << 4) | (meta & 0xf)] = type;
 	}
 	
-	public void setBlockTypeForBlockAndMeta(int blockAndMeta, BlockType type) {
+	public void setBlockType(int blockAndMeta, BlockType type) {
 		this.blockTypeArray[blockAndMeta & 0xffff] = type;
-	}
-	
-	public void setBlockTypeForBlockID(int blockID, BlockType type) {
-		for (int i = 0; i < 16; i++) {
-			this.blockTypeArray[((blockID & 0xfff) << 4) | i] = type;
-		}
-	}
-	
-	public void setColour(int blockID, int dv, int colour) {
-		this.bcArray[((blockID & 0xfff) << 4) | (dv & 0xf)] = colour;
-	}
-	
-	public void setColour(int blockAndMeta, int colour) {
-		this.bcArray[blockAndMeta & 0xffff] = colour;
 	}
 	
 	public static int getColourFromString(String s) {
@@ -187,14 +181,13 @@ public class BlockColours {
 	// read biome colour multiplier values.
 	// line format is:
 	//   biome <biomeId> <waterMultiplier> <grassMultiplier> <foliageMultiplier>
-	// the biome id and colour multipliers are in hex.
 	// accepts "*" wildcard for biome id (meaning for all biomes).
-	private static void loadBiomeLine(BlockColours bc, String[] split) {
+	private void loadBiomeLine(String[] split) {
 		try {
 			int startBiomeId = 0;
 			int endBiomeId = MAX_BIOMES;
 			if (!split[1].equals("*")) {
-				startBiomeId = Integer.parseInt(split[1], 16);
+				startBiomeId = Integer.parseInt(split[1]);
 				endBiomeId = startBiomeId + 1;
 			}
 			
@@ -204,12 +197,12 @@ public class BlockColours {
 				int foliageMultiplier = getColourFromString(split[4]) & 0xffffff;
 				
 				for (int biomeId = startBiomeId; biomeId < endBiomeId; biomeId++) {
-					bc.setBiomeWaterShading(biomeId, waterMultiplier);
-					bc.setBiomeGrassShading(biomeId, grassMultiplier);
-					bc.setBiomeFoliageShading(biomeId, foliageMultiplier);
+					this.setBiomeWaterShading(biomeId, waterMultiplier);
+					this.setBiomeGrassShading(biomeId, grassMultiplier);
+					this.setBiomeFoliageShading(biomeId, foliageMultiplier);
 				}
 			} else {
-				RegionManager.logWarning("biome ID '%02x' out of range", startBiomeId);
+				RegionManager.logWarning("biome ID '%d' out of range", startBiomeId);
 			}
 			
 		} catch (NumberFormatException e) {
@@ -222,19 +215,19 @@ public class BlockColours {
 	//   block <blockId> <blockMeta> <colour>
 	// the biome id, meta value, and colour code are in hex.
 	// accepts "*" wildcard for biome id and meta (meaning for all blocks and/or meta values).
-	private static void loadBlockLine(BlockColours bc, String[] split, boolean isBlockColourLine) {
+	private void loadBlockLine(String[] split, boolean isBlockColourLine) {
 		try {
 			int startBlockId = 0;
 			int endBlockId = MAX_BLOCKS;
 			if (!split[1].equals("*")) {
-				startBlockId = Integer.parseInt(split[1], 16);
+				startBlockId = Integer.parseInt(split[1]);
 				endBlockId = startBlockId + 1;
 			}
 			
 			int startBlockMeta = 0;
 			int endBlockMeta = MAX_META;
 			if (!split[2].equals("*")) {
-				startBlockMeta = Integer.parseInt(split[2], 16);
+				startBlockMeta = Integer.parseInt(split[2]);
 				endBlockMeta = startBlockMeta + 1;
 			}
 			
@@ -245,7 +238,7 @@ public class BlockColours {
 					
 					for (int blockId = startBlockId; blockId < endBlockId; blockId++) {
 						for (int blockMeta = startBlockMeta; blockMeta < endBlockMeta; blockMeta++) {
-							bc.setColour(blockId, blockMeta, colour);
+							this.setColour(blockId, blockMeta, colour);
 						}
 					}
 				} else {
@@ -254,7 +247,7 @@ public class BlockColours {
 					
 					for (int blockId = startBlockId; blockId < endBlockId; blockId++) {
 						for (int blockMeta = startBlockMeta; blockMeta < endBlockMeta; blockMeta++) {
-							bc.setBlockType(blockId, blockMeta, type);
+							this.setBlockType(blockId, blockMeta, type);
 						}
 					}
 				}
@@ -265,24 +258,22 @@ public class BlockColours {
 		}
 	}
 	
-	// load block colours and biome colour multipliers from a file.
-	public static BlockColours loadFromFile(File f) {
-		BlockColours bc = new BlockColours();
-		
+	public void loadFromFile(File f) {
 		Scanner fin = null;
 		try {
 			fin = new Scanner(new FileReader(f));
 			
 			while (fin.hasNextLine()) {
-				String line = fin.nextLine().trim();
+				// get next line and remove comments (part of line after #)
+				String line = fin.nextLine().split("#")[0].trim();
 				if (line.length() > 0) {
 					String[] lineSplit = line.split(" ");
 					if (lineSplit[0].equals("biome") && (lineSplit.length == 5)) {
-						loadBiomeLine(bc, lineSplit);
+						this.loadBiomeLine(lineSplit);
 					} else if (lineSplit[0].equals("block") && (lineSplit.length == 4)) {
-						loadBlockLine(bc, lineSplit, true);
+						this.loadBlockLine(lineSplit, true);
 					} else if (lineSplit[0].equals("blocktype") && (lineSplit.length == 4)) {
-						loadBlockLine(bc, lineSplit, false);
+						this.loadBlockLine(lineSplit, false);
 					} else {
 						RegionManager.logWarning("invalid map colour line '%s'", line);
 					}
@@ -296,8 +287,6 @@ public class BlockColours {
 				fin.close();
 			}
 		}
-		
-		return bc;
 	}
 	
 	//
@@ -315,7 +304,7 @@ public class BlockColours {
 			
 			// don't add lines that are covered by the default.
 			if ((waterMultiplier != 0xffffff) || (grassMultiplier != 0xffffff) || (foliageMultiplier != 0xffffff)) {
-				fout.write(String.format("biome %02x %06x %06x %06x\n", biomeId, waterMultiplier, grassMultiplier, foliageMultiplier));
+				fout.write(String.format("biome %d %06x %06x %06x\n", biomeId, waterMultiplier, grassMultiplier, foliageMultiplier));
 			}
 		}
 	}
@@ -367,7 +356,7 @@ public class BlockColours {
 		// add lines for items that don't match the wildcard line.
 		for (int i = 0; i < items.length; i++) {
 			if (!items[i].equals(mostOccurringItem) && !items[i].equals(defaultItem)) {
-				fout.write(String.format("%s %x %s\n", lineStart, i, items[i]));
+				fout.write(String.format("%s %d %s\n", lineStart, i, items[i]));
 			}
 		}
 	}
@@ -383,7 +372,7 @@ public class BlockColours {
 				colours[meta] = String.format("%08x", this.getColour(blockId, meta));
 			}
 			// write a minimal representation to the file
-			String lineStart = String.format("block %03x", blockId);
+			String lineStart = String.format("block %d", blockId);
 			writeMinimalBlockLines(fout, lineStart, colours, "00000000");
 		}
 	}
@@ -400,7 +389,7 @@ public class BlockColours {
 				blockTypes[meta] = getBlockTypeAsString(bt);
 			}
 			// write a minimal representation to the file
-			String lineStart = String.format("blocktype %03x", blockId);
+			String lineStart = String.format("blocktype %d", blockId);
 			writeMinimalBlockLines(fout, lineStart, blockTypes, "normal");
 		}
 	}
@@ -424,6 +413,50 @@ public class BlockColours {
 				} catch (IOException e) {}
 			}
 		}
-		
+	}
+	
+	public static void writeOverridesFile(File f) {
+		Writer fout = null;
+		try {
+			fout = new OutputStreamWriter(new FileOutputStream(f));
+			
+			fout.write(
+				"block 37 * 60ffff00      # make dandelions yellow\n" +
+				"block 38 * 60ff0000      # make roses red\n" +
+				"blocktype 2 * grass      # grass block\n" +
+				"blocktype 8 * water      # still water block\n" +
+				"blocktype 9 * water      # flowing water block\n" +
+				"blocktype 18 * leaves    # leaves block\n" +
+				"blocktype 31 * grass     # tall grass block\n" +
+				"blocktype 106 * foliage  # vines block\n" +
+				"blocktype 169 * grass    # biomes o plenty holy grass\n" +
+				"blocktype 1920 * grass   # biomes o plenty plant\n" +
+				"blocktype 1923 * opaque  # biomes o plenty leaves 1\n" +
+				"blocktype 1924 * opaque  # biomes o plenty leaves 2\n" +
+				"blocktype 1925 * foliage # biomes o plenty foliage\n" +
+				"blocktype 1926 * opaque  # biomes o plenty fruit leaf block\n" +
+				"blocktype 1932 * foliage # biomes o plenty tree moss\n" +
+				"blocktype 1962 * leaves  # biomes o plenty colorized leaves\n" +
+				"blocktype 2164 * leaves  # twilight forest leaves\n" +
+				"blocktype 2177 * leaves  # twilight forest magic leaves\n" +
+				"blocktype 2204 * leaves  # extrabiomesXL green leaves\n" +
+				"blocktype 2200 * opaque  # extrabiomesXL autumn leaves\n" +
+				"blocktype 3257 * opaque  # natura berry bush\n" +
+				"blocktype 3272 * opaque  # natura darkwood leaves\n" +
+				"blocktype 3259 * leaves  # natura flora leaves\n" +
+				"blocktype 3278 * opaque  # natura rare leaves\n" +
+				"blocktype 3258 * opaque  # natura sakura leaves\n"
+			);
+			
+		} catch (IOException e) {
+			RegionManager.logError("saving block overrides: could not write to '%s'", f);
+			
+		} finally {
+			if (fout != null) {
+				try {
+					fout.close();
+				} catch (IOException e) {}
+			}
+		}
 	}
 }
