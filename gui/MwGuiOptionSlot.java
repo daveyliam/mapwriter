@@ -148,22 +148,18 @@ public class MwGuiOptionSlot extends GuiSlot {
 			case 1:
 				// top right position
 				this.mw.overlayManager.smallMapMode.setMargins(10, -1, -1, 10);
-				this.mw.overlayManager.undergroundMapMode.setMargins(10, -1, -1, 10);
 				break;
 			case 2:
 				// top left position
 				this.mw.overlayManager.smallMapMode.setMargins(10, -1, 10, -1);
-				this.mw.overlayManager.undergroundMapMode.setMargins(10, -1, 10, -1);
 				break;
 			case 3:
 				// bottom right position
 				this.mw.overlayManager.smallMapMode.setMargins(-1, 40, -1, 10);
-				this.mw.overlayManager.undergroundMapMode.setMargins(-1, 40, -1, 10);
 				break;
 			case 4:
 				// bottom left position
 				this.mw.overlayManager.smallMapMode.setMargins(-1, 40, 10, -1);
-				this.mw.overlayManager.undergroundMapMode.setMargins(-1, 40, 10, -1);
 				break;
 			default:
 				break;

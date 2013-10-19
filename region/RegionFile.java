@@ -183,7 +183,7 @@ public class RegionFile {
 		File dir = this.file.getParentFile();
 		if (dir.exists()) {
 			if (!dir.isDirectory()) {
-				RegionManager.logError("region directory %s exists and is not a directory", dir);
+				RegionManager.logError("path %s exists and is not a directory", dir);
 				return true;
 			}
 		} else {

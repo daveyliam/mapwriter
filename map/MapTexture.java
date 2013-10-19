@@ -16,21 +16,8 @@ public class MapTexture extends Texture {
 	public int textureRegions;
 	public int textureSize;
 	
-	public int viewUpdateCount = 0;
-	
-	public int requestedMinX = 0;
-	public int requestedMinZ = 0;
-	public int requestedMaxX = 0;
-	public int requestedMaxZ = 0;
-	public int requestedZoomLevel = 0;
-	public int requestedDimension = 0;
-	
-	public int loadedMinX = 0;
-	public int loadedMinZ = 0;
-	public int loadedMaxX = 0;
-	public int loadedMaxZ = 0;
-	public int loadedZoomLevel = 0;
-	public int loadedDimension = 0;
+	private MapViewRequest loadedView = null;
+	private MapViewRequest requestedView = null;
 	
 	private Region[] regionArray;
 	
@@ -60,31 +47,10 @@ public class MapTexture extends Texture {
 		this.regionArray = new Region[this.textureRegions * this.textureRegions];
 	}
 	
-	public void requestView(MapView view, BackgroundExecutor executor, RegionManager regionManager) {
-		// round to nearest multiple of 512
-		
-		int zoomLevel = view.getRegionZoomLevel();
-		int size = Region.SIZE << zoomLevel;
-		int minX = ((int) view.getMinX()) & (-size);
-		int minZ = ((int) view.getMinZ()) & (-size);
-		int maxX = ((int) view.getMaxX()) & (-size);
-		int maxZ = ((int) view.getMaxZ()) & (-size);
-		int dimension = view.getDimension();
-		if ((this.viewUpdateCount <= 0) ||
-				(minX != this.requestedMinX) ||
-				(minZ != this.requestedMinZ) ||
-				(maxX != this.requestedMaxX) ||
-				(maxZ != this.requestedMaxZ) ||
-				(zoomLevel != this.requestedZoomLevel) ||
-				(dimension != this.requestedDimension)) {
-			this.requestedMinX = minX;
-			this.requestedMinZ = minZ;
-			this.requestedMaxX = maxX;
-			this.requestedMaxZ = maxZ;
-			this.requestedZoomLevel = zoomLevel;
-			this.requestedDimension = dimension;
-			this.viewUpdateCount++;
-			executor.addTask(new MapUpdateViewTask(this, regionManager));
+	public void requestView(MapViewRequest req, BackgroundExecutor executor, RegionManager regionManager) {
+		if ((this.requestedView == null) || (!this.requestedView.equals(req))) {
+			this.requestedView = req;
+			executor.addTask(new MapUpdateViewTask(this, regionManager, req));
 		}
 	}
 	
@@ -144,12 +110,12 @@ public class MapTexture extends Texture {
 	//	return region.equals(this.regionArray[this.getRegionIndex(region.x, region.z, region.zoomLevel)]);
 	//}
 	
-	public int loadRegions(RegionManager regionManager, int minX, int minZ, int maxX, int maxZ, int zoomLevel, int dimension) {
-		int size = Region.SIZE << zoomLevel;
+	public int loadRegions(RegionManager regionManager, MapViewRequest req) {
+		int size = Region.SIZE << req.zoomLevel;
 		int loadedCount = 0;
-		for (int z = minZ; z <= maxZ; z += size) {
-			for (int x = minX; x <= maxX; x += size) {
-				if (!this.loadRegion(regionManager, x, z, zoomLevel, dimension)) {
+		for (int z = req.zMin; z <= req.zMax; z += size) {
+			for (int x = req.xMin; x <= req.xMax; x += size) {
+				if (!this.loadRegion(regionManager, x, z, req.zoomLevel, req.dimension)) {
 					loadedCount++;
 				}
 			}
@@ -180,5 +146,13 @@ public class MapTexture extends Texture {
 			}
 			this.textureUpdateQueue.clear();
 		}
+	}
+	
+	public void setLoaded(MapViewRequest req) {
+		this.loadedView = req;
+	}
+	
+	public boolean isLoaded(MapViewRequest req) {
+		return (this.loadedView != null) && (this.loadedView.mostlyEquals(req));
 	}
 }

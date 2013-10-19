@@ -5,7 +5,7 @@ import mapwriter.region.MwChunk;
 import mapwriter.region.RegionManager;
 
 public class MapUpdateViewTask extends Task {
-	final int minX, minZ, maxX, maxZ, zoomLevel, dimension;
+	final MapViewRequest req;
 	int loadedCount = 0;
 	MwChunk[] chunksToUpdate;
 	RegionManager regionManager;
@@ -13,23 +13,17 @@ public class MapUpdateViewTask extends Task {
 	
 	// chunkmanager will need to keep a list of chunks to update.
 	// it should also keep a 2D chunkSum array so that only modified chunks are updated.
-	public MapUpdateViewTask(MapTexture mapTexture, RegionManager regionManager) {
+	public MapUpdateViewTask(MapTexture mapTexture, RegionManager regionManager, MapViewRequest req) {
 		
 		this.mapTexture = mapTexture;
 		this.regionManager = regionManager;
-		this.minX = mapTexture.requestedMinX;
-		this.minZ = mapTexture.requestedMinZ;
-		this.maxX = mapTexture.requestedMaxX;
-		this.maxZ = mapTexture.requestedMaxZ;
-		this.zoomLevel = mapTexture.requestedZoomLevel;
-		this.dimension = mapTexture.requestedDimension;
+		this.req = req;
 	}
 	
 	@Override
 	public void run() {
 		// load regions for view
-		this.loadedCount = this.mapTexture.loadRegions(this.regionManager,
-				this.minX, this.minZ, this.maxX, this.maxZ, this.zoomLevel, this.dimension);
+		this.loadedCount = this.mapTexture.loadRegions(this.regionManager, this.req);
 		
 		// update region pixels with chunk data
 		// copy updated pixels to maptexture
@@ -40,12 +34,7 @@ public class MapUpdateViewTask extends Task {
 	@Override
 	public void onComplete() {
 		// set currentView in mapTexture to requestedView
-		this.mapTexture.loadedMinX = this.minX;
-		this.mapTexture.loadedMinZ = this.minZ;
-		this.mapTexture.loadedMaxX = this.maxX;
-		this.mapTexture.loadedMaxZ = this.maxZ;
-		this.mapTexture.loadedZoomLevel = this.zoomLevel;
-		this.mapTexture.loadedDimension = this.dimension;
+		this.mapTexture.setLoaded(this.req);
 		
 		//MwUtil.log("MapUpdateViewTask: loaded %d regions", this.loadedCount);
 	}

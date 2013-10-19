@@ -10,7 +10,7 @@ import net.minecraft.block.Block;
 
 import org.lwjgl.opengl.GL11;
 
-public class UndergroundMapRenderer implements MapRenderer {
+public class UndergroundMapRenderer {
 	private Mw mw;
 	private MapMode mapMode;
 	private Texture undergroundTexture;
@@ -140,7 +140,7 @@ public class UndergroundMapRenderer implements MapRenderer {
 			Render.disableStencil();
 		}
 		
-		StandardMapRenderer.drawBorder(this.mapMode);
+		MapRenderer.drawBorder(this.mapMode);
 		
 		// only 15 blocks of the 16 block texture are shown, so rather than the player arrow being
 		// drawn in the exact centre of the overlay area, it needs to be drawn 8/15 of the way in.
@@ -154,7 +154,7 @@ public class UndergroundMapRenderer implements MapRenderer {
 		GL11.glLoadIdentity();
 		GL11.glTranslatef((float) this.mapMode.xTranslation, (float) this.mapMode.yTranslation, -2000.0f);
 		
-		StandardMapRenderer.drawCoords(this.mw, this.mapMode);
+		MapRenderer.drawCoords(this.mw, this.mapMode);
 		
 		// some shader mods seem to need depth testing re-enabled
 		GL11.glEnable(GL11.GL_DEPTH_TEST);

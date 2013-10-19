@@ -1,7 +1,6 @@
 package mapwriter.gui;
 
 import java.awt.Point;
-import java.io.File;
 
 import mapwriter.MergeTask;
 import mapwriter.Mw;
@@ -10,7 +9,7 @@ import mapwriter.ReloadRegionsTask;
 import mapwriter.forge.MwKeyHandler;
 import mapwriter.map.MapView;
 import mapwriter.map.Marker;
-import mapwriter.map.StandardMapRenderer;
+import mapwriter.map.MapRenderer;
 import mapwriter.map.mapmode.FullScreenMapMode;
 import mapwriter.map.mapmode.MapMode;
 import net.minecraft.client.gui.GuiButton;
@@ -27,7 +26,7 @@ public class MwGui extends GuiScreen {
 	private Mw mw;
     private MapMode mapMode;
     private MapView mapView;
-    private StandardMapRenderer map;
+    private MapRenderer map;
     
 	private final static double PAN_FACTOR = 0.3D;
     
@@ -81,7 +80,7 @@ public class MwGui extends GuiScreen {
     	this.mw = mw;
     	this.mapMode = new FullScreenMapMode(mw.config);
     	this.mapView = new MapView();
-    	this.map = new StandardMapRenderer(this.mw, this.mapMode, this.mapView);
+    	this.map = new MapRenderer(this.mw, this.mapMode, this.mapView);
     	
     	this.mapView.setDimension(this.mw.overlayManager.overlayView.getDimension());
     	this.mapView.setViewCentreScaled(this.mw.playerX, this.mw.playerZ, this.mw.playerDimension);
@@ -105,7 +104,6 @@ public class MwGui extends GuiScreen {
     
     public void exitGui() {
     	//MwUtil.log("closing GUI");
-    	this.map.close();
     	this.mapMode.close();
     	Keyboard.enableRepeatEvents(false);
     	this.mc.displayGuiScreen((GuiScreen) null);
@@ -151,9 +149,6 @@ public class MwGui extends GuiScreen {
     }
     
     public void mergeMapViewToImage() {
-    	// get free output file name in the minecraft launcher dir
-		File outputFile = MwUtil.getFreeFilename(null, this.mw.worldDir.getName(), "png");
-		if (outputFile != null) {
 			this.mw.chunkManager.saveChunks();
 			this.mw.executor.addTask(new MergeTask(this.mw.regionManager,
 					(int) this.mapView.getX(),
@@ -161,12 +156,10 @@ public class MwGui extends GuiScreen {
 					(int) this.mapView.getWidth(),
 					(int) this.mapView.getHeight(),
 					this.mapView.getDimension(),
-					outputFile));
+					this.mw.worldDir,
+					this.mw.worldDir.getName()));
 			
-			MwUtil.printBoth("merging to '" + outputFile.getAbsolutePath() + "'");
-		} else {
-			MwUtil.printBoth("error: could not get free output filename");
-		}
+			MwUtil.printBoth("merging to '" + this.mw.worldDir.getAbsolutePath() + "'");
     }
     
     public void regenerateView() {
@@ -544,8 +537,7 @@ public class MwGui extends GuiScreen {
         	this.mouseLeftHeld++;
         }
         
-        // update and draw the map
-        this.map.update();
+        // draw the map
         this.map.draw();
         
         // let the renderEngine know we have changed the texture.

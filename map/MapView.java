@@ -7,17 +7,20 @@ import mapwriter.map.mapmode.MapMode;
 
 public class MapView {
 	
+	private int mode = 0;
+	private static String[] modeDescArray = {"surface", "underground"};
+	
 	private int zoomLevel = 0;
 	private int dimension = 0;
 	private int textureSize = 2048;
 	
 	// the position of the centre of the 'view' of the map using game (block) coordinates
-	private double x = 0.0;
-	private double z = 0.0;
+	private double x = 0;
+	private double z = 0;
 	
 	// width and height of map to display in pixels
-	private int mapW = 1;
-	private int mapH = 1;
+	private int mapW = 0;
+	private int mapH = 0;
 	
 	// the width and height of the map in blocks at zoom level 0.
 	// updated when map width, map height, or texture size changes.
@@ -26,17 +29,25 @@ public class MapView {
 	
 	// the width and height of the map in blocks at the current
 	// zoom level.
-	public double w = 1.0;
-	public double h = 1.0;
+	public double w = 1;
+	public double h = 1;
 	
-	// the last coordinate the view was updated at.
-	// if the view moves 256 blocks away from this position a texture update is triggered.
-	public int lastUpdateX = 0;
-	public int lastUpdateZ = 0;
+	public int toggleMode() {
+		this.mode = (this.mode + 1) % (modeDescArray.length);
+		return this.mode;
+	}
+	
+	public int getMode() {
+		return this.mode;
+	}
+	
+	public String getModeString() {
+		return modeDescArray[this.mode];
+	}
 	
 	public void setViewCentre(double vX, double vZ) {
-		this.x = vX;
-		this.z = vZ;
+			this.x = vX;
+			this.z = vZ;
 	}
 	
 	public double getX() {
@@ -107,13 +118,15 @@ public class MapView {
 	
 	public void setDimension(int dimension) {
 		double scale = 1.0;
-		if ((this.dimension != -1) && (dimension == -1)) {
-			scale = 0.125;
-		} else if ((this.dimension == -1) && (dimension != -1)) {
-			scale = 8.0;
+		if (dimension != this.dimension) {
+			if ((this.dimension != -1) && (dimension == -1)) {
+				scale = 0.125;
+			} else if ((this.dimension == -1) && (dimension != -1)) {
+				scale = 8.0;
+			}
+			this.dimension = dimension;
+			this.setViewCentre(this.x * scale, this.z * scale);
 		}
-		this.dimension = dimension;
-		this.setViewCentre(this.x * scale, this.z * scale);
 	}
 	
 	public void setDimensionAndAdjustZoom(int dimension) {
