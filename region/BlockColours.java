@@ -421,12 +421,14 @@ public class BlockColours {
 			fout = new OutputStreamWriter(new FileOutputStream(f));
 			
 			fout.write(
-				"block 37 * 60ffff00      # make dandelions yellow\n" +
-				"block 38 * 60ff0000      # make roses red\n" +
+				"block 37 * 60ffff00      # make dandelions more yellow\n" +
+				"block 38 * 60ff0000      # make roses more red\n" +
 				"blocktype 2 * grass      # grass block\n" +
 				"blocktype 8 * water      # still water block\n" +
 				"blocktype 9 * water      # flowing water block\n" +
 				"blocktype 18 * leaves    # leaves block\n" +
+				"blocktype 18 1 opaque    # pine leaves (not biome colorized)\n" +
+				"blocktype 18 2 opaque    # birch leaves (not biome colorized)\n" +
 				"blocktype 31 * grass     # tall grass block\n" +
 				"blocktype 106 * foliage  # vines block\n" +
 				"blocktype 169 * grass    # biomes o plenty holy grass\n" +

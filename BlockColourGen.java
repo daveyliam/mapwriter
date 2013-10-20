@@ -16,9 +16,6 @@ import net.minecraft.world.biome.BiomeGenBase;
 
 public class BlockColourGen {
 	
-	public static final String catBlockType = "blocktype";
-	public static final String catBlockColour = "blockcolour";
-	
 	private static int getIconMapColour(Icon icon, Texture terrainTexture) {
 		int iconX = (int) Math.round(((float) terrainTexture.w) * icon.getMinU());
 		int iconY = (int) Math.round(((float) terrainTexture.h) * icon.getMinV());
@@ -60,8 +57,8 @@ public class BlockColourGen {
 			}
 			break;
 		case LEAVES:
-			// leaves look weird on the map if they are not opaque,
-			// also leaves look too dark if the render colour is applied.
+			// leaves look weird on the map if they are not opaque.
+			// they also look too dark if the render colour is applied.
 			blockColour |= 0xff000000;
 			break;
 		default:
@@ -155,8 +152,18 @@ public class BlockColourGen {
 						//if (dv == 0)
 						//	MwUtil.log("block %03x:%x colour = %08x", blockID, dv, blockColour);
 					}
+					
+					// doesn't work as some leaves blocks aren't rendered using the biome
+					// foliage colour
+					//try {
+					//	if (block.isLeaves(null, 0, 0, 0)) {
+					//		bc.setBlockType(blockAndMeta, BlockType.LEAVES);
+					//	}
+					//} catch (NullPointerException e) {
+					//}
+					
 					blockColour = adjustBlockColourFromType(bc, blockAndMeta, blockColour);
-				}	
+				}
 				bc.setColour(blockAndMeta, blockColour);
 			}
 		}
