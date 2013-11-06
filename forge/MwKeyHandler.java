@@ -4,12 +4,12 @@ import java.util.EnumSet;
 
 import mapwriter.Mw;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.src.ModLoader;
 
 import org.lwjgl.input.Keyboard;
 
 import cpw.mods.fml.client.registry.KeyBindingRegistry.KeyHandler;
 import cpw.mods.fml.common.TickType;
+import cpw.mods.fml.common.registry.LanguageRegistry;
 
 public class MwKeyHandler extends KeyHandler {
 
@@ -31,13 +31,15 @@ public class MwKeyHandler extends KeyHandler {
 	public MwKeyHandler(Mw mw) {
 		super(keyBindings, keyBooleans);
 		this.mw = mw;
-		ModLoader.addLocalization("key.mw_open_gui", "Open map GUI");
-		ModLoader.addLocalization("key.mw_new_marker", "New waypoint");
-		ModLoader.addLocalization("key.mw_next_map_mode", "Next map mode");
-		ModLoader.addLocalization("key.mw_next_marker_group", "Next waypoint group");
-		ModLoader.addLocalization("key.mw_teleport", "Teleport to waypoint");
-		ModLoader.addLocalization("key.mw_zoom_in", "Minimap zoom in");
-		ModLoader.addLocalization("key.mw_zoom_out", "Minimap zoom out");
+		
+		// set localized names for the keys
+		LanguageRegistry.instance().addStringLocalization("key.mw_open_gui", "en_US", "Open map GUI");
+		LanguageRegistry.instance().addStringLocalization("key.mw_new_marker", "en_US", "New waypoint");
+		LanguageRegistry.instance().addStringLocalization("key.mw_next_map_mode", "en_US", "Next map mode");
+		LanguageRegistry.instance().addStringLocalization("key.mw_next_marker_group", "en_US", "Next waypoint group");
+		LanguageRegistry.instance().addStringLocalization("key.mw_teleport", "en_US", "Teleport to waypoint");
+		LanguageRegistry.instance().addStringLocalization("key.mw_zoom_in", "en_US", "Minimap zoom in");
+		LanguageRegistry.instance().addStringLocalization("key.mw_zoom_out", "en_US", "Minimap zoom out");
 	}
 
 	@Override

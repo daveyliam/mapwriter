@@ -22,7 +22,6 @@ import net.minecraft.client.gui.GuiGameOver;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.network.packet.Packet1Login;
 import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.src.ModLoader;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
@@ -159,14 +158,15 @@ public class Mw {
 	
 	public Mw(MwConfig config) {
 		// client only initialization
-		this.mc = ModLoader.getMinecraftInstance();
+		// oops, no idea why I was using a ModLoader method to get the Minecraft instance before
+		this.mc = Minecraft.getMinecraft();
 		
 		// load config
 		this.config = config;
 		
 		// create base save directory
-		this.saveDir = new File(Minecraft.getMinecraft().mcDataDir, "saves");
-		this.configDir = new File(Minecraft.getMinecraft().mcDataDir, "config");
+		this.saveDir = new File(this.mc.mcDataDir, "saves");
+		this.configDir = new File(this.mc.mcDataDir, "config");
 		
 		this.ready = false;
 		
@@ -181,11 +181,13 @@ public class Mw {
 			IntegratedServer server = this.mc.getIntegratedServer();
 			worldName = (server != null) ? server.getFolderName() : "sp_world";
 		} else {
-			// strip invalid characters from the server name so that it
-			// can't be something malicious like '..\..\..\windows\'
 			worldName = String.format("%s_%d", this.serverName, this.serverPort);
 		}
+		
+		// strip invalid characters from the server name so that it
+		// can't be something malicious like '..\..\..\windows\'
 		worldName = MwUtil.mungeString(worldName);
+		
 		// if something went wrong make sure the name is not blank
 		// (causes crash on start up due to empty configuration section)
 		if (worldName == "") {
