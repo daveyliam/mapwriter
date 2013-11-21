@@ -3,6 +3,7 @@ package mapwriter.map;
 import java.util.List;
 
 import mapwriter.Mw;
+import mapwriter.api.MwAPI;
 import mapwriter.map.mapmode.MapMode;
 
 public class MapView {
@@ -46,8 +47,12 @@ public class MapView {
 	}
 	
 	public void setViewCentre(double vX, double vZ) {
-			this.x = vX;
-			this.z = vZ;
+		this.x = vX;
+		this.z = vZ;
+		
+		if(MwAPI.getCurrentDataProvider() != null)
+		   MwAPI.getCurrentDataProvider().onMapCenterChanged(vX, vZ, this);
+		
 	}
 	
 	public double getX() {
@@ -90,6 +95,9 @@ public class MapView {
 			this.w = this.baseW >> (-this.zoomLevel);
 			this.h = this.baseH >> (-this.zoomLevel);
 		}
+		
+		if (MwAPI.getCurrentDataProvider() != null)
+			MwAPI.getCurrentDataProvider().onZoomChanged(this.getZoomLevel(), this);		
 	}
 	
 	public int adjustZoomLevel(int n) {
@@ -127,6 +135,9 @@ public class MapView {
 			this.dimension = dimension;
 			this.setViewCentre(this.x * scale, this.z * scale);
 		}
+	
+		if (MwAPI.getCurrentDataProvider() != null)
+			MwAPI.getCurrentDataProvider().onDimensionChanged(this.dimension, this);		
 	}
 	
 	public void setDimensionAndAdjustZoom(int dimension) {

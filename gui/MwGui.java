@@ -6,6 +6,8 @@ import mapwriter.MergeTask;
 import mapwriter.Mw;
 import mapwriter.MwUtil;
 import mapwriter.ReloadRegionsTask;
+import mapwriter.api.IMwDataProvider;
+import mapwriter.api.MwAPI;
 import mapwriter.forge.MwKeyHandler;
 import mapwriter.map.MapView;
 import mapwriter.map.Marker;
@@ -53,6 +55,7 @@ public class MwGui extends GuiScreen {
     private Label optionsLabel;
     private Label dimensionLabel;
     private Label groupLabel;
+    private Label overlayLabel;
     
     class Label {
     	int x = 0, y = 0, w = 1, h = 12;
@@ -90,6 +93,14 @@ public class MwGui extends GuiScreen {
     	this.optionsLabel = new Label();
     	this.dimensionLabel = new Label();
     	this.groupLabel = new Label();
+    	this.overlayLabel = new Label();
+    }
+
+    public MwGui(Mw mw, int dim, int x, int z){
+    	this(mw);
+    	this.mapView.setDimension(dim);
+    	this.mapView.setViewCentreScaled(x, z, dim);
+    	this.mapView.setZoomLevel(0);    	
     }
     
     // called when gui is displayed and every time the screen
@@ -291,6 +302,9 @@ public class MwGui extends GuiScreen {
     // the scroll wheel.
     @Override
     public void handleMouseInput() {
+    	if (MwAPI.getCurrentDataProvider() != null && MwAPI.getCurrentDataProvider().onMouseInput(this.mapView, this.mapMode))
+    		return;
+    	
     	int x = Mouse.getEventX() * this.width / this.mc.displayWidth;
         int y = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
     	int direction = Mouse.getEventDWheel();
@@ -383,6 +397,15 @@ public class MwGui extends GuiScreen {
         		);
     		}
     	}
+
+    	else if (button == 2) {
+    		Point blockPoint = this.mapMode.screenXYtoBlockXZ(this.mapView, x, y);
+	
+    		IMwDataProvider provider = MwAPI.getCurrentDataProvider();
+    			if (provider != null)    			
+    				provider.onMiddleClick(this.mapView.getDimension(), blockPoint.x, blockPoint.y, this.mapView);
+    	}
+    	
     	this.viewXStart = this.mapView.getX();
 		this.viewZStart = this.mapView.getZ();
 		//this.viewSizeStart = this.mapManager.getViewSize();
@@ -418,6 +441,18 @@ public class MwGui extends GuiScreen {
     		int n = (direction > 0) ? 1 : -1;
     		this.mw.markerManager.nextGroup(n);
     		this.mw.markerManager.update();
+    	} else if (this.overlayLabel.posWithin(x, y)) {
+    		int n = (direction > 0) ? 1 : -1;
+			if (MwAPI.getCurrentDataProvider() != null)
+				MwAPI.getCurrentDataProvider().onOverlayDeactivated(this.mapView);    		
+    		
+    		if (n == 1)
+    			MwAPI.setNextProvider();
+    		else
+    			MwAPI.setPrevProvider();
+
+			if (MwAPI.getCurrentDataProvider() != null)
+				MwAPI.getCurrentDataProvider().onOverlayActivated(this.mapView);    		
     		
     	} else {
     		int zF = (direction > 0) ? -1 : 1;
@@ -456,6 +491,11 @@ public class MwGui extends GuiScreen {
          /*if (this.mw.markerManager.selectedMarker != null) {
          	s += ", current marker: " + this.mw.markerManager.selectedMarker.name;
          }*/
+    	 
+    	 IMwDataProvider provider = MwAPI.getCurrentDataProvider();
+ 			if (provider != null)    	 
+ 				s += provider.getStatusString(this.mapView.getDimension(), bX, bY, bZ);
+    	 
          drawRect(10, this.height - 21, this.width - 20, this.height - 6, 0x80000000);
          this.drawCenteredString(this.fontRenderer,
          		s, this.width / 2, this.height - 18, 0xffffff);
@@ -573,6 +613,8 @@ public class MwGui extends GuiScreen {
        this.dimensionLabel.drawToRightOf(this.optionsLabel, dimString);
        String groupString = String.format("[group: %s]", this.mw.markerManager.getVisibleGroupName());
        this.groupLabel.drawToRightOf(this.dimensionLabel, groupString);
+       String overlayString = String.format("[overlay : %s]", MwAPI.getCurrentProviderName());
+       this.overlayLabel.drawToRightOf(this.groupLabel, overlayString);
         
         // help message on mouse over
 		if (this.helpLabel.posWithin(mouseX, mouseY)) {

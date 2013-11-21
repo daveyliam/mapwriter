@@ -156,6 +156,8 @@ public class Mw {
 	public ChunkManager chunkManager = null;
 	public Trail playerTrail = null;
 	
+	public static Mw instance;
+	
 	public Mw(MwConfig config) {
 		// client only initialization
 		// oops, no idea why I was using a ModLoader method to get the Minecraft instance before
@@ -171,6 +173,8 @@ public class Mw {
 		this.ready = false;
 		
 		RegionManager.logger = MwForge.logger;
+		
+		instance = this;
 	}
 	
 	public String getWorldName() {

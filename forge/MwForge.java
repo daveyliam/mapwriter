@@ -2,6 +2,10 @@ package mapwriter.forge;
 
 import java.util.logging.Logger;
 
+import mapwriter.api.MwAPI;
+import mapwriter.overlay.OverlayChecker;
+import mapwriter.overlay.OverlayGrid;
+import mapwriter.overlay.OverlaySlime;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -44,5 +48,10 @@ public class MwForge {
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		logger.info("FML Event: postInit");
+
+		MwAPI.registerDataProvider("Slime", new OverlaySlime());
+		//MwAPI.registerDataProvider("Grid", new OverlayGrid());
+		//MwAPI.registerDataProvider("Checker", new OverlayChecker());
+		//MwAPI.setCurrentDataProvider("Slime");
 	}
 }
