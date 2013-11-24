@@ -1,9 +1,13 @@
 package mapwriter.map;
 
 import java.awt.Point;
+import java.util.ArrayList;
 
 import mapwriter.Mw;
 import mapwriter.Render;
+import mapwriter.api.IMwChunkOverlay;
+import mapwriter.api.IMwDataProvider;
+import mapwriter.api.MwAPI;
 import mapwriter.map.mapmode.MapMode;
 
 import org.lwjgl.opengl.GL11;
@@ -100,6 +104,16 @@ public class MapRenderer {
 		// draw player arrow
 		Render.setColour(this.mapMode.playerArrowColour);
 		Render.drawArrow(arrow.x, arrow.y, this.mw.playerHeading, this.mapMode.playerArrowSize);
+
+		// draw overlays from registered providers
+   	 	//for (IMwDataProvider provider : MwAPI.getDataProviders())
+		IMwDataProvider provider = MwAPI.getCurrentDataProvider();
+		if (provider != null){
+			ArrayList<IMwChunkOverlay> overlays = provider.getChunksOverlay(this.mapView.getDimension(), this.mapView.getX(), this.mapView.getZ(), this.mapView.getMinX(), this.mapView.getMinZ(), this.mapView.getMaxX(), this.mapView.getMaxZ());
+			if (overlays != null)
+   	 			for (IMwChunkOverlay overlay : overlays)
+   	 				this.paintChunk(mapMode, mapView, overlay);
+		}
 		
 		GL11.glLoadIdentity();
 		GL11.glTranslatef((float) this.mapMode.xTranslation, (float) this.mapMode.yTranslation, -2000.0f);
@@ -109,7 +123,45 @@ public class MapRenderer {
 		// some shader mods seem to need depth testing re-enabled
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glPopMatrix();
+		
+		if (provider != null){
+			GL11.glPushMatrix();			
+			provider.onDraw(this.mapView, this.mapMode);
+			GL11.glPopMatrix();			
+		}
 	}
+	
+	public static void paintChunk(MapMode mapMode, MapView mapView, IMwChunkOverlay overlay){
+		int chunkX    = overlay.getCoordinates().x;
+		int chunkZ    = overlay.getCoordinates().y;
+		float filling = overlay.getFilling();
+		
+		Point.Double topCorner = mapMode.blockXZtoScreenXY(mapView, chunkX << 4, chunkZ << 4);
+		Point.Double botCorner = mapMode.blockXZtoScreenXY(mapView, (chunkX + 1) << 4, (chunkZ + 1 << 4));
+
+		topCorner.x = Math.max(mapMode.x,             topCorner.x);
+		topCorner.x = Math.min(mapMode.x + mapMode.w, topCorner.x);
+		topCorner.y = Math.max(mapMode.y,             topCorner.y);
+		topCorner.y = Math.min(mapMode.y + mapMode.h, topCorner.y);
+		
+		botCorner.x = Math.max(mapMode.x,             botCorner.x);
+		botCorner.x = Math.min(mapMode.x + mapMode.w, botCorner.x);
+		botCorner.y = Math.max(mapMode.y,             botCorner.y);
+		botCorner.y = Math.min(mapMode.y + mapMode.h, botCorner.y);		
+
+		double sizeX = (botCorner.x - topCorner.x) * filling;
+		double sizeY = (botCorner.y - topCorner.y) * filling;		
+		double offsetX = ((botCorner.x - topCorner.x) - sizeX) / 2;
+		double offsetY = ((botCorner.y - topCorner.y) - sizeY) / 2;	
+		
+		if (overlay.hasBorder()){
+			Render.setColour(overlay.getBorderColor());
+			Render.drawRectBorder(topCorner.x + 1, topCorner.y + 1, botCorner.x - topCorner.x - 1, botCorner.y - topCorner.y - 1, overlay.getBorderWidth());
+		}
+		
+		Render.setColour(overlay.getColor());
+		Render.drawRect(topCorner.x + offsetX + 1, topCorner.y + offsetY + 1, sizeX - 1, sizeY - 1);
+	}	
 	
 	public static void drawCoords(Mw mw, MapMode mapMode) {
 		// draw coordinates

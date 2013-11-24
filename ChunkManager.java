@@ -136,6 +136,10 @@ public class ChunkManager {
 		}
 	}
 	
+	public void forceChunks(MwChunk[] chunks){
+		this.mw.executor.addTask(new MapUpdateChunksTask(this.mw.mapTexture, this.mw.regionManager, chunks));
+	}
+	
 	private class SaveChunkTask extends Task {
 		private final RegionManager regionManager;
 		private final MwChunk mwChunk;

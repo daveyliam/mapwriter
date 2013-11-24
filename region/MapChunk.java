@@ -7,6 +7,8 @@ import net.minecraft.world.chunk.Chunk;
 
 public class MapChunk {
 	int[] data = new int[512];
+	int[] columnIndexArray;
+	int[][] compressedColumns;
 	
 	int createFromChunk(Chunk chunk) {
 		int i = 256;
@@ -49,6 +51,10 @@ public class MapChunk {
 	void setColumn(int x, int z, int[] column) {
 		this.compressedColumns[((z & 0xf) << 4) | (x & 0xf)] = column;
 	}
+	
+	private int[] getColumn(int x, int z) {
+		return this.compressedColumns[((z & 0xf) << 4) | (x & 0xf)];
+	}	
 	
 	private int decompressColumn(int[] src, short[] dst) {
 		int i = 0;
