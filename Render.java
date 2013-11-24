@@ -167,16 +167,6 @@ public class Render {
 		}
 	}
 	
-	// note that the coords must be in the correct sequence, following the perimeter of the quad,
-	// and in anticlockwise order.
-	// otherwise one or both of the triangles that make the quad will not be rendered.
-	//  1 +------+ 4      2 +------+ 1     1 +------+ 2
-	//    |      |          |      |         |      |
-	//    |      |          |      |         |      |
-	//  2 +------+ 3      3 +------+ 4     3 +------+ 4
-	//     works             works            fails
-	//
-	
 	public static void drawArrow(double x, double y, double angle, double length) {
 		// angle the back corners will be drawn at relative to the pointing angle
 		double arrowBackAngle = 0.75D * Math.PI;
@@ -189,6 +179,20 @@ public class Render {
         tes.addVertex(x + (length * 0.5D * Math.cos(angle - arrowBackAngle)), y + (length * 0.5D * Math.sin(angle - arrowBackAngle)), zDepth);
         tes.addVertex(x + (length * 0.3D * Math.cos(angle + Math.PI)), y + (length * 0.3D * Math.sin(angle + Math.PI)), zDepth);
         tes.addVertex(x + (length * 0.5D * Math.cos(angle + arrowBackAngle)), y + (length * 0.5D * Math.sin(angle + arrowBackAngle)), zDepth);
+        tes.draw();
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glDisable(GL11.GL_BLEND);
+	}
+	
+	public static void drawTriangle(double x1, double y1, double x2, double y2, double x3, double y3) {
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        Tessellator tes = Tessellator.instance;
+        tes.startDrawing(GL11.GL_TRIANGLES);
+        tes.addVertex(x1, y1, zDepth);
+        tes.addVertex(x2, y2, zDepth);
+        tes.addVertex(x3, y3, zDepth);
         tes.draw();
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glDisable(GL11.GL_BLEND);

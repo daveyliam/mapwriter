@@ -104,7 +104,14 @@ public class MapRenderer {
 		// draw player arrow
 		Render.setColour(this.mapMode.playerArrowColour);
 		Render.drawArrow(arrow.x, arrow.y, this.mw.playerHeading, this.mapMode.playerArrowSize);
-
+		
+		// draw north arrow
+		if (this.mapMode.rotate) {
+			Render.setColour(this.mapMode.borderColour);
+			double r = this.mapMode.h / 2.0;
+			Render.drawTriangle(4.0, -r, 0.0, -r - 4.0, -4.0, -r);
+		}
+		
 		// draw overlays from registered providers
    	 	//for (IMwDataProvider provider : MwAPI.getDataProviders())
 		IMwDataProvider provider = MwAPI.getCurrentDataProvider();
