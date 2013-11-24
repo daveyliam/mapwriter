@@ -166,8 +166,12 @@ public class MapRenderer {
 	public static void drawCoords(Mw mw, MapMode mapMode) {
 		// draw coordinates
 		if (mw.coordsEnabled && mapMode.coordsEnabled) {
-			Render.drawCentredString(mapMode.textX, mapMode.textY, mapMode.textColour,
+			GL11.glPushMatrix();
+			GL11.glTranslatef(mapMode.textX, mapMode.textY, 0);
+			GL11.glScalef(0.5f, 0.5f, 1.0f);
+			Render.drawCentredString(0, 0, mapMode.textColour,
 					"%d, %d, %d", mw.playerXInt, mw.playerYInt, mw.playerZInt);
+			GL11.glPopMatrix();
 		}
 	}
 	
