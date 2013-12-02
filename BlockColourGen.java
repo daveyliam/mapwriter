@@ -17,8 +17,8 @@ import net.minecraft.world.biome.BiomeGenBase;
 public class BlockColourGen {
 	
 	private static int getIconMapColour(Icon icon, Texture terrainTexture) {
-		int iconX = (int) Math.round(((float) terrainTexture.w) * icon.getMinU());
-		int iconY = (int) Math.round(((float) terrainTexture.h) * icon.getMinV());
+		int iconX = (int) Math.round(((float) terrainTexture.w) * Math.min(icon.getMinU(), icon.getMaxU()));
+		int iconY = (int) Math.round(((float) terrainTexture.h) * Math.min(icon.getMinV(), icon.getMaxV()));
 		int iconWidth = (int) Math.round(((float) terrainTexture.w) * Math.abs(icon.getMaxU() - icon.getMinU()));
 		int iconHeight = (int) Math.round(((float) terrainTexture.h) * Math.abs(icon.getMaxV() - icon.getMinV()));
 		
