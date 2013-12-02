@@ -20,26 +20,11 @@ public class BlockColourGen {
 		int iconX = (int) Math.round(((float) terrainTexture.w) * icon.getMinU());
 		int iconY = (int) Math.round(((float) terrainTexture.h) * icon.getMinV());
 
-		float maxU = icon.getMaxU();
-		float minU = icon.getMinU();
-		float diffU;
-		if (minU > maxU) {
-			diffU = minU - maxU;
-		} else {
-			diffU = maxU - minU;
-		}
+		float deltaU = Math.abs(icon.getMaxU() - icon.getMinU());
+		float deltaV = Math.abs(icon.getMaxV() - icon.getMinV());
 
-		float maxV = icon.getMaxV();
-		float minV = icon.getMinV();
-		float diffV;
-		if (minV > maxV) {
-			diffV = minV - maxV;
-		} else {
-			diffV = maxV - minV;
-		}
-
-		int iconWidth = (int) Math.round(((float) terrainTexture.w) * diffU);
-		int iconHeight = (int) Math.round(((float) terrainTexture.h) * diffV);
+		int iconWidth = (int) Math.round(((float) terrainTexture.w) * deltaU);
+		int iconHeight = (int) Math.round(((float) terrainTexture.h) * deltaV);
 		
 		int[] pixels = new int[iconWidth * iconHeight];
 		
