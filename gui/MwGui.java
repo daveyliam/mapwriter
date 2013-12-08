@@ -506,7 +506,7 @@ public class MwGui extends GuiScreen {
     }
     
     public void drawHelp() {
-    	drawRect(10, 20, 288, 215, 0x80000000);
+    	drawRect(10, 20, this.width - 20, this.height - 30, 0x80000000);
     	this.fontRenderer.drawSplitString(
     			"Keys:\n\n" + 
     			"  Space\n" +
@@ -525,7 +525,7 @@ public class MwGui extends GuiScreen {
     			"Left click drag a selected marker to move it.\n" +
     			"Mouse wheel over selected marker to cycle colour.\n" + 
     			"Mouse wheel over dimension or group box to cycle.\n",
-    			14, 24, 280, 0xffffff);
+    			15, 24, this.width - 30, 0xffffff);
     	this.fontRenderer.drawSplitString(
     			"| Next marker group\n" +
     			"| Delete selected marker\n" +
@@ -537,7 +537,7 @@ public class MwGui extends GuiScreen {
     			"| Save PNG of visible map area\n" +
     			"| Regenerate visible map area from region files\n" +
     			"| Underground map mode\n",
-    			70, 42, 210, 0xffffff);
+    			75, 42, this.width - 90, 0xffffff);
     }
     
     public void drawMouseOverHint(int x, int y, String title, int mX, int mY, int mZ) {
