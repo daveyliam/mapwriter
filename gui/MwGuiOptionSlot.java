@@ -70,6 +70,9 @@ public class MwGuiOptionSlot extends GuiSlot {
 		case 10:
 			this.buttons[i].displayString = "Max Death Markers: " + this.mw.maxDeathMarkers;
 			break;
+		//case 11:
+		//	this.buttons[i].displayString = "Map Lighting: " + (this.mw.lightingEnabled ? "enabled" : "disabled");
+		//	break;	
 		default:
 			break;
 		}
@@ -180,6 +183,10 @@ public class MwGuiOptionSlot extends GuiSlot {
 				this.mw.maxDeathMarkers = 0;
 			}
 			break;
+		//case 11:
+		//	// lighting
+		//	this.mw.lightingEnabled = !this.mw.lightingEnabled;
+		//	break;
 		default:
 			break;
 		}

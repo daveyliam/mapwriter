@@ -34,6 +34,7 @@ public class ChunkManager {
 		byte[][] msbArray = new byte[16][];
 		byte[][] lsbArray = new byte[16][];
 		byte[][] metaArray = new byte[16][];
+		byte[][] lightingArray = new byte[16][];
 		
 		ExtendedBlockStorage[] storageArrays = chunk.getBlockStorageArray();
 		if (storageArrays != null) {
@@ -43,12 +44,13 @@ public class ChunkManager {
 					lsbArray[y] = storage.getBlockLSBArray();
 					msbArray[y] = (storage.getBlockMSBArray() != null) ? storage.getBlockMSBArray().data : null;
 					metaArray[y] = (storage.getMetadataArray() != null) ? storage.getMetadataArray().data : null;
+					lightingArray[y] = (storage.getBlocklightArray() != null) ? storage.getBlocklightArray().data : null;
 				}
 			}
 		}
 		
 		return new MwChunk(chunk.xPosition, chunk.zPosition, chunk.worldObj.provider.dimensionId,
-				msbArray, lsbArray, metaArray, chunk.getBiomeArray());
+				msbArray, lsbArray, metaArray, lightingArray, chunk.getBiomeArray());
 	}
 	
 	public synchronized void addChunk(Chunk chunk) {

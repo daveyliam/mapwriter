@@ -144,7 +144,7 @@ public class ChunkRender {
 	
 	public static void render(BlockColours bc, MwChunk chunk, int[] pixels, int offset, int scanSize, int startY) {
 		if (startY < 0) {
-			startY = chunk.maxHeight;
+			startY = chunk.maxHeight - 1;
 		}
 		for (int z = 0; z < MwChunk.SIZE; z++) {
 			for (int x = 0; x < MwChunk.SIZE; x++) {

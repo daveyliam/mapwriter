@@ -114,6 +114,7 @@ public class Mw {
 	public boolean portNumberInWorldNameEnabled = true;
 	public String saveDirOverride = "";
 	public boolean regionFileOutputEnabled = true;	// TODO: implement
+	//public boolean lightingEnabled = false;
 	
 	// flags and counters
 	private boolean onPlayerDeathAlreadyFired = false;
@@ -217,6 +218,7 @@ public class Mw {
 		this.saveDirOverride = this.config.get(catOptions, "saveDirOverride", this.saveDirOverride).getString();
 		this.portNumberInWorldNameEnabled = config.getOrSetBoolean(catOptions, "portNumberInWorldNameEnabled", this.portNumberInWorldNameEnabled);
 		this.undergroundMode = this.config.getOrSetBoolean(catOptions, "undergroundMode", this.undergroundMode);
+		//this.lightingEnabled = this.config.getOrSetBoolean(catOptions, "lightingEnabled", this.lightingEnabled);
 		
 		maxZoom = this.config.getOrSetInt(catOptions, "zoomOutLevels", maxZoom, 1, 256);
 		minZoom = -this.config.getOrSetInt(catOptions, "zoomInLevels", -minZoom, 1, 256);
@@ -246,6 +248,7 @@ public class Mw {
 		this.config.setInt(catOptions, "maxDeathMarkers", this.maxDeathMarkers);
 		this.config.setInt(catOptions, "chunksPerTick", this.chunksPerTick);
 		this.config.setBoolean(catOptions, "undergroundMode", this.undergroundMode);
+		//this.config.setBoolean(catOptions, "lightingEnabled", this.lightingEnabled);
 		
 		// save config
 		this.config.save();

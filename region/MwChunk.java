@@ -14,12 +14,13 @@ public class MwChunk implements IChunk {
 	public final byte[][] msbArray;
 	public final byte[][] lsbArray;
 	public final byte[][] metaArray;
+	public final byte[][] lightingArray;
 	
 	public final byte[] biomeArray;
 	
 	public final int maxHeight;
 	
-	public MwChunk(int x, int z, int dimension, byte[][] msbArray, byte[][] lsbArray, byte[][] metaArray, byte[] biomeArray) {
+	public MwChunk(int x, int z, int dimension, byte[][] msbArray, byte[][] lsbArray, byte[][] metaArray, byte[][] lightingArray, byte[] biomeArray) {
 		this.x = x;
 		this.z = z;
 		this.dimension = dimension;
@@ -27,6 +28,7 @@ public class MwChunk implements IChunk {
 		this.lsbArray = lsbArray;
 		this.metaArray = metaArray;
 		this.biomeArray = biomeArray;
+		this.lightingArray = lightingArray;
 		int maxY = 0;
 		for (int y = 0; y < 16; y++) {
 			if (lsbArray[y] != null) {
@@ -40,10 +42,6 @@ public class MwChunk implements IChunk {
 		return String.format("(%d, %d) dim%d", this.x, this.z, this.dimension);
 	}
 	
-	public int getLightValue(int x, int y, int z) {
-		return 15;
-	}
-	
 	// load from anvil file
 	public static MwChunk read(int x, int z, int dimension, RegionFileCache regionFileCache) {
 		
@@ -51,6 +49,7 @@ public class MwChunk implements IChunk {
 		byte[][] msbArray = new byte[16][];
 		byte[][] lsbArray = new byte[16][];
 		byte[][] metaArray = new byte[16][];
+		byte[][] lightingArray = new byte[16][];
 		
         DataInputStream dis = null;
         RegionFile regionFile = regionFileCache.getRegionFile(x << 4, z << 4, dimension);
@@ -127,7 +126,7 @@ public class MwChunk implements IChunk {
 			//this.log("MwChunk.read: chunk (%d, %d) input stream is null", this.x, this.z); 
 		}
 		
-		return new MwChunk(x, z, dimension, msbArray, lsbArray, metaArray, biomeArray);
+		return new MwChunk(x, z, dimension, msbArray, lsbArray, metaArray, lightingArray, biomeArray);
 	}
 	
 	public boolean isEmpty() {
@@ -136,6 +135,16 @@ public class MwChunk implements IChunk {
 	
 	public int getBiome(int x, int z) {
 		return (this.biomeArray != null) ? (int) (this.biomeArray[((z & 0xf) << 4) | (x & 0xf)]) & 0xff : 0;
+	}
+	
+	public int getLightValue(int x, int y, int z) {
+		//int yi = (y >> 4) & 0xf;
+		//int offset = ((y & 0xf) << 8) | ((z & 0xf) << 4) | (x & 0xf);
+		
+		//int light = ((this.lightingArray  != null) && (this.lightingArray[yi]  != null)) ? this.lightingArray[yi][offset  >> 1] : 15;
+		
+		//return ((offset & 1) == 1) ? ((light >> 4) & 0xf) : (light & 0xf);
+		return 15;
 	}
 	
 	public int getBlockAndMetadata(int x, int y, int z) {
