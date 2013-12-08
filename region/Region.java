@@ -24,7 +24,6 @@ public class Region {
 	public final int size;
 	
 	public SurfacePixels surfacePixels;
-	public UndergroundPixels undergroundPixels;
 	
 	public Region(RegionManager regionManager, int x, int z, int zoomLevel, int dimension) {
 		
@@ -38,20 +37,16 @@ public class Region {
 		
 		this.key = getKey(this.x, this.z, this.zoomLevel, this.dimension);
 		
-		File surfaceImageFile = this.getImageFile("surface");
+		File surfaceImageFile = this.getImageFile();
 		this.surfacePixels = new SurfacePixels(this, surfaceImageFile);
-		File undergroundImageFile = this.getImageFile("underground");
-		this.undergroundPixels = new UndergroundPixels(this, undergroundImageFile);
 	}
 	
 	public void close() {
 		this.surfacePixels.close();
-		this.undergroundPixels.close();
 	}
 	
 	public void clear() {
 		this.surfacePixels.clear();
-		// don't clear underground pixels
 	}
 		
 	public String toString() {
@@ -65,7 +60,7 @@ public class Region {
 		return dir;
 	}
 	
-	public File getImageFile(String prefix) {
+	public File getImageFile() {
 		File dimDir = addDimensionDirToPath(this.regionManager.imageDir, this.dimension);
 		File zoomDir = new File(dimDir, "z" + this.zoomLevel);
 		
@@ -75,10 +70,6 @@ public class Region {
 				this.x >> (Region.SHIFT + this.zoomLevel),
 				this.z >> (Region.SHIFT + this.zoomLevel)
 		);
-		
-		if (prefix != null) {
-			filename = prefix + "." + filename;
-		}
 		
 		return new File(zoomDir, filename);
 	}
@@ -118,12 +109,8 @@ public class Region {
 				((x >> this.zoomLevel) & (Region.SIZE - 1));
 	}
 	
-	public int[] getRenderedPixels(int y) {
-		if ((this.zoomLevel == 0) && (y >= 0)) {
-			return this.undergroundPixels.getRenderedPixels(y);
-		} else {
-			return this.surfacePixels.getRenderedPixels(y);
-		}
+	public int[] getPixels() {
+		return this.surfacePixels.getPixels();
 	}
 	
 	public boolean isAreaWithin(int x, int z, int w, int h, int dimension) {
@@ -176,13 +163,9 @@ public class Region {
 		this.updateZoomLevels(this.x, this.z, this.size, this.size);
 	}
 	
-	public void updateChunk(MwChunk chunk, int y, byte[] mask) {
+	public void updateChunk(MwChunk chunk) {
 		if (this.zoomLevel == 0) {
-			if (y < 0) {
-				this.surfacePixels.updateChunk(chunk, y, mask);
-			} else {
-				this.undergroundPixels.updateChunk(chunk, y, mask);
-			}
+			this.surfacePixels.updateChunk(chunk);
 		}
 	}
 }

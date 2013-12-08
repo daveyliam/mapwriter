@@ -28,14 +28,13 @@ public class MapRenderer {
 		
 		this.mapMode.setScreenRes();
 		this.mapView.setMapWH(this.mapMode);
-		this.mapView.setTextureSize(this.mw.mapTexture.textureSize);
+		this.mapView.setTextureSize(this.mw.textureSize);
+		int regionZoomLevel = Math.max(0, this.mapView.getZoomLevel());
 		
 		MapViewRequest req = new MapViewRequest(this.mapView);
 		this.mw.mapTexture.requestView(req, this.mw.executor, this.mw.regionManager);
 		
-		int regionZoomLevel = Math.max(0, this.mapView.getZoomLevel());
-		
-		double tSize = (double) this.mw.mapTexture.textureSize;
+		double tSize = (double) this.mw.textureSize;
 		double zoomScale = (double) (1 << regionZoomLevel);
 		
 		// if the texture UV coordinates do not line up with the texture pixels then the texture
@@ -71,18 +70,38 @@ public class MapRenderer {
 			Render.setCircularStencil(0, 0, this.mapMode.h / 2.0);
 		}
 		
-		// don't draw the map texture if the requested zoom level and dimension does not match
-		// the zoom level and dimension of the regions currently loaded into the texture.
-		// this prevents the map showing old regions while the new ones are loading.
-		if (this.mw.mapTexture.isLoaded(req)) {
+		
+		if ((this.mw.undergroundMode) && (regionZoomLevel == 0)) {
+			// draw the underground map
+			this.mw.undergroundMapTexture.requestView(
+					(int) this.mapView.getMinX(), (int) this.mapView.getMinZ(),
+					(int) this.mapView.getMaxX(), (int) this.mapView.getMaxZ()
+			);
+			Render.setColourWithAlphaPercent(0xffffff, this.mapMode.alphaPercent);
+			this.mw.undergroundMapTexture.bind();
+			Render.drawTexturedRect(
+					this.mapMode.x, this.mapMode.y, this.mapMode.w, this.mapMode.h,
+					u, v, u + w, v + h
+			);
+		
+		} else if (this.mw.mapTexture.isLoaded(req)) {
+			// draw the surface map
 			Render.setColourWithAlphaPercent(0xffffff, this.mapMode.alphaPercent);
 			this.mw.mapTexture.bind();
-			Render.drawTexturedRect(this.mapMode.x, this.mapMode.y, this.mapMode.w, this.mapMode.h,
-					u, v, u + w, v + h);
+			Render.drawTexturedRect(
+					this.mapMode.x, this.mapMode.y, this.mapMode.w, this.mapMode.h,
+					u, v, u + w, v + h
+			);
+			
 		} else {
+			// don't draw the map texture if the requested zoom level and dimension does not match
+			// the zoom level and dimension of the regions currently loaded into the texture.
+			// this prevents the map showing old regions while the new ones are loading.
 			Render.setColourWithAlphaPercent(0x000000, this.mapMode.alphaPercent);
 			Render.drawRect(this.mapMode.x, this.mapMode.y, this.mapMode.w, this.mapMode.h);
 		}
+		
+		
 		
 		if (this.mapMode.circular) {
 			Render.disableStencil();
@@ -107,9 +126,13 @@ public class MapRenderer {
 		
 		// draw north arrow
 		if (this.mapMode.rotate) {
+			
 			Render.setColour(this.mapMode.borderColour);
 			double r = this.mapMode.h / 2.0;
 			Render.drawTriangle(4.0, -r, 0.0, -r - 4.0, -4.0, -r);
+			Render.setColour(0xff00c000);
+			r += 1.0;
+			Render.drawTriangle(2.0, -r, 0.0, -r - 2.0, -2.0, -r);
 		}
 		
 		// draw overlays from registered providers

@@ -4,7 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class MwChunk {
+public class MwChunk implements IChunk {
 	public static final int SIZE = 16;
 	
 	public final int x;
@@ -40,6 +40,10 @@ public class MwChunk {
 		return String.format("(%d, %d) dim%d", this.x, this.z, this.dimension);
 	}
 	
+	public int getLightValue(int x, int y, int z) {
+		return 15;
+	}
+	
 	// load from anvil file
 	public static MwChunk read(int x, int z, int dimension, RegionFileCache regionFileCache) {
 		
@@ -49,7 +53,7 @@ public class MwChunk {
 		byte[][] metaArray = new byte[16][];
 		
         DataInputStream dis = null;
-        RegionFile regionFile = regionFileCache.getRegionFile(x, z, dimension);
+        RegionFile regionFile = regionFileCache.getRegionFile(x << 4, z << 4, dimension);
         if (!regionFile.isOpen()) {
         	if (regionFile.exists()) {
         		regionFile.open();
@@ -92,8 +96,8 @@ public class MwChunk {
 				
 				int xNbt = level.getChild("xPos").getInt();
 				int zNbt = level.getChild("zPos").getInt();
-				if (((xNbt & 31) != x) || ((zNbt & 31) != z)) {
-					RegionManager.logWarning("chunk (%d, %d) has NBT coords (%d, %d)", x, z, xNbt & 31, zNbt & 31);
+				if ((xNbt != x) || (zNbt != z)) {
+					RegionManager.logWarning("chunk (%d, %d) has NBT coords (%d, %d)", x, z, xNbt, zNbt);
 				}
 				
 				Nbt sections = level.getChild("Sections");
@@ -185,7 +189,7 @@ public class MwChunk {
 	
 	public synchronized boolean write(RegionFileCache regionFileCache) {
 		boolean error = false;
-		RegionFile regionFile = regionFileCache.getRegionFile(this.x, this.z, this.dimension);
+		RegionFile regionFile = regionFileCache.getRegionFile(this.x << 4, this.z << 4, this.dimension);
 		if (!regionFile.isOpen()) {
         	error = regionFile.open();
         }

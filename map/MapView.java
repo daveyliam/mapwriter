@@ -14,7 +14,6 @@ public class MapView {
 	
 	// the position of the centre of the 'view' of the map using game (block) coordinates
 	private double x = 0;
-	private double y = -1;
 	private double z = 0;
 	
 	// width and height of map to display in pixels
@@ -38,14 +37,6 @@ public class MapView {
 		if(MwAPI.getCurrentDataProvider() != null)
 		   MwAPI.getCurrentDataProvider().onMapCenterChanged(vX, vZ, this);
 		
-	}
-	
-	public void setY(double y) {
-		this.y = y;
-	}
-	
-	public double getY() {
-		return this.y;
 	}
 	
 	public double getX() {

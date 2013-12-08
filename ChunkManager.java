@@ -5,7 +5,6 @@ import java.util.Map;
 import mapwriter.region.MwChunk;
 import mapwriter.tasks.SaveChunkTask;
 import mapwriter.tasks.UpdateSurfaceChunksTask;
-import mapwriter.tasks.UpdateUndergroundChunksTask;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 
@@ -92,9 +91,6 @@ public class ChunkManager {
 				}
 			}
 		}
-		this.mw.executor.addTask(
-			new UpdateUndergroundChunksTask(this.mw, chunkArray, chunkArrayX, chunkArrayZ)
-		);
 	}
 	
 	public void updateSurfaceChunks() {

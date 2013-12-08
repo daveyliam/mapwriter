@@ -276,6 +276,10 @@ public class MwGui extends GuiScreen {
 			this.regenerateView();
 			this.exitGui();
 			break;
+		
+		case Keyboard.KEY_U:
+			this.mw.undergroundMode = !this.mw.undergroundMode;
+			break;
 			
 		//case Keyboard.KEY_9:
 		//	MwUtil.log("refreshing maptexture");
@@ -513,7 +517,8 @@ public class MwGui extends GuiScreen {
     			"  N\n" +
     			"  T\n" +
     			"  P\n" +
-    			"  R\n\n" +
+    			"  R\n" +
+    			"  U\n\n" +
     			"Left click drag or arrow keys pan the map.\n" +
     			"Mouse wheel or Page Up/Down zooms map.\n" +
     			"Right click map to create a new marker.\n" +
@@ -530,7 +535,8 @@ public class MwGui extends GuiScreen {
     			"| Select next marker\n" +
     			"| Teleport to cursor or selected marker\n" +
     			"| Save PNG of visible map area\n" +
-    			"| Regenerate visible map area from region files\n",
+    			"| Regenerate visible map area from region files\n" +
+    			"| Underground map mode\n",
     			70, 42, 210, 0xffffff);
     }
     

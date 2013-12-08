@@ -17,6 +17,8 @@ import net.minecraft.world.biome.BiomeGenBase;
 public class BlockColourGen {
 	
 	private static int getIconMapColour(Icon icon, Texture terrainTexture) {
+		// flipped icons have the U and V coords reversed (minU > maxU, minV > maxV).
+		// thanks go to taelnia for fixing this. 
 		int iconX = (int) Math.round(((float) terrainTexture.w) * Math.min(icon.getMinU(), icon.getMaxU()));
 		int iconY = (int) Math.round(((float) terrainTexture.h) * Math.min(icon.getMinV(), icon.getMaxV()));
 		int iconWidth = (int) Math.round(((float) terrainTexture.w) * Math.abs(icon.getMaxU() - icon.getMinU()));

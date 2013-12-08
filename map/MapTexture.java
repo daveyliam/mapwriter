@@ -19,7 +19,6 @@ public class MapTexture extends Texture {
 	private MapViewRequest requestedView = null;
 	
 	private Region[] regionArray;
-	private int loadedY = -1;
 	
 	// accessed from both render and background thread.
 	// make sure all methods using it are synchronized.
@@ -82,7 +81,7 @@ public class MapTexture extends Texture {
 		}
 	}
 	
-	public void updateTextureFromRegion(Region region, int x, int y, int z, int w, int h) {
+	public void updateTextureFromRegion(Region region, int x, int z, int w, int h) {
 		int tx = (x >> region.zoomLevel) & (this.w - 1);
 		int ty = (z >> region.zoomLevel) & (this.h - 1);
 		int tw = (w >> region.zoomLevel);
@@ -94,7 +93,7 @@ public class MapTexture extends Texture {
 		
 		//MwUtil.log("updateTextureFromRegion: region %s, %d %d %d %d -> %d %d %d %d", region, x, z, w, h, tx, ty, tw, th);
 		
-		int[] pixels = region.getRenderedPixels(y);
+		int[] pixels = region.getPixels();
 		if (pixels != null) {
 			this.setRGBOpaque(tx, ty, tw, th, pixels, region.getPixelOffset(x, z), Region.SIZE);
 		} else {
@@ -110,7 +109,7 @@ public class MapTexture extends Texture {
 		return (z * this.textureRegions) + x;
 	}
 	
-	public boolean loadRegion(RegionManager regionManager, int x, int y, int z, int zoomLevel, int dimension) {
+	public boolean loadRegion(RegionManager regionManager, int x, int z, int zoomLevel, int dimension) {
 		//MwUtil.log("mapTexture.loadRegion %d %d %d %d", x, z, zoomLevel, dimension);
 		boolean loaded = false;
 		int index = this.getRegionIndex(x, z, zoomLevel);
@@ -119,15 +118,10 @@ public class MapTexture extends Texture {
 			Region newRegion = regionManager.getRegion(x, z, zoomLevel, dimension);
 			this.regionArray[index] = newRegion;
 			this.updateTextureFromRegion(
-				newRegion, newRegion.x, y, newRegion.z, newRegion.size, newRegion.size
+				newRegion, newRegion.x, newRegion.z, newRegion.size, newRegion.size
 			);
 			//MwUtil.log("regionArray[%d] = %s", newRegion.index, newRegion);
 			loaded = true;
-		} else if ((currentRegion != null) && (y != this.loadedY)) {
-			// if y is different from the loadedY then update the pixels
-			this.updateTextureFromRegion(
-				currentRegion, currentRegion.x, y, currentRegion.z, currentRegion.size, currentRegion.size
-			);
 		}
 		return loaded;
 	}
@@ -137,22 +131,19 @@ public class MapTexture extends Texture {
 		int loadedCount = 0;
 		for (int z = req.zMin; z <= req.zMax; z += size) {
 			for (int x = req.xMin; x <= req.xMax; x += size) {
-				if (this.loadRegion(regionManager, x, req.y, z, req.zoomLevel, req.dimension)) {
+				if (this.loadRegion(regionManager, x, z, req.zoomLevel, req.dimension)) {
 					loadedCount++;
 				}
 			}
 		}
-		this.loadedY = req.y;
 		return loadedCount;
 	}
 	
-	public void updateArea(RegionManager regionManager, int x, int y, int z, int w, int h, int dimension) {
-		if (((y < 0) && (this.loadedY < 0)) || ((y >= 0) && (this.loadedY >= 0))) {
-			for (int i = 0; i < this.regionArray.length; i++) {
-				Region region = this.regionArray[i];
-				if ((region != null) && (region.isAreaWithin(x, z, w, h, dimension))) {
-					this.updateTextureFromRegion(region, x, y, z, w, h);
-				}
+	public void updateArea(RegionManager regionManager, int x, int z, int w, int h, int dimension) {
+		for (int i = 0; i < this.regionArray.length; i++) {
+			Region region = this.regionArray[i];
+			if ((region != null) && (region.isAreaWithin(x, z, w, h, dimension))) {
+				this.updateTextureFromRegion(region, x, z, w, h);
 			}
 		}
 	}

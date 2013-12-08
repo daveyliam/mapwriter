@@ -112,9 +112,9 @@ public class RegionManager {
 		return region;
 	}
 	
-	public void updateChunk(MwChunk chunk, int y, byte[] maskArray) {	
+	public void updateChunk(MwChunk chunk) {	
 		Region region = this.getRegion(chunk.x << 4, chunk.z << 4, 0, chunk.dimension);
-		region.updateChunk(chunk, y, maskArray);
+		region.updateChunk(chunk);
 	}
 	
 	public void rebuildRegions(int xStart, int zStart, int w, int h, int dimension) {
@@ -136,8 +136,11 @@ public class RegionManager {
 					for (int cz = 0; cz < 32; cz++) {
 						for (int cx = 0; cx < 32; cx++) {
 							// load chunk from anvil file
-							MwChunk chunk = MwChunk.read(cx, cz, region.dimension, this.regionFileCache);
-							region.updateChunk(chunk, -1, null);
+							MwChunk chunk = MwChunk.read(
+								(region.x >> 4) + cx, (region.z >> 4) + cz,
+								region.dimension, this.regionFileCache
+							);
+							region.updateChunk(chunk);
 						}
 					}
 				}

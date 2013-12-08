@@ -15,6 +15,7 @@ import mapwriter.map.Marker;
 import mapwriter.map.MarkerManager;
 import mapwriter.map.MiniMap;
 import mapwriter.map.Trail;
+import mapwriter.map.UndergroundTexture;
 import mapwriter.region.BlockColours;
 import mapwriter.region.RegionManager;
 import mapwriter.tasks.CloseRegionManagerTask;
@@ -97,6 +98,7 @@ public class Mw {
 	// configuration options
 	public boolean linearTextureScalingEnabled = true;
 	public int coordsMode = 0;
+	public boolean undergroundMode = false;
 	public boolean teleportEnabled = true;
 	public String teleportCommand = "tp";
 	public int defaultTeleportHeight = 80;
@@ -105,14 +107,13 @@ public class Mw {
 	public boolean useSavedBlockColours = false;
 	public int maxChunkSaveDistSq = 128 * 128;
 	public boolean mapPixelSnapEnabled = true;
-	private int textureSize = 2048;
+	public int textureSize = 2048;
 	public int configTextureSize = 2048;
 	public int maxDeathMarkers = 3;
 	public int chunksPerTick = 5;
 	public boolean portNumberInWorldNameEnabled = true;
 	public String saveDirOverride = "";
 	public boolean regionFileOutputEnabled = true;	// TODO: implement
-	public boolean undergroundMapEnabled = true;	// TODO: implement
 	
 	// flags and counters
 	private boolean onPlayerDeathAlreadyFired = false;
@@ -144,6 +145,7 @@ public class Mw {
 	
 	// instances of components
 	public MapTexture mapTexture = null;
+	public UndergroundTexture undergroundMapTexture = null;
 	public BackgroundExecutor executor = null;
 	public MiniMap miniMap = null;
 	public MarkerManager markerManager = null;
@@ -214,6 +216,7 @@ public class Mw {
 		this.chunksPerTick = this.config.getOrSetInt(catOptions, "chunksPerTick", this.chunksPerTick, 1, 500);
 		this.saveDirOverride = this.config.get(catOptions, "saveDirOverride", this.saveDirOverride).getString();
 		this.portNumberInWorldNameEnabled = config.getOrSetBoolean(catOptions, "portNumberInWorldNameEnabled", this.portNumberInWorldNameEnabled);
+		this.undergroundMode = this.config.getOrSetBoolean(catOptions, "undergroundMode", this.undergroundMode);
 		
 		maxZoom = this.config.getOrSetInt(catOptions, "zoomOutLevels", maxZoom, 1, 256);
 		minZoom = -this.config.getOrSetInt(catOptions, "zoomInLevels", -minZoom, 1, 256);
@@ -242,6 +245,7 @@ public class Mw {
 		this.config.setBoolean(catOptions, "mapPixelSnapEnabled", this.mapPixelSnapEnabled);
 		this.config.setInt(catOptions, "maxDeathMarkers", this.maxDeathMarkers);
 		this.config.setInt(catOptions, "chunksPerTick", this.chunksPerTick);
+		this.config.setBoolean(catOptions, "undergroundMode", this.undergroundMode);
 		
 		// save config
 		this.config.save();
@@ -380,12 +384,20 @@ public class Mw {
 		this.executor.addTask(new CloseRegionManagerTask(this.regionManager));
 		this.executor.close();
 		MapTexture oldMapTexture = this.mapTexture;
-		this.mapTexture = new MapTexture(this.textureSize, this.linearTextureScalingEnabled);
+		MapTexture newMapTexture = new MapTexture(this.textureSize, this.linearTextureScalingEnabled);
+		this.mapTexture = newMapTexture;
 		if (oldMapTexture != null) {
 			oldMapTexture.close();
 		}
 		this.executor = new BackgroundExecutor();
 		this.regionManager = new RegionManager(this.worldDir, this.imageDir, this.blockColours);
+		
+		UndergroundTexture oldTexture = this.undergroundMapTexture;
+		UndergroundTexture newTexture = new UndergroundTexture(this, this.textureSize, this.linearTextureScalingEnabled);
+		this.undergroundMapTexture = newTexture;
+		if (oldTexture != null) {
+			this.undergroundMapTexture.close();
+		}
 	}
 	
 	public void setCoordsMode(int mode) {
@@ -474,6 +486,7 @@ public class Mw {
 		
 		// mapTexture depends on config being loaded
 		this.mapTexture = new MapTexture(this.textureSize, this.linearTextureScalingEnabled);
+		this.undergroundMapTexture = new UndergroundTexture(this, this.textureSize, this.linearTextureScalingEnabled);
 		this.reloadBlockColours();
 		// region manager depends on config, mapTexture, and block colours
 		this.regionManager = new RegionManager(this.worldDir, this.imageDir, this.blockColours);
@@ -541,6 +554,7 @@ public class Mw {
 			this.miniMap.close();
 			this.miniMap = null;
 			
+			this.undergroundMapTexture.close();
 			this.mapTexture.close();
 			
 			this.saveConfig();
@@ -553,6 +567,11 @@ public class Mw {
 		if (this.ready && (this.mc.thePlayer != null)) {
 			
 			this.updatePlayer();
+			
+			if ((this.tickCounter % 30) == 0) {
+				this.undergroundMapTexture.update();
+			}
+			
 			// check if the game over screen is being displayed and if so 
 			// (thanks to Chrixian for this method of checking when the player is dead)
 			if (this.mc.currentScreen instanceof GuiGameOver) {
@@ -566,7 +585,6 @@ public class Mw {
 				// if in game (no gui screen) center the minimap on the player and render it.
 				if (this.mc.currentScreen == null) {
 					this.miniMap.view.setViewCentreScaled(this.playerX, this.playerZ, this.playerDimension);
-					this.miniMap.view.setY(-1);
 					this.miniMap.drawCurrentMap();
 				}
 			}

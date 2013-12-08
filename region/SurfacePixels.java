@@ -58,10 +58,6 @@ public class SurfacePixels {
 		return this.pixels;
 	}
 	
-	public int[] getRenderedPixels(int y) {
-		return this.getPixels();
-	}
-	
 	public int[] getOrAllocatePixels() {
 		this.getPixels();
 		if (this.pixels == null) {
@@ -71,7 +67,7 @@ public class SurfacePixels {
 		return this.pixels;
 	}
 	
-	public void updateChunk(MwChunk chunk, int y, byte[] mask) {
+	public void updateChunk(MwChunk chunk) {
 		int x = (chunk.x << 4);
 		int z = (chunk.z << 4);
 		int offset = this.region.getPixelOffset(x, z);
@@ -80,7 +76,7 @@ public class SurfacePixels {
 		// more directly
 		ChunkRender.render(
 			this.region.regionManager.blockColours,
-			chunk, pixels, offset, Region.SIZE, -1, null
+			chunk, pixels, offset, Region.SIZE, -1
 		);
 		this.region.updateZoomLevels(x, z, MwChunk.SIZE, MwChunk.SIZE);
 		this.updateCount++;
@@ -118,7 +114,7 @@ public class SurfacePixels {
 	}
 	
 	public static void saveImage(File filename, int[] pixels, int w, int h) {
-		BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+		BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 		img.setRGB(0, 0, w, h, pixels, 0, w);
 		
 		try {

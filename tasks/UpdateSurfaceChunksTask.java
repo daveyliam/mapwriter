@@ -21,11 +21,11 @@ public class UpdateSurfaceChunksTask extends Task {
 		for (MwChunk chunk : this.chunkArray) {
 			if (chunk != null) {
 				// update the chunk in the region pixels
-				this.regionManager.updateChunk(chunk, -1, null);
+				this.regionManager.updateChunk(chunk);
 				// copy updated region pixels to maptexture
 				this.mapTexture.updateArea(
 					this.regionManager,
-					chunk.x << 4, -1, chunk.z << 4,
+					chunk.x << 4, chunk.z << 4,
 					MwChunk.SIZE, MwChunk.SIZE, chunk.dimension
 				);
 			}
