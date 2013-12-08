@@ -1,4 +1,4 @@
-package mapwriter;
+package mapwriter.tasks;
 
 import mapwriter.region.RegionManager;
 

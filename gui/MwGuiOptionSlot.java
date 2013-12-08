@@ -18,12 +18,17 @@ public class MwGuiOptionSlot extends GuiSlot {
 	private int mouseY = 0;
 	
 	private int miniMapPositionIndex = 0;
-	private String[] miniMapPositionStringArray = {
+	private static final String[] miniMapPositionStringArray = {
 		"unchanged",
 		"top right",
 		"top left",
 		"bottom right",
 		"bottom left"
+	};
+	private static final String[] coordsModeStringArray = {
+		"disabled",
+		"small",
+		"large"
 	};
 	
 	private GuiButton[] buttons = new GuiButton[11];
@@ -33,10 +38,10 @@ public class MwGuiOptionSlot extends GuiSlot {
 	public void updateButtonLabel(int i) {
 		switch(i) {
 		case 0:
-			this.buttons[i].displayString = "Draw coords: " + this.mw.coordsEnabled;
+			this.buttons[i].displayString = "Draw coords: " + coordsModeStringArray[this.mw.coordsMode];
 			break;
 		case 1:
-			this.buttons[i].displayString = "Circular mode: " + this.mw.overlayManager.smallMapMode.circular;
+			this.buttons[i].displayString = "Circular mode: " + this.mw.miniMap.smallMapMode.circular;
 			break;
 		case 2:
 			this.buttons[i].displayString = "Texture size: " + this.mw.configTextureSize;
@@ -54,10 +59,10 @@ public class MwGuiOptionSlot extends GuiSlot {
 			this.buttons[i].displayString = "Max Draw Distance: " + Math.round(Math.sqrt(this.mw.maxChunkSaveDistSq));
 			break;
 		case 7:
-			this.buttons[i].displayString = "Mini map size: " + this.mw.overlayManager.smallMapMode.heightPercent;
+			this.buttons[i].displayString = "Mini map size: " + this.mw.miniMap.smallMapMode.heightPercent;
 			break;
 		case 8:
-			this.buttons[i].displayString = "Mini map position: " + this.miniMapPositionStringArray[this.miniMapPositionIndex];
+			this.buttons[i].displayString = "Mini map position: " + miniMapPositionStringArray[this.miniMapPositionIndex];
 			break;
 		case 9:
 			this.buttons[i].displayString = "Map pixel snapping: " + (this.mw.mapPixelSnapEnabled ? "enabled" : "disabled");
@@ -101,7 +106,7 @@ public class MwGuiOptionSlot extends GuiSlot {
 			break;
 		case 1:
 			// toggle circular
-			this.mw.overlayManager.toggleRotating();
+			this.mw.miniMap.toggleRotating();
 			break;
 		case 2:
 			// toggle texture size
@@ -136,30 +141,30 @@ public class MwGuiOptionSlot extends GuiSlot {
 			this.mw.maxChunkSaveDistSq = d * d;
 			break;
 		case 7:
-			this.mw.overlayManager.smallMapMode.toggleHeightPercent();
+			this.mw.miniMap.smallMapMode.toggleHeightPercent();
 			break;
 		case 8:
 			this.miniMapPositionIndex++;
-			if (this.miniMapPositionIndex >= this.miniMapPositionStringArray.length) {
+			if (this.miniMapPositionIndex >= miniMapPositionStringArray.length) {
 				// don't go back to the "unchanged" setting
 				this.miniMapPositionIndex = 1;
 			}
 			switch (this.miniMapPositionIndex) {
 			case 1:
 				// top right position
-				this.mw.overlayManager.smallMapMode.setMargins(10, -1, -1, 10);
+				this.mw.miniMap.smallMapMode.setMargins(10, -1, -1, 10);
 				break;
 			case 2:
 				// top left position
-				this.mw.overlayManager.smallMapMode.setMargins(10, -1, 10, -1);
+				this.mw.miniMap.smallMapMode.setMargins(10, -1, 10, -1);
 				break;
 			case 3:
 				// bottom right position
-				this.mw.overlayManager.smallMapMode.setMargins(-1, 40, -1, 10);
+				this.mw.miniMap.smallMapMode.setMargins(-1, 40, -1, 10);
 				break;
 			case 4:
 				// bottom left position
-				this.mw.overlayManager.smallMapMode.setMargins(-1, 40, 10, -1);
+				this.mw.miniMap.smallMapMode.setMargins(-1, 40, 10, -1);
 				break;
 			default:
 				break;

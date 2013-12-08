@@ -25,4 +25,7 @@ Reobfuscation and Packaging:
 
 Acknowledgements:
 
-* Christian Ehrhardt for the code to get death markers working.
+* Chrixian for the code to get death markers working.
+* ProfMobius for the overlay API.
+* taelnia for extrautils compatibility patch.
+

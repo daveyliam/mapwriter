@@ -2,9 +2,10 @@ package mapwriter;
 
 import java.util.Map;
 
-import mapwriter.map.MapTexture;
 import mapwriter.region.MwChunk;
-import mapwriter.region.RegionManager;
+import mapwriter.tasks.SaveChunkTask;
+import mapwriter.tasks.UpdateSurfaceChunksTask;
+import mapwriter.tasks.UpdateUndergroundChunksTask;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 
@@ -28,7 +29,7 @@ public class ChunkManager {
 	
 	// create MwChunk from Minecraft chunk.
 	// only MwChunk's should be used in the background thread.
-	// TODO: make this a full copy of chunk data
+	// TODO: make this a full copy of chunk data to prevent possible race conditions
 	public static MwChunk copyToMwChunk(Chunk chunk) {
 		
 		byte[][] msbArray = new byte[16][];
@@ -75,93 +76,72 @@ public class ChunkManager {
 			}
 		}
 	}
-
-	public class MapUpdateChunksTask extends Task {
-		MwChunk[] chunkArray;
-		RegionManager regionManager;
-		MapTexture mapTexture;
-		
-		public MapUpdateChunksTask(MapTexture mapTexture, RegionManager regionManager, MwChunk[] chunkArray) {
-			this.mapTexture = mapTexture;
-			this.regionManager = regionManager;
-			this.chunkArray = chunkArray;
-		}
-		
-		@Override
-		public void run() {
-			for (MwChunk chunk : this.chunkArray) {
-				if (chunk != null) {
-					// update the chunk in the region pixels
-					this.regionManager.updateChunk(chunk);
-					// copy updated region pixels to maptexture
-					this.mapTexture.updateChunk(this.regionManager, chunk);
+	
+	public void updateUndergroundChunks() {
+		int chunkArrayX = (this.mw.playerXInt >> 4) - 1;
+		int chunkArrayZ = (this.mw.playerZInt >> 4) - 1;
+		MwChunk[] chunkArray = new MwChunk[9];
+		for (int z = 0; z < 3; z++) {
+			for (int x = 0; x < 3; x++) {
+				Chunk chunk = this.mw.mc.theWorld.getChunkFromChunkCoords(
+					chunkArrayX + x,
+					chunkArrayZ + z
+				);
+				if (!chunk.isEmpty()) {
+					chunkArray[(z * 3) + x] = copyToMwChunk(chunk);
 				}
 			}
-			// unload least accessed regions
-			this.regionManager.pruneRegions();
+		}
+		this.mw.executor.addTask(
+			new UpdateUndergroundChunksTask(this.mw, chunkArray, chunkArrayX, chunkArrayZ)
+		);
+	}
+	
+	public void updateSurfaceChunks() {
+		int chunksToUpdate = Math.min(this.chunkMap.size(), this.mw.chunksPerTick);
+		MwChunk[] chunkArray = new MwChunk[chunksToUpdate];
+		for (int i = 0; i < chunksToUpdate; i++) {
+			Map.Entry<Chunk, Integer> entry = this.chunkMap.getNextEntry();
+			if (entry != null) {
+				// if this chunk is within a certain distance to the player then
+				// add it to the viewed set
+				Chunk chunk = entry.getKey();
+				int flags = entry.getValue();
+				if (MwUtil.distToChunkSq(this.mw.playerXInt, this.mw.playerZInt, chunk) <= this.mw.maxChunkSaveDistSq) {
+					flags |= (VISIBLE_FLAG | VIEWED_FLAG);
+				} else {
+					flags &= ~VISIBLE_FLAG;
+				}
+				entry.setValue(flags);
+				
+				if ((flags & VISIBLE_FLAG) != 0) {
+					chunkArray[i] = copyToMwChunk(chunk);
+				} else {
+					chunkArray[i] = null;
+				}
+			}
 		}
 		
-		@Override
-		public void onComplete() {
-		}
+		this.mw.executor.addTask(new UpdateSurfaceChunksTask(this.mw, chunkArray));
 	}
 	
 	public void onTick() {
 		if (!this.closed) {
-			int chunksToUpdate = Math.min(this.chunkMap.size(), this.mw.chunksPerTick);
-			MwChunk[] chunkArray = new MwChunk[chunksToUpdate];
-			for (int i = 0; i < chunksToUpdate; i++) {
-				Map.Entry<Chunk, Integer> entry = this.chunkMap.getNextEntry();
-				if (entry != null) {
-					// if this chunk is within a certain distance to the player then
-					// add it to the viewed set
-					Chunk chunk = entry.getKey();
-					int flags = entry.getValue();
-					if (MwUtil.distToChunkSq(this.mw.playerXInt, this.mw.playerZInt, chunk) <= this.mw.maxChunkSaveDistSq) {
-						flags |= (VISIBLE_FLAG | VIEWED_FLAG);
-					} else {
-						flags &= ~VISIBLE_FLAG;
-					}
-					entry.setValue(flags);
-					
-					if ((flags & VISIBLE_FLAG) != 0) {
-						chunkArray[i] = copyToMwChunk(chunk);
-					} else {
-						chunkArray[i] = null;
-					}
-				}
+			if ((this.mw.tickCounter & 0xf) == 0) {
+				this.updateUndergroundChunks();
+			} else {
+				this.updateSurfaceChunks();
 			}
-			
-			this.mw.executor.addTask(new MapUpdateChunksTask(this.mw.mapTexture, this.mw.regionManager, chunkArray));
 		}
 	}
 	
-	public void forceChunks(MwChunk[] chunks){
-		this.mw.executor.addTask(new MapUpdateChunksTask(this.mw.mapTexture, this.mw.regionManager, chunks));
-	}
-	
-	private class SaveChunkTask extends Task {
-		private final RegionManager regionManager;
-		private final MwChunk mwChunk;
-		
-		public SaveChunkTask(RegionManager regionManager, MwChunk mwChunk) {
-			this.regionManager = regionManager;
-			this.mwChunk = mwChunk;
-		}
-
-		@Override
-		public void run() {
-			this.regionManager.saveChunk(this.mwChunk);
-		}
-
-		@Override
-		public void onComplete() {
-		}
+	public void forceChunks(MwChunk[] chunkArray){
+		this.mw.executor.addTask(new UpdateSurfaceChunksTask(this.mw, chunkArray));
 	}
 	
 	private void addSaveChunkTask(Chunk chunk) {
 		if (!chunk.isEmpty()) {
-			this.mw.executor.addTask(new SaveChunkTask(this.mw.regionManager, copyToMwChunk(chunk)));
+			this.mw.executor.addTask(new SaveChunkTask(copyToMwChunk(chunk), this.mw.regionManager));
 		}
 	}
 }

@@ -26,7 +26,7 @@ public class MwGuiDimensionDialog extends MwGuiTextDialog {
 		int dimension = this.getInputAsInt();
 		if (this.inputValid) {
     		this.mapView.setDimensionAndAdjustZoom(dimension);
-    		this.mw.overlayManager.overlayView.setDimension(dimension);
+    		this.mw.miniMap.view.setDimension(dimension);
     		this.mw.addDimension(dimension);
     		done = true;
 		}

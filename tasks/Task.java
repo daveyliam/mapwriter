@@ -1,4 +1,4 @@
-package mapwriter;
+package mapwriter.tasks;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;

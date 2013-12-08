@@ -8,15 +8,13 @@ import mapwriter.map.mapmode.MapMode;
 
 public class MapView {
 	
-	private int mode = 0;
-	private static String[] modeDescArray = {"surface", "underground"};
-	
 	private int zoomLevel = 0;
 	private int dimension = 0;
 	private int textureSize = 2048;
 	
 	// the position of the centre of the 'view' of the map using game (block) coordinates
 	private double x = 0;
+	private double y = -1;
 	private double z = 0;
 	
 	// width and height of map to display in pixels
@@ -33,19 +31,6 @@ public class MapView {
 	public double w = 1;
 	public double h = 1;
 	
-	public int toggleMode() {
-		this.mode = (this.mode + 1) % (modeDescArray.length);
-		return this.mode;
-	}
-	
-	public int getMode() {
-		return this.mode;
-	}
-	
-	public String getModeString() {
-		return modeDescArray[this.mode];
-	}
-	
 	public void setViewCentre(double vX, double vZ) {
 		this.x = vX;
 		this.z = vZ;
@@ -53,6 +38,14 @@ public class MapView {
 		if(MwAPI.getCurrentDataProvider() != null)
 		   MwAPI.getCurrentDataProvider().onMapCenterChanged(vX, vZ, this);
 		
+	}
+	
+	public void setY(double y) {
+		this.y = y;
+	}
+	
+	public double getY() {
+		return this.y;
 	}
 	
 	public double getX() {
@@ -73,8 +66,9 @@ public class MapView {
 	
 	public void panView(double relX, double relZ) {
 		this.setViewCentre(
-				this.x + (relX * this.w),
-				this.z + (relZ * this.h));
+			this.x + (relX * this.w),
+			this.z + (relZ * this.h)
+		);
 	}
 	
 	public int setZoomLevel(int zoomLevel) {

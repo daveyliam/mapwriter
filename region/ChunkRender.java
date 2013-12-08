@@ -1,6 +1,10 @@
 package mapwriter.region;
 
-public class ChunkToPixels {
+public class ChunkRender {
+	
+	public static final byte MASK_UNPROCESSED = 0;
+	public static final byte MASK_NON_OPAQUE = 1;
+	public static final byte MASK_OPAQUE = 2;
 	
 	// values that change how height shading algorithm works
 	public static final double brightenExponent = 0.35;
@@ -60,12 +64,17 @@ public class ChunkToPixels {
 		return heightShading;
 	}
 	
-	public static void getMapPixels(BlockColours bc, MwChunk chunk, int[] pixels, int offset, int scanSize) {
-		// if the dimension has a roof caveMap should be enabled
-		boolean caveMap = (chunk.dimension == -1);
-		
+	public static void render(BlockColours bc, MwChunk chunk, int[] pixels, int offset, int scanSize, int startY, byte[] mask) {
+		if (startY < 0) {
+			startY = chunk.maxHeight;
+		}
 		for (int z = 0; z < MwChunk.SIZE; z++) {
 			for (int x = 0; x < MwChunk.SIZE; x++) {
+				// only process columns where the mask bit is set.
+				// process all columns if mask is null.
+				if ((mask != null) && ((mask[(z * 16) + x]) != MASK_NON_OPAQUE)) {
+					continue;
+				}
 				
 				// calculate the colour of a pixel by alpha blending the colour of each block
 				// in a column until an opaque block is reached.
@@ -73,7 +82,7 @@ public class ChunkToPixels {
 				// for maps without a ceiling y is simply the height of the highest block in that chunk.
 				// for maps with a ceiling y is the height of the first non opaque block starting from
 				// the ceiling.
-				int y = (caveMap) ? getFirstNonOpaqueBlockY(bc, chunk, x, chunk.maxHeight - 1, z) : chunk.maxHeight - 1;
+				int y = getFirstNonOpaqueBlockY(bc, chunk, x, startY, z);
 				
 				int biome = chunk.getBiome(x, z);
 				

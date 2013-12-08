@@ -8,7 +8,7 @@ import mapwriter.map.mapmode.LargeMapMode;
 import mapwriter.map.mapmode.MapMode;
 import mapwriter.map.mapmode.SmallMapMode;
 
-public class OverlayManager {
+public class MiniMap {
 	private Mw mw;
 	
 	public static final String catSmallMap = "smallMap";
@@ -19,19 +19,17 @@ public class OverlayManager {
 	public MapMode largeMapMode;
 	public MapMode guiMapMode;
 	
-	public MapView overlayView;
-	public MapView guiView;
+	public MapView view;
 	
 	public MapRenderer smallMap;
 	public MapRenderer largeMap;
-	public MapRenderer guiMap;
 	
 	private List<MapRenderer> mapList;
 	private MapRenderer currentMap = null;
 	
 	public int modeIndex = 0;
 	
-	public OverlayManager(Mw mw) {
+	public MiniMap(Mw mw) {
 		this.mw = mw;
 		
 		// load config file options
@@ -39,16 +37,16 @@ public class OverlayManager {
 		int zoomLevel = this.mw.config.getOrSetInt(Mw.catOptions, "overlayZoomLevel", 0, Mw.minZoom, Mw.maxZoom);
 		
 		// map view shared between large and small map modes
-		this.overlayView = new MapView();
-		this.overlayView.setZoomLevel(zoomLevel);
+		this.view = new MapView();
+		this.view.setZoomLevel(zoomLevel);
 		
 		// small map mode
 		this.smallMapMode = new SmallMapMode(this.mw.config);
-		this.smallMap = new MapRenderer(mw, this.smallMapMode, this.overlayView);
+		this.smallMap = new MapRenderer(mw, this.smallMapMode, this.view);
 		
 		// large map mode
 		this.largeMapMode = new LargeMapMode(this.mw.config);
-		this.largeMap = new MapRenderer(mw, this.largeMapMode, this.overlayView);
+		this.largeMap = new MapRenderer(mw, this.largeMapMode, this.view);
 		
 		this.mapList = new ArrayList<MapRenderer>();
 		
@@ -76,7 +74,7 @@ public class OverlayManager {
 		this.largeMapMode.close();
 		
 		this.mw.config.setInt(Mw.catOptions, "overlayModeIndex", this.modeIndex);
-		this.mw.config.setInt(Mw.catOptions, "overlayZoomLevel", this.overlayView.getZoomLevel());
+		this.mw.config.setInt(Mw.catOptions, "overlayZoomLevel", this.view.getZoomLevel());
 	}
 	
 	// toggle between small map, underground map and no map

@@ -14,12 +14,11 @@ import java.util.List;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
-/* Anvil region file reader/writer implementation.
- *
- * This code is very similar to RegionFile and RegionFileChunkBuffer from
- * Minecraft. Not sure if it would be better just to use the Minecraft code.
- * 
- */
+/* 
+Anvil region file reader/writer implementation.
+This code is very similar to RegionFile and RegionFileChunkBuffer from Minecraft.
+Not sure if it would have been better just to use the Minecraft code.
+*/
 
 public class RegionFile {
 	

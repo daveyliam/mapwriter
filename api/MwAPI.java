@@ -2,8 +2,6 @@ package mapwriter.api;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 import com.google.common.collect.HashBiMap;
 

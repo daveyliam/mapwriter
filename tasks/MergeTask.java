@@ -1,7 +1,8 @@
-package mapwriter;
+package mapwriter.tasks;
 
 import java.io.File;
 
+import mapwriter.MwUtil;
 import mapwriter.region.MergeToImage;
 import mapwriter.region.RegionManager;
 

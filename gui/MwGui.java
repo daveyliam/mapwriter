@@ -2,10 +2,8 @@ package mapwriter.gui;
 
 import java.awt.Point;
 
-import mapwriter.MergeTask;
 import mapwriter.Mw;
 import mapwriter.MwUtil;
-import mapwriter.ReloadRegionsTask;
 import mapwriter.api.IMwDataProvider;
 import mapwriter.api.MwAPI;
 import mapwriter.forge.MwKeyHandler;
@@ -14,6 +12,8 @@ import mapwriter.map.Marker;
 import mapwriter.map.MapRenderer;
 import mapwriter.map.mapmode.FullScreenMapMode;
 import mapwriter.map.mapmode.MapMode;
+import mapwriter.tasks.MergeTask;
+import mapwriter.tasks.RebuildRegionsTask;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 
@@ -85,7 +85,7 @@ public class MwGui extends GuiScreen {
     	this.mapView = new MapView();
     	this.map = new MapRenderer(this.mw, this.mapMode, this.mapView);
     	
-    	this.mapView.setDimension(this.mw.overlayManager.overlayView.getDimension());
+    	this.mapView.setDimension(this.mw.miniMap.view.getDimension());
     	this.mapView.setViewCentreScaled(this.mw.playerX, this.mw.playerZ, this.mw.playerDimension);
     	this.mapView.setZoomLevel(0);
     	
@@ -180,7 +180,7 @@ public class MwGui extends GuiScreen {
 				(int) this.mapView.getMinX(),
 				(int) this.mapView.getMinZ()));
 		this.mw.reloadBlockColours();
-		this.mw.executor.addTask(new ReloadRegionsTask(
+		this.mw.executor.addTask(new RebuildRegionsTask(
 				this.mw,
 				(int) this.mapView.getMinX(),
 				(int) this.mapView.getMinZ(),
@@ -530,7 +530,7 @@ public class MwGui extends GuiScreen {
     			"| Select next marker\n" +
     			"| Teleport to cursor or selected marker\n" +
     			"| Save PNG of visible map area\n" +
-    			"| Regenerate visible map area\n",
+    			"| Regenerate visible map area from region files\n",
     			70, 42, 210, 0xffffff);
     }
     

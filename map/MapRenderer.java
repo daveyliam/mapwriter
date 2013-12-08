@@ -115,11 +115,13 @@ public class MapRenderer {
 		// draw overlays from registered providers
    	 	//for (IMwDataProvider provider : MwAPI.getDataProviders())
 		IMwDataProvider provider = MwAPI.getCurrentDataProvider();
-		if (provider != null){
+		if (provider != null) {
 			ArrayList<IMwChunkOverlay> overlays = provider.getChunksOverlay(this.mapView.getDimension(), this.mapView.getX(), this.mapView.getZ(), this.mapView.getMinX(), this.mapView.getMinZ(), this.mapView.getMaxX(), this.mapView.getMaxZ());
-			if (overlays != null)
-   	 			for (IMwChunkOverlay overlay : overlays)
-   	 				this.paintChunk(mapMode, mapView, overlay);
+			if (overlays != null) {
+   	 			for (IMwChunkOverlay overlay : overlays) {
+   	 				paintChunk(mapMode, mapView, overlay);
+   	 			}
+			}
 		}
 		
 		GL11.glLoadIdentity();
@@ -131,7 +133,7 @@ public class MapRenderer {
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glPopMatrix();
 		
-		if (provider != null){
+		if (provider != null) {
 			GL11.glPushMatrix();			
 			provider.onDraw(this.mapView, this.mapMode);
 			GL11.glPopMatrix();			
@@ -161,7 +163,7 @@ public class MapRenderer {
 		double offsetX = ((botCorner.x - topCorner.x) - sizeX) / 2;
 		double offsetY = ((botCorner.y - topCorner.y) - sizeY) / 2;	
 		
-		if (overlay.hasBorder()){
+		if (overlay.hasBorder()) {
 			Render.setColour(overlay.getBorderColor());
 			Render.drawRectBorder(topCorner.x + 1, topCorner.y + 1, botCorner.x - topCorner.x - 1, botCorner.y - topCorner.y - 1, overlay.getBorderWidth());
 		}
@@ -172,10 +174,13 @@ public class MapRenderer {
 	
 	public static void drawCoords(Mw mw, MapMode mapMode) {
 		// draw coordinates
-		if (mw.coordsEnabled && mapMode.coordsEnabled) {
+		if (mapMode.coordsEnabled && (mw.coordsMode > 0)) {
+			
 			GL11.glPushMatrix();
 			GL11.glTranslatef(mapMode.textX, mapMode.textY, 0);
-			GL11.glScalef(0.5f, 0.5f, 1.0f);
+			if (mw.coordsMode == 1) {
+				GL11.glScalef(0.5f, 0.5f, 1.0f);
+			}
 			Render.drawCentredString(0, 0, mapMode.textColour,
 					"%d, %d, %d", mw.playerXInt, mw.playerYInt, mw.playerZInt);
 			GL11.glPopMatrix();

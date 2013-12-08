@@ -3,7 +3,7 @@ package mapwriter.map;
 import mapwriter.region.Region;
 
 public class MapViewRequest {
-	public final int xMin, xMax, zMin, zMax, zoomLevel, dimension, mode;
+	public final int xMin, xMax, zMin, zMax, zoomLevel, dimension, y;
 	
 	public MapViewRequest(MapView view) {
 		this.zoomLevel = view.getRegionZoomLevel();
@@ -13,14 +13,14 @@ public class MapViewRequest {
 		this.xMax = ((int) view.getMaxX()) & (-size);
 		this.zMax = ((int) view.getMaxZ()) & (-size);
 		this.dimension = view.getDimension();
-		this.mode = view.getMode();
+		this.y = (int) view.getY();
 	}
 	
 	public boolean equals(MapViewRequest req) {
 		return (req != null) &&
 				(req.zoomLevel == this.zoomLevel) &&
 				(req.dimension == this.dimension) &&
-				(req.mode == this.mode) &&
+				(req.y == this.y) &&
 				(req.xMin == this.xMin) &&
 				(req.xMax == this.xMax) &&
 				(req.zMin == this.zMin) &&
@@ -30,7 +30,6 @@ public class MapViewRequest {
 	public boolean mostlyEquals(MapViewRequest req) {
 		return (req != null) &&
 				(req.zoomLevel == this.zoomLevel) &&
-				(req.dimension == this.dimension) &&
-				(req.mode == this.mode);
+				(req.dimension == this.dimension);
 	}
 }

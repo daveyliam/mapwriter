@@ -13,10 +13,11 @@ import mapwriter.map.MapTexture;
 import mapwriter.map.MapView;
 import mapwriter.map.Marker;
 import mapwriter.map.MarkerManager;
-import mapwriter.map.OverlayManager;
+import mapwriter.map.MiniMap;
 import mapwriter.map.Trail;
 import mapwriter.region.BlockColours;
 import mapwriter.region.RegionManager;
+import mapwriter.tasks.CloseRegionManagerTask;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGameOver;
 import net.minecraft.client.settings.KeyBinding;
@@ -74,15 +75,6 @@ logged in.
 	
 */
 
-
-/* TODO list
- * 
- * - Button to cycle through group selection
- * - Save map as 8192x8192 tiles
- * - Rei's format marker reading and writing
- * - Cave map
- */
-
 public class Mw {
 	
 	public Minecraft mc = null;
@@ -104,7 +96,7 @@ public class Mw {
 	
 	// configuration options
 	public boolean linearTextureScalingEnabled = true;
-	public boolean coordsEnabled = false;
+	public int coordsMode = 0;
 	public boolean teleportEnabled = true;
 	public String teleportCommand = "tp";
 	public int defaultTeleportHeight = 80;
@@ -117,6 +109,10 @@ public class Mw {
 	public int configTextureSize = 2048;
 	public int maxDeathMarkers = 3;
 	public int chunksPerTick = 5;
+	public boolean portNumberInWorldNameEnabled = true;
+	public String saveDirOverride = "";
+	public boolean regionFileOutputEnabled = true;	// TODO: implement
+	public boolean undergroundMapEnabled = true;	// TODO: implement
 	
 	// flags and counters
 	private boolean onPlayerDeathAlreadyFired = false;
@@ -149,7 +145,7 @@ public class Mw {
 	// instances of components
 	public MapTexture mapTexture = null;
 	public BackgroundExecutor executor = null;
-	public OverlayManager overlayManager = null;
+	public MiniMap miniMap = null;
 	public MarkerManager markerManager = null;
 	public BlockColours blockColours = null;
 	public RegionManager regionManager = null;
@@ -179,13 +175,18 @@ public class Mw {
 	
 	public String getWorldName() {
 		String worldName;
-		if (!this.multiplayer) {
+		if (this.multiplayer) {
+			if (this.portNumberInWorldNameEnabled) {
+				worldName = String.format("%s_%d", this.serverName, this.serverPort);
+			} else {
+				worldName = String.format("%s", this.serverName);
+			}
+			
+		} else {
 			// cannot use this.mc.theWorld.getWorldInfo().getWorldName() as it
 			// is set statically to "MpServer".
 			IntegratedServer server = this.mc.getIntegratedServer();
 			worldName = (server != null) ? server.getFolderName() : "sp_world";
-		} else {
-			worldName = String.format("%s_%d", this.serverName, this.serverPort);
 		}
 		
 		// strip invalid characters from the server name so that it
@@ -202,15 +203,17 @@ public class Mw {
 	
 	public void loadConfig() {
 		this.config.load();
-		this.linearTextureScalingEnabled = this.config.getOrSetBoolean(catOptions, "linearTextureScaling", true);
-		this.useSavedBlockColours = this.config.getOrSetBoolean(catOptions, "useSavedBlockColours", false);
+		this.linearTextureScalingEnabled = this.config.getOrSetBoolean(catOptions, "linearTextureScaling", this.linearTextureScalingEnabled);
+		this.useSavedBlockColours = this.config.getOrSetBoolean(catOptions, "useSavedBlockColours", this.useSavedBlockColours);
 		this.teleportEnabled = this.config.getOrSetBoolean(catOptions, "teleportEnabled", this.teleportEnabled);
 		this.teleportCommand = this.config.get(catOptions, "teleportCommand", this.teleportCommand).getString();
-		this.coordsEnabled = this.config.getOrSetBoolean(catOptions, "coordsEnabled", this.coordsEnabled);
+		this.coordsMode = this.config.getOrSetInt(catOptions, "coordsMode", this.coordsMode, 0, 2);
 		this.maxChunkSaveDistSq = this.config.getOrSetInt(catOptions, "maxChunkSaveDistSq", this.maxChunkSaveDistSq, 1, 256 * 256);
 		this.mapPixelSnapEnabled = this.config.getOrSetBoolean(catOptions, "mapPixelSnapEnabled", this.mapPixelSnapEnabled);
 		this.maxDeathMarkers = this.config.getOrSetInt(catOptions, "maxDeathMarkers", this.maxDeathMarkers, 0, 1000);
 		this.chunksPerTick = this.config.getOrSetInt(catOptions, "chunksPerTick", this.chunksPerTick, 1, 500);
+		this.saveDirOverride = this.config.get(catOptions, "saveDirOverride", this.saveDirOverride).getString();
+		this.portNumberInWorldNameEnabled = config.getOrSetBoolean(catOptions, "portNumberInWorldNameEnabled", this.portNumberInWorldNameEnabled);
 		
 		maxZoom = this.config.getOrSetInt(catOptions, "zoomOutLevels", maxZoom, 1, 256);
 		minZoom = -this.config.getOrSetInt(catOptions, "zoomInLevels", -minZoom, 1, 256);
@@ -234,7 +237,7 @@ public class Mw {
 		this.config.setBoolean(catOptions, "linearTextureScaling", this.linearTextureScalingEnabled);
 		this.config.setBoolean(catOptions, "useSavedBlockColours", this.useSavedBlockColours);
 		this.config.setInt(catOptions, "textureSize", this.configTextureSize);
-		this.config.setBoolean(catOptions, "coordsEnabled", this.coordsEnabled);
+		this.config.setInt(catOptions, "coordsMode", this.coordsMode);
 		this.config.setInt(catOptions, "maxChunkSaveDistSq", this.maxChunkSaveDistSq);
 		this.config.setBoolean(catOptions, "mapPixelSnapEnabled", this.mapPixelSnapEnabled);
 		this.config.setInt(catOptions, "maxDeathMarkers", this.maxDeathMarkers);
@@ -333,10 +336,10 @@ public class Mw {
 	public void loadBlockColourOverrides(BlockColours bc) {
 		File f = new File(this.configDir, blockColourOverridesFileName);
 		if (f.isFile()) {
-			MwUtil.logError("loading block colour overrides file %s", f);
+			MwUtil.logInfo("loading block colour overrides file %s", f);
 			bc.loadFromFile(f);
 		} else {
-			MwUtil.logError("recreating block colour overrides file %s", f);
+			MwUtil.logInfo("recreating block colour overrides file %s", f);
 			BlockColours.writeOverridesFile(f);
 			if (f.isFile()) {
 				bc.loadFromFile(f);
@@ -385,13 +388,13 @@ public class Mw {
 		this.regionManager = new RegionManager(this.worldDir, this.imageDir, this.blockColours);
 	}
 	
-	public void setCoords(boolean enabled) {
-		this.coordsEnabled = enabled;
+	public void setCoordsMode(int mode) {
+		this.coordsMode = Math.min(Math.max(0, mode), 2);
 	}
 	
-	public boolean toggleCoords() {
-		this.setCoords(!this.coordsEnabled);
-		return this.coordsEnabled;
+	public int toggleCoords() {
+		this.setCoordsMode((this.coordsMode + 1) % 3);
+		return this.coordsMode;
 	}
 	
 	////////////////////////////////
@@ -420,13 +423,24 @@ public class Mw {
 		
 		this.worldName = this.getWorldName();
 		
-		// create directories
-		if (this.multiplayer) {
-			this.worldDir = new File(new File(this.saveDir, "mapwriter_mp_worlds"), this.worldName);
-		} else {
-			this.worldDir = new File(new File(this.saveDir, "mapwriter_sp_worlds"), this.worldName);
+		// get world and image directories
+		File saveDir = this.saveDir;
+		if (this.saveDirOverride.length() > 0) {
+			File d = new File(this.saveDirOverride);
+			if (d.isDirectory()) {
+				saveDir = d;
+			} else {
+				MwUtil.log("error: no such directory %s", this.saveDirOverride);
+			}
 		}
 		
+		if (this.multiplayer) {
+			this.worldDir = new File(new File(saveDir, "mapwriter_mp_worlds"), this.worldName);
+		} else {
+			this.worldDir = new File(new File(saveDir, "mapwriter_sp_worlds"), this.worldName);
+		}
+		
+		// create directories
 		this.imageDir = new File(this.worldDir, "images");
 		if (!this.imageDir.exists()) {
 			this.imageDir.mkdirs();
@@ -464,8 +478,8 @@ public class Mw {
 		// region manager depends on config, mapTexture, and block colours
 		this.regionManager = new RegionManager(this.worldDir, this.imageDir, this.blockColours);
 		// overlay manager depends on mapTexture
-		this.overlayManager = new OverlayManager(this);
-		this.overlayManager.overlayView.setDimension(login.dimension);
+		this.miniMap = new MiniMap(this);
+		this.miniMap.view.setDimension(login.dimension);
 		
 		this.chunkManager = new ChunkManager(this);
 		
@@ -486,7 +500,7 @@ public class Mw {
 		this.playerDimension = world.provider.dimensionId;
 		if (this.ready) {
 			this.addDimension(this.playerDimension);
-			this.overlayManager.overlayView.setDimension(this.playerDimension);
+			this.miniMap.view.setDimension(this.playerDimension);
 		}
 	}
 	
@@ -524,8 +538,8 @@ public class Mw {
 			this.markerManager.clear();
 			
 			// close overlay
-			this.overlayManager.close();
-			this.overlayManager = null;
+			this.miniMap.close();
+			this.miniMap = null;
 			
 			this.mapTexture.close();
 			
@@ -540,7 +554,7 @@ public class Mw {
 			
 			this.updatePlayer();
 			// check if the game over screen is being displayed and if so 
-			// (thanks to Christian Ehrhardt for this method of checking when the player is dead)
+			// (thanks to Chrixian for this method of checking when the player is dead)
 			if (this.mc.currentScreen instanceof GuiGameOver) {
 				if (!this.onPlayerDeathAlreadyFired) {
 					this.onPlayerDeath();
@@ -551,8 +565,9 @@ public class Mw {
 				this.onPlayerDeathAlreadyFired = false;
 				// if in game (no gui screen) center the minimap on the player and render it.
 				if (this.mc.currentScreen == null) {
-					this.overlayManager.overlayView.setViewCentreScaled(this.playerX, this.playerZ, this.playerDimension);
-					this.overlayManager.drawCurrentMap();
+					this.miniMap.view.setViewCentreScaled(this.playerX, this.playerZ, this.playerDimension);
+					this.miniMap.view.setY(-1);
+					this.miniMap.drawCurrentMap();
 				}
 			}
 			
@@ -619,7 +634,7 @@ public class Mw {
 			
 			if (kb == MwKeyHandler.keyMapMode) {
 				// map mode toggle
-				this.overlayManager.nextOverlayMode(1);
+				this.miniMap.nextOverlayMode(1);
 				
 			} else if (kb == MwKeyHandler.keyMapGui) {
 				// open map gui
@@ -661,10 +676,10 @@ public class Mw {
 				}
 			} else if (kb == MwKeyHandler.keyZoomIn) {
 				// zoom in
-				this.overlayManager.overlayView.adjustZoomLevel(-1);
+				this.miniMap.view.adjustZoomLevel(-1);
 			} else if (kb == MwKeyHandler.keyZoomOut) {
 				// zoom out
-				this.overlayManager.overlayView.adjustZoomLevel(1);
+				this.miniMap.view.adjustZoomLevel(1);
 			}
 		}
 	}

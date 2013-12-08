@@ -1,12 +1,6 @@
 package mapwriter.region;
 
-
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-
-import javax.imageio.ImageIO;
 
 /*
 	MwRegion class
@@ -24,19 +18,13 @@ public class Region {
 	
 	public final int x;
 	public final int z;
-	public final int size;
 	public final int dimension;
 	public final int zoomLevel;
 	public final Long key;
-	public final File imageFile;
-	public final RegionFile regionFile;
+	public final int size;
 	
-	public Region nextZoomLevel;
-	private boolean cannotLoad = false;
-	int updateCount = 0;
-	int lastAccessedTick = 0;
-	private int refCount = 0;
-	private int[] pixels = null;
+	public SurfacePixels surfacePixels;
+	public UndergroundPixels undergroundPixels;
 	
 	public Region(RegionManager regionManager, int x, int z, int zoomLevel, int dimension) {
 		
@@ -49,67 +37,23 @@ public class Region {
 		this.z = z & (-this.size);
 		
 		this.key = getKey(this.x, this.z, this.zoomLevel, this.dimension);
-		this.imageFile = getImageFile(regionManager.imageDir, this.x, this.z, this.zoomLevel, this.dimension);
-		File regionFileName = getRegionFile(regionManager.worldDir, this.x, this.z, this.dimension);
-		this.regionFile = new RegionFile(regionFileName);
 		
-		if (this.zoomLevel < maxZoom) {
-			this.nextZoomLevel = this.regionManager.getRegion(this.x, this.z, this.zoomLevel + 1, this.dimension);
-			this.nextZoomLevel.refCount++;
-		} else {
-			this.nextZoomLevel = null;
-		}
-		
-		this.setAccessed();
-		//MwUtil.log("created region %s", this);
+		File surfaceImageFile = this.getImageFile("surface");
+		this.surfacePixels = new SurfacePixels(this, surfaceImageFile);
+		File undergroundImageFile = this.getImageFile("underground");
+		this.undergroundPixels = new UndergroundPixels(this, undergroundImageFile);
 	}
 	
 	public void close() {
-		//RegionManager.logInfo("closing region %s", this);
-		if (this.needsSaving()) {
-			this.saveToImage();
-		}
-		if (this.regionFile.isOpen()) {
-			this.regionFile.close();
-		}
-		if (this.nextZoomLevel != null) {
-			this.nextZoomLevel.refCount--;
-			this.nextZoomLevel = null;
-		}
-		this.pixels = null;
-		this.updateCount = 0;
+		this.surfacePixels.close();
+		this.undergroundPixels.close();
 	}
 	
-	public boolean isLoaded() {
-		return (this.pixels != null);
+	public void clear() {
+		this.surfacePixels.clear();
+		// don't clear underground pixels
 	}
-	
-	public int getRefCount() {
-		return this.refCount;
-	}
-	
-	public int[] allocatePixels() {
-		this.pixels = new int[Region.SIZE * Region.SIZE];
-		Arrays.fill(pixels, 0xff000000);
-		return this.pixels;
-	}
-	
-	public int[] getPixels() {
-		this.setAccessed();
-		if (this.pixels == null) {
-			this.load();
-		}
-		return this.pixels;
-	}
-	
-	public int[] getOrAllocatePixels() {
-		int[] pixels = this.getPixels();
-		if (pixels == null) {
-			pixels = this.allocatePixels();
-		}
-		return pixels;
-	}
-	
+		
 	public String toString() {
 		return String.format("(%d,%d) z%d dim%d", this.x, this.z, this.zoomLevel, this.dimension);
 	}
@@ -121,30 +65,22 @@ public class Region {
 		return dir;
 	}
 	
-	public static File getImageFile(File imageDir, int x, int z, int zoomLevel, int dimension) {
-		File dimDir = addDimensionDirToPath(imageDir, dimension);
-		File zoomDir = new File(dimDir, "z" + zoomLevel);
+	public File getImageFile(String prefix) {
+		File dimDir = addDimensionDirToPath(this.regionManager.imageDir, this.dimension);
+		File zoomDir = new File(dimDir, "z" + this.zoomLevel);
+		
+		zoomDir.mkdirs();
 		
 		String filename = String.format("%d.%d.png",
-				x >> (Region.SHIFT + zoomLevel),
-				z >> (Region.SHIFT + zoomLevel));
+				this.x >> (Region.SHIFT + this.zoomLevel),
+				this.z >> (Region.SHIFT + this.zoomLevel)
+		);
+		
+		if (prefix != null) {
+			filename = prefix + "." + filename;
+		}
 		
 		return new File(zoomDir, filename);
-	}
-	
-	public static File getRegionFile(File worldDir, int x, int z, int dimension) {
-		File dimDir = addDimensionDirToPath(worldDir, dimension);
-		File regionDir = new File(dimDir, "region");
-		
-		String filename = String.format("r.%d.%d.mca",
-				x >> Region.SHIFT,
-				z >> Region.SHIFT);
-		
-		return new File(regionDir, filename);
-	}
-	
-	public boolean regionFileExists() {
-		return this.regionFile.exists();
 	}
 	
 	public boolean equals(int x, int z, int zoomLevel, int dimension) {
@@ -182,200 +118,71 @@ public class Region {
 				((x >> this.zoomLevel) & (Region.SIZE - 1));
 	}
 	
-	public boolean isChunkWithin(MwChunk chunk) {
-		int x = (chunk.x << 4) & (-this.size);
-		int z = (chunk.z << 4) & (-this.size);
-		return (x == this.x) && (z == this.z) && (chunk.dimension == this.dimension);
+	public int[] getRenderedPixels(int y) {
+		if ((this.zoomLevel == 0) && (y >= 0)) {
+			return this.undergroundPixels.getRenderedPixels(y);
+		} else {
+			return this.surfacePixels.getRenderedPixels(y);
+		}
 	}
 	
-	public boolean isModified() {
-		return (this.updateCount > 0);
+	public boolean isAreaWithin(int x, int z, int w, int h, int dimension) {
+		return (x >= this.x) && (z >= this.z) && 
+			((x + w) <= (this.x + this.size)) && ((z + h) <= (this.z + this.size)) && 
+			(dimension == this.dimension);
 	}
 	
-	public void setUpdated() {
-		this.updateCount++;
-		this.setAccessed();
-	}
-	
-	private void setAccessed() {
-		this.lastAccessedTick = this.regionManager.getCurrentTick();
-	}
-	
-	public void setSaved() {
-		this.updateCount = 0;
-		this.cannotLoad = false;
-	}
-	
-	public boolean needsSaving() {
-		// regions at zoom level 0 do not need to be saved
-		// (the chunks are saved separately)
-		return (this.updateCount > 0) && (this.zoomLevel > 0);
-	}
-	
-	// returns true if chunk not updated
-	public boolean updateChunk(MwChunk chunk) {
-		boolean updated = false;
+	// scale an area of pixels by half in this region and write them
+	// to the pixels of the next zoom level region.
+	// x, z, w, h, in world block coordinates
+	// returns the region the scaled pixels were written to, or null
+	// on failure.
+	public Region updateNextZoomLevel(int x, int z, int w, int h) {
+		int[] srcPixels = this.surfacePixels.getPixels();
+		Region dstRegion = null;
+		if (srcPixels != null) {
+			int dstZoomLevel  = this.zoomLevel + 1;
+			if (dstZoomLevel <= Region.maxZoom) {
+				dstRegion = this.regionManager.getRegion(x, z, dstZoomLevel, this.dimension);
+				int dstW = Math.max(1, (w >> dstRegion.zoomLevel));
+				int dstH = Math.max(1, (h >> dstRegion.zoomLevel));
+				
+				// AND srcX and srcZ by -2 (0xfffffffe) to make sure that
+				// they are always even. This prevents out of bounds exceptions
+				// at higher zoom levels.
+				int srcX = (x >> this.zoomLevel) & (Region.SIZE - 1) & (-2);
+				int srcZ = (z >> this.zoomLevel) & (Region.SIZE - 1) & (-2);
+				int dstX = (x >> dstRegion.zoomLevel) & (Region.SIZE - 1);
+				int dstZ = (z >> dstRegion.zoomLevel) & (Region.SIZE - 1);
+				
+				dstRegion.surfacePixels.updateScaled(srcPixels, srcX, srcZ, dstX, dstZ, dstW, dstH);
+			}
+		}
 		
-		if ((this.zoomLevel == 0) && !chunk.isEmpty()) {
-			//RegionManager.logInfo("updating chunk %s in region %s", chunk, this);
-			int[] pixels = this.getOrAllocatePixels();
-			int x = (chunk.x << 4);
-			int z = (chunk.z << 4);
-			int offset = this.getPixelOffset(x, z);
-			ChunkToPixels.getMapPixels(this.regionManager.blockColours, chunk, pixels, offset, Region.SIZE);
-			this.updateZoomLevels(x, z, MwChunk.SIZE, MwChunk.SIZE);
-			
-			this.setUpdated();
-			
-			updated = true;
-		}
-		return !updated;
+		return dstRegion;
 	}
 	
+	// update all higher zoom level regions that this region
+	// lies within
 	public void updateZoomLevels(int x, int z, int w, int h) {
-		Region region = this;
-		while (region.nextZoomLevel != null) {
-			region.updateNextZoomLevel(x, z, w, h);
-			region = region.nextZoomLevel;
+		Region nextRegion = this;
+		while (nextRegion != null) {
+			nextRegion = nextRegion.updateNextZoomLevel(x, z, w, h);
 		}
 	}
 	
+	// update this entire region in the next zoom level
 	public void updateZoomLevels() {
 		this.updateZoomLevels(this.x, this.z, this.size, this.size);
 	}
 	
-	public static int getAverageOfPixelQuad(int[] pixels, int offset, int scanSize) {
-		int p00 = pixels[offset];
-		int p01 = pixels[offset + 1];
-		int p10 = pixels[offset + scanSize];
-		int p11 = pixels[offset + scanSize + 1];
-		
-		// ignore alpha channel
-		int r = ((p00 >> 16) & 0xff) + ((p01 >> 16) & 0xff) + ((p10 >> 16) & 0xff) + ((p11 >> 16) & 0xff);
-		r >>= 2;
-		int g = ((p00 >>  8) & 0xff) + ((p01 >>  8) & 0xff) + ((p10 >>  8) & 0xff) + ((p11 >>  8) & 0xff);
-		g >>= 2;
-		int b =  (p00        & 0xff) +  (p01        & 0xff) + (p10         & 0xff) +  (p11        & 0xff);
-		b >>= 2;
-		return 0xff000000 | ((r & 0xff) << 16) | ((g & 0xff) << 8) | (b & 0xff);
-	}
-	
-	// x, z, w, h, in world block coordinates
-	public boolean updateNextZoomLevel(int x, int z, int w, int h) {
-		boolean error = true;
-		Region dstRegion = this.nextZoomLevel;
-		int[] srcPixels = this.getPixels();
-		
-		if ((dstRegion != null) && (srcPixels != null) && ((this.zoomLevel + 1) == dstRegion.zoomLevel)) {
-
-			int[] dstPixels = dstRegion.getOrAllocatePixels();
-			
-			int dstW = Math.max(1, (w >> dstRegion.zoomLevel));
-			int dstH = Math.max(1, (h >> dstRegion.zoomLevel));
-			
-			// AND srcX and srcZ by -2 (0xfffffffe) to make sure that
-			// they are always even. This prevents out of bounds exceptions
-			// at higher zoom levels.
-			int srcX = (x >> this.zoomLevel) & (Region.SIZE - 1) & (-2);
-			int srcZ = (z >> this.zoomLevel) & (Region.SIZE - 1) & (-2);
-			int dstX = (x >> dstRegion.zoomLevel) & (Region.SIZE - 1);
-			int dstZ = (z >> dstRegion.zoomLevel) & (Region.SIZE - 1);
-			
-			for (int j = 0; j < dstH; j++) {
-				for (int i = 0; i < dstW; i++) {
-					int srcOffset = ((srcZ + (j * 2)) << Region.SHIFT) + (srcX + (i * 2));
-					int dstPixel = getAverageOfPixelQuad(srcPixels, srcOffset, Region.SIZE);
-					dstPixels[((dstZ + j) << Region.SHIFT) + (dstX + i)] = dstPixel;
-				}
-			}
-			
-			dstRegion.setUpdated();
-			error = false;
-		}
-		
-		return error;
-	}
-	
-	private void loadFromRegionFile() {
-		if (this.regionFileExists()) {
-			int[] pixels = this.allocatePixels();
-			for (int cz = 0; cz < 32; cz++) {
-				for (int cx = 0; cx < 32; cx++) {
-					// load chunk from anvil file
-					MwChunk chunk = MwChunk.read(cx, cz, this.dimension, this.regionFile);
-					if (!chunk.isEmpty()) {
-						int offset = ((cz << 4) << Region.SHIFT) + (cx << 4);
-						// hopefully accessing the non final field blockColours from a separate
-						// thread will be fine. All threads should be shut down before it is ever closed.
-						ChunkToPixels.getMapPixels(this.regionManager.blockColours, chunk, pixels, offset, Region.SIZE);
-					}
-				}
-			}
-		}
-	}
-	
-	private void loadFromImageFile() {
-		BufferedImage img = null;
-		try {
-			img = ImageIO.read(this.imageFile);
-		} catch (IOException e) {
-			img = null;
-		}
-		int[] pixels = null;
-		if (img != null) {
-			if ((img.getWidth() == Region.SIZE) && (img.getHeight() == Region.SIZE)) {
-				pixels = this.allocatePixels();
-				img.getRGB(0, 0, Region.SIZE, Region.SIZE,
-						pixels, 0, Region.SIZE);
-			} else {
-				RegionManager.logWarning("MwRegion.load: image '%s' has invalid dimensions (%dx%d)", this.imageFile, img.getWidth(), img.getHeight());
-			}
-		}
-	}
-	
-	public void reload() {
-		this.updateCount = 0;
-		
-		//RegionManager.logInfo("loading region %s", this);
+	public void updateChunk(MwChunk chunk, int y, byte[] mask) {
 		if (this.zoomLevel == 0) {
-			this.loadFromRegionFile();
-		} else {
-			this.loadFromImageFile();
-		}
-		//this.updateZoomLevels(this.x, this.z, this.size, this.size);
-	}
-	
-	private void load() {
-		// all updates will be overwritten
-		if (!this.cannotLoad) {
-			this.reload();
-		}
-		
-		// this should be the only place that cannotLoad can be set to true.
-		// it will be set to false on any update.
-		this.cannotLoad = (this.pixels == null);
-	}
-	
-	public void saveToImage() {
-		int[] pixels = this.getPixels();
-		if (pixels != null) {
-			BufferedImage img = new BufferedImage(Region.SIZE, Region.SIZE, BufferedImage.TYPE_INT_RGB);
-			img.setRGB(0, 0, Region.SIZE, Region.SIZE,
-				pixels, 0, Region.SIZE);
-			
-			// write the given image to the image file
-			File dir = this.imageFile.getParentFile();
-			if (!dir.exists()) {
-				dir.mkdirs();
-			}
-			
-			try {
-				//MwUtil.log("writing region %s to %s", this, this.imageFile);
-				ImageIO.write(img, "png", this.imageFile);
-			} catch (IOException e) {
-				RegionManager.logError("MwRegion.writeImage: error: could not write image to %s", this.imageFile.getName());
+			if (y < 0) {
+				this.surfacePixels.updateChunk(chunk, y, mask);
+			} else {
+				this.undergroundPixels.updateChunk(chunk, y, mask);
 			}
 		}
-		this.setSaved();
 	}
 }

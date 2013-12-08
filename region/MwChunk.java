@@ -41,7 +41,7 @@ public class MwChunk {
 	}
 	
 	// load from anvil file
-	public static MwChunk read(int x, int z, int dimension, RegionFile regionFile) {
+	public static MwChunk read(int x, int z, int dimension, RegionFileCache regionFileCache) {
 		
 		byte[] biomeArray = null;
 		byte[][] msbArray = new byte[16][];
@@ -49,6 +49,7 @@ public class MwChunk {
 		byte[][] metaArray = new byte[16][];
 		
         DataInputStream dis = null;
+        RegionFile regionFile = regionFileCache.getRegionFile(x, z, dimension);
         if (!regionFile.isOpen()) {
         	if (regionFile.exists()) {
         		regionFile.open();
@@ -182,8 +183,9 @@ public class MwChunk {
 		return root;
 	}
 	
-	public synchronized boolean write(RegionFile regionFile) {
+	public synchronized boolean write(RegionFileCache regionFileCache) {
 		boolean error = false;
+		RegionFile regionFile = regionFileCache.getRegionFile(this.x, this.z, this.dimension);
 		if (!regionFile.isOpen()) {
         	error = regionFile.open();
         }

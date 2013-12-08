@@ -22,7 +22,7 @@ public class MergeToImage {
 				
 				// get region pixels
 				Region region = regionManager.getRegion(x + xi, z + zi, 0, dimension);
-				int[] regionPixels = region.getPixels();
+				int[] regionPixels = region.surfacePixels.getPixels();
 				if (regionPixels != null) {
 					mergedImage.setRGB(xi, zi, Region.SIZE, Region.SIZE, regionPixels, 0, Region.SIZE);
 				}

@@ -3,7 +3,6 @@ package mapwriter.overlay;
 import java.awt.Point;
 import java.util.ArrayList;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.MathHelper;
 import mapwriter.api.IMwChunkOverlay;
 import mapwriter.api.IMwDataProvider;
