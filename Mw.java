@@ -568,7 +568,7 @@ public class Mw {
 			
 			this.updatePlayer();
 			
-			if ((this.tickCounter % 30) == 0) {
+			if (this.undergroundMode && ((this.tickCounter % 30) == 0)) {
 				this.undergroundMapTexture.update();
 			}
 			
