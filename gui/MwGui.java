@@ -82,7 +82,7 @@ public class MwGui extends GuiScreen {
     public MwGui(Mw mw) {
     	this.mw = mw;
     	this.mapMode = new FullScreenMapMode(mw.config);
-    	this.mapView = new MapView();
+    	this.mapView = new MapView(this.mw);
     	this.map = new MapRenderer(this.mw, this.mapMode, this.mapView);
     	
     	this.mapView.setDimension(this.mw.miniMap.view.getDimension());
@@ -276,10 +276,6 @@ public class MwGui extends GuiScreen {
 			this.regenerateView();
 			this.exitGui();
 			break;
-		
-		case Keyboard.KEY_U:
-			this.mw.undergroundMode = !this.mw.undergroundMode;
-			break;
 			
 		//case Keyboard.KEY_9:
 		//	MwUtil.log("refreshing maptexture");
@@ -297,7 +293,10 @@ public class MwGui extends GuiScreen {
     		} else if (key == MwKeyHandler.keyNextGroup.keyCode) {
     			this.mw.markerManager.nextGroup();
 	        	this.mw.markerManager.update();
-    		}
+    		} else if (key == MwKeyHandler.keyUndergroundMode.keyCode) {
+    			this.mw.toggleUndergroundMode();
+    			this.mapView.setUndergroundMode(this.mw.undergroundMode);
+			}
 			break;
         }
     }

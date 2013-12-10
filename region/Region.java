@@ -13,8 +13,6 @@ public class Region {
 	public static final int SHIFT = 9;
 	public static final int SIZE = 1 << SHIFT;
 	public static final int MASK = -SIZE;
-	public static int maxZoom = 5;
-	public static int minZoom = -5;
 	
 	public final int x;
 	public final int z;
@@ -29,7 +27,7 @@ public class Region {
 		
 		this.regionManager = regionManager;
 		
-		this.zoomLevel = Math.min(Math.max(0, zoomLevel), Region.maxZoom);
+		this.zoomLevel = Math.min(Math.max(0, zoomLevel), regionManager.maxZoom);
 		this.dimension = dimension;
 		this.size = Region.SIZE << zoomLevel;
 		this.x = x & (-this.size);
@@ -129,7 +127,7 @@ public class Region {
 		Region dstRegion = null;
 		if (srcPixels != null) {
 			int dstZoomLevel  = this.zoomLevel + 1;
-			if (dstZoomLevel <= Region.maxZoom) {
+			if (dstZoomLevel <= this.regionManager.maxZoom) {
 				dstRegion = this.regionManager.getRegion(x, z, dstZoomLevel, this.dimension);
 				int dstW = Math.max(1, (w >> dstRegion.zoomLevel));
 				int dstH = Math.max(1, (h >> dstRegion.zoomLevel));

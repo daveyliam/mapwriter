@@ -203,22 +203,22 @@ public class MapMode {
 	public Point screenXYtoBlockXZ(MapView mapView, int sx, int sy) {
 		double withinMapX = ((double) (sx - this.xTranslation - this.x)) / ((double) this.w);
 		double withinMapY = ((double) (sy - this.yTranslation - this.y)) / ((double) this.h);
-		int bx = (int) Math.floor((mapView.getMinX() + (withinMapX * mapView.w)));
-		int bz = (int) Math.floor((mapView.getMinZ() + (withinMapY * mapView.h)));
+		int bx = (int) Math.floor((mapView.getMinX() + (withinMapX * mapView.getWidth())));
+		int bz = (int) Math.floor((mapView.getMinZ() + (withinMapY * mapView.getHeight())));
 		return new Point(bx, bz);
 	}
 	
 	public Point.Double blockXZtoScreenXY(MapView mapView, double bX, double bZ) {
-		double xNorm = (bX - mapView.getX()) / mapView.w;
-		double zNorm = (bZ - mapView.getZ()) / mapView.h;
+		double xNorm = (bX - mapView.getX()) / mapView.getWidth();
+		double zNorm = (bZ - mapView.getZ()) / mapView.getHeight();
 		return new Point.Double(
 				this.x + (this.w * (xNorm + 0.5)),
 				this.y + (this.h * (zNorm + 0.5)));
 	}
 	
 	public Point.Double getClampedScreenXY(MapView mapView, double bX, double bZ) {
-		double xRel = (bX - mapView.getX()) / mapView.w;
-		double zRel = (bZ - mapView.getZ()) / mapView.h;
+		double xRel = (bX - mapView.getX()) / mapView.getWidth();
+		double zRel = (bZ - mapView.getZ()) / mapView.getHeight();
 		double limit = 0.49;
 		
 		if (!this.circular) {

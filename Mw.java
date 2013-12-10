@@ -102,8 +102,8 @@ public class Mw {
 	public boolean teleportEnabled = true;
 	public String teleportCommand = "tp";
 	public int defaultTeleportHeight = 80;
-	public static int maxZoom = 5;
-	public static int minZoom = -5;
+	public int maxZoom = 5;
+	public int minZoom = -5;
 	public boolean useSavedBlockColours = false;
 	public int maxChunkSaveDistSq = 128 * 128;
 	public boolean mapPixelSnapEnabled = true;
@@ -113,7 +113,8 @@ public class Mw {
 	public int chunksPerTick = 5;
 	public boolean portNumberInWorldNameEnabled = true;
 	public String saveDirOverride = "";
-	public boolean regionFileOutputEnabled = true;	// TODO: implement
+	public boolean regionFileOutputEnabledSP = true;
+	public boolean regionFileOutputEnabledMP = true;
 	//public boolean lightingEnabled = false;
 	
 	// flags and counters
@@ -218,10 +219,12 @@ public class Mw {
 		this.saveDirOverride = this.config.get(catOptions, "saveDirOverride", this.saveDirOverride).getString();
 		this.portNumberInWorldNameEnabled = config.getOrSetBoolean(catOptions, "portNumberInWorldNameEnabled", this.portNumberInWorldNameEnabled);
 		this.undergroundMode = this.config.getOrSetBoolean(catOptions, "undergroundMode", this.undergroundMode);
+		this.regionFileOutputEnabledSP = this.config.getOrSetBoolean(catOptions, "regionFileOutputEnabledSP", this.regionFileOutputEnabledSP);
+		this.regionFileOutputEnabledMP = this.config.getOrSetBoolean(catOptions, "regionFileOutputEnabledMP", this.regionFileOutputEnabledMP);
 		//this.lightingEnabled = this.config.getOrSetBoolean(catOptions, "lightingEnabled", this.lightingEnabled);
 		
-		maxZoom = this.config.getOrSetInt(catOptions, "zoomOutLevels", maxZoom, 1, 256);
-		minZoom = -this.config.getOrSetInt(catOptions, "zoomInLevels", -minZoom, 1, 256);
+		this.maxZoom = this.config.getOrSetInt(catOptions, "zoomOutLevels", this.maxZoom, 1, 256);
+		this.minZoom = -this.config.getOrSetInt(catOptions, "zoomInLevels", -this.minZoom, 1, 256);
 		
 		this.configTextureSize = this.config.getOrSetInt(catOptions, "textureSize", this.configTextureSize, 1024, 8192);
 		this.setTextureSize();
@@ -393,7 +396,7 @@ public class Mw {
 			oldMapTexture.close();
 		}
 		this.executor = new BackgroundExecutor();
-		this.regionManager = new RegionManager(this.worldDir, this.imageDir, this.blockColours);
+		this.regionManager = new RegionManager(this.worldDir, this.imageDir, this.blockColours, this.minZoom, this.maxZoom);
 		
 		UndergroundTexture oldTexture = this.undergroundMapTexture;
 		UndergroundTexture newTexture = new UndergroundTexture(this, this.textureSize, this.linearTextureScalingEnabled);
@@ -410,6 +413,11 @@ public class Mw {
 	public int toggleCoords() {
 		this.setCoordsMode((this.coordsMode + 1) % 3);
 		return this.coordsMode;
+	}
+	
+	public void toggleUndergroundMode() {
+		this.undergroundMode = !this.undergroundMode;
+		this.miniMap.view.setUndergroundMode(this.undergroundMode);
 	}
 	
 	////////////////////////////////
@@ -464,14 +472,6 @@ public class Mw {
 			MwUtil.log("Mapwriter: ERROR: could not create images directory '%s'", this.imageDir.getPath());
 		}
 		
-		// create directories for zoom levels 1..n
-		//boolean zoomLevelsExist = true;
-		for (int i = 1; i <= maxZoom; i++) {
-			File zDir = new File(imageDir, "z" + i);
-			//zoomLevelsExist &= zDir.exists();
-			zDir.mkdirs();
-		}
-		
 		this.tickCounter = 0;
 		this.onPlayerDeathAlreadyFired = false;
 		
@@ -492,7 +492,7 @@ public class Mw {
 		this.undergroundMapTexture = new UndergroundTexture(this, this.textureSize, this.linearTextureScalingEnabled);
 		this.reloadBlockColours();
 		// region manager depends on config, mapTexture, and block colours
-		this.regionManager = new RegionManager(this.worldDir, this.imageDir, this.blockColours);
+		this.regionManager = new RegionManager(this.worldDir, this.imageDir, this.blockColours, this.minZoom, this.maxZoom);
 		// overlay manager depends on mapTexture
 		this.miniMap = new MiniMap(this);
 		this.miniMap.view.setDimension(login.dimension);
@@ -701,6 +701,8 @@ public class Mw {
 			} else if (kb == MwKeyHandler.keyZoomOut) {
 				// zoom out
 				this.miniMap.view.adjustZoomLevel(1);
+			} else if (kb == MwKeyHandler.keyUndergroundMode) {
+				this.toggleUndergroundMode();
 			}
 		}
 	}

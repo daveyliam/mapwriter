@@ -71,7 +71,7 @@ public class MapRenderer {
 		}
 		
 		
-		if ((this.mw.undergroundMode) && (regionZoomLevel == 0)) {
+		if ((this.mapView.getUndergroundMode()) && (regionZoomLevel == 0)) {
 			// draw the underground map
 			this.mw.undergroundMapTexture.requestView(this.mapView);
 			Render.setColour(0xff000000);

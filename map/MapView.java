@@ -27,15 +27,29 @@ public class MapView {
 	
 	// the width and height of the map in blocks at the current
 	// zoom level.
-	public double w = 1;
-	public double h = 1;
+	private double w = 1;
+	private double h = 1;
+	
+	private int minZoom;
+	private int maxZoom;
+	
+	private boolean undergroundMode;
+	
+	public MapView(Mw mw) {
+		this.minZoom = mw.minZoom;
+		this.maxZoom = mw.maxZoom;
+		this.undergroundMode = mw.undergroundMode;
+		this.setZoomLevel(0);
+		this.setViewCentre(mw.playerX, mw.playerZ);
+	}
 	
 	public void setViewCentre(double vX, double vZ) {
 		this.x = vX;
 		this.z = vZ;
 		
-		if(MwAPI.getCurrentDataProvider() != null)
+		if (MwAPI.getCurrentDataProvider() != null) {
 		   MwAPI.getCurrentDataProvider().onMapCenterChanged(vX, vZ, this);
+		}
 		
 	}
 	
@@ -65,7 +79,11 @@ public class MapView {
 	public int setZoomLevel(int zoomLevel) {
 		//MwUtil.log("MapView.setZoomLevel(%d)", zoomLevel);
 		int prevZoomLevel = this.zoomLevel;
-		this.zoomLevel = Math.min(Math.max(Mw.minZoom, zoomLevel), Mw.maxZoom);
+		if (this.undergroundMode) {
+			this.zoomLevel = Math.min(Math.max(this.minZoom, zoomLevel), 0);
+		} else {
+			this.zoomLevel = Math.min(Math.max(this.minZoom, zoomLevel), this.maxZoom);
+		}
 		if (prevZoomLevel != this.zoomLevel) {
 			this.updateZoom();
 		}
@@ -236,5 +254,18 @@ public class MapView {
 			inside = ((x * x) + (z * z)) < (r * r);
 		}
 		return inside;
+	}
+	
+	public boolean getUndergroundMode() {
+		return this.undergroundMode;
+	}
+	
+	public void setUndergroundMode(boolean enabled) {
+		if (enabled) {
+			if (this.zoomLevel >= 0) {
+				this.setZoomLevel(-1);
+			}
+		}
+		this.undergroundMode = enabled;
 	}
 }

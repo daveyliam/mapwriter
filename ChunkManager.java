@@ -138,8 +138,11 @@ public class ChunkManager {
 	}
 	
 	private void addSaveChunkTask(Chunk chunk) {
-		if (!chunk.isEmpty()) {
-			this.mw.executor.addTask(new SaveChunkTask(copyToMwChunk(chunk), this.mw.regionManager));
+		if ((this.mw.multiplayer && this.mw.regionFileOutputEnabledMP) || 
+			(!this.mw.multiplayer && this.mw.regionFileOutputEnabledSP)) {
+			if (!chunk.isEmpty()) {
+				this.mw.executor.addTask(new SaveChunkTask(copyToMwChunk(chunk), this.mw.regionManager));
+			}
 		}
 	}
 }

@@ -41,6 +41,9 @@ public class RegionManager {
 	public static Logger logger;
 	public final RegionFileCache regionFileCache;
 	
+	public int maxZoom;
+	public int minZoom;
+	
 	public static void logInfo(String s, Object...args) {
 		if (logger != null) {
 			logger.info(String.format(s, args));
@@ -59,12 +62,14 @@ public class RegionManager {
 		}
 	}
 	
-	public RegionManager(File worldDir, File imageDir, BlockColours blockColours) {
+	public RegionManager(File worldDir, File imageDir, BlockColours blockColours, int minZoom, int maxZoom) {
 		this.worldDir = worldDir;
 		this.imageDir = imageDir;
 		this.blockColours = blockColours;
 		this.regionMap = new LruCache();
 		this.regionFileCache = new RegionFileCache(worldDir);
+		this.minZoom = minZoom;
+		this.maxZoom = maxZoom;
 	}
 	
 	public void close() {

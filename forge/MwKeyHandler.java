@@ -1,5 +1,6 @@
 package mapwriter.forge;
 
+import java.util.Arrays;
 import java.util.EnumSet;
 
 import mapwriter.Mw;
@@ -22,11 +23,17 @@ public class MwKeyHandler extends KeyHandler {
 	public static KeyBinding keyTeleport = new KeyBinding("key.mw_teleport", Keyboard.KEY_PERIOD);
 	public static KeyBinding keyZoomIn = new KeyBinding("key.mw_zoom_in", Keyboard.KEY_PRIOR);
 	public static KeyBinding keyZoomOut = new KeyBinding("key.mw_zoom_out", Keyboard.KEY_NEXT);
+	public static KeyBinding keyUndergroundMode = new KeyBinding("key.mw_underground_mode", Keyboard.KEY_U);
+	//public static KeyBinding keyQuickLargeMap = new KeyBinding("key.mw_quick_large_map", Keyboard.KEY_NONE);
 	
 	private static KeyBinding[] keyBindings = new KeyBinding[] {
-		keyMapGui, keyNewMarker, keyMapMode, keyNextGroup, keyTeleport, keyZoomIn, keyZoomOut};
-	private static boolean[] keyBooleans = new boolean[] {
-		false, false, false, false, false, false, false};
+		keyMapGui, keyNewMarker, keyMapMode, keyNextGroup, keyTeleport, keyZoomIn, keyZoomOut, keyUndergroundMode};
+	private static boolean[] keyBooleans;
+	
+	static {
+		keyBooleans = new boolean[keyBindings.length];
+		Arrays.fill(keyBooleans, false);
+	}
 	
 	public MwKeyHandler(Mw mw) {
 		super(keyBindings, keyBooleans);
@@ -40,8 +47,10 @@ public class MwKeyHandler extends KeyHandler {
 		LanguageRegistry.instance().addStringLocalization("key.mw_teleport", "en_US", "Teleport to waypoint");
 		LanguageRegistry.instance().addStringLocalization("key.mw_zoom_in", "en_US", "Minimap zoom in");
 		LanguageRegistry.instance().addStringLocalization("key.mw_zoom_out", "en_US", "Minimap zoom out");
+		LanguageRegistry.instance().addStringLocalization("key.mw_underground_mode", "en_US", "Underground map mode");
+		//LanguageRegistry.instance().addStringLocalization("key.mw_quick_large_map", "en_US", "Quick large map mode");
 	}
-
+	
 	@Override
 	public String getLabel() {
 		return "MapWriter Key Bindings";

@@ -33,11 +33,11 @@ public class MiniMap {
 		this.mw = mw;
 		
 		// load config file options
-		this.modeIndex = this.mw.config.getOrSetInt(Mw.catOptions, "overlayModeIndex", this.modeIndex, 0, 1000);
-		int zoomLevel = this.mw.config.getOrSetInt(Mw.catOptions, "overlayZoomLevel", 0, Mw.minZoom, Mw.maxZoom);
+		this.modeIndex = mw.config.getOrSetInt(Mw.catOptions, "overlayModeIndex", this.modeIndex, 0, 1000);
+		int zoomLevel = mw.config.getOrSetInt(Mw.catOptions, "overlayZoomLevel", 0, mw.minZoom, mw.maxZoom);
 		
 		// map view shared between large and small map modes
-		this.view = new MapView();
+		this.view = new MapView(mw);
 		this.view.setZoomLevel(zoomLevel);
 		
 		// small map mode
