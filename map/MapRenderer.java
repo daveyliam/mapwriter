@@ -73,10 +73,9 @@ public class MapRenderer {
 		
 		if ((this.mw.undergroundMode) && (regionZoomLevel == 0)) {
 			// draw the underground map
-			this.mw.undergroundMapTexture.requestView(
-					(int) this.mapView.getMinX(), (int) this.mapView.getMinZ(),
-					(int) this.mapView.getMaxX(), (int) this.mapView.getMaxZ()
-			);
+			this.mw.undergroundMapTexture.requestView(this.mapView);
+			Render.setColour(0xff000000);
+			Render.drawRect(this.mapMode.x, this.mapMode.y, this.mapMode.w, this.mapMode.h);
 			Render.setColourWithAlphaPercent(0xffffff, this.mapMode.alphaPercent);
 			this.mw.undergroundMapTexture.bind();
 			Render.drawTexturedRect(

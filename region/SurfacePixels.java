@@ -74,9 +74,10 @@ public class SurfacePixels {
 		int[] pixels = this.getOrAllocatePixels();
 		// TODO: refactor so that blockColours can be accessed
 		// more directly
-		ChunkRender.render(
+		ChunkRender.renderSurface(
 			this.region.regionManager.blockColours,
-			chunk, pixels, offset, Region.SIZE, -1
+			chunk, pixels, offset, Region.SIZE,
+			(chunk.dimension == -1) // use ceiling algorithm for nether
 		);
 		this.region.updateZoomLevels(x, z, MwChunk.SIZE, MwChunk.SIZE);
 		this.updateCount++;

@@ -52,6 +52,14 @@ public class Texture {
 		}
 	}
 	
+	public void setPixelBufPosition(int i) {
+		this.pixelBuf.position(i);
+	}
+	
+	public void pixelBufPut(int pixel) {
+		this.pixelBuf.put(pixel);
+	}
+	
 	public synchronized void fillRect(int x, int y, int w, int h, int colour) {
 		int offset = (y * this.w) + x;
 		for (int j = 0; j < h; j++) {

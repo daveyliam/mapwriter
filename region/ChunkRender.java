@@ -2,24 +2,16 @@ package mapwriter.region;
 
 public class ChunkRender {
 	
+	public static final byte FLAG_UNPROCESSED = 0;
+	public static final byte FLAG_NON_OPAQUE = 1;
+	public static final byte FLAG_OPAQUE = 2;
+
+	
 	// values that change how height shading algorithm works
 	public static final double brightenExponent = 0.35;
 	public static final double darkenExponent = 0.35;
 	public static final double brightenAmplitude = 0.7;
 	public static final double darkenAmplitude = 1.4;
-	
-	public static int getFirstNonOpaqueBlockY(BlockColours bc, IChunk chunk, int x, int y, int z) {
-		boolean found = false;
-		// search in a column downwards for the first non opaque block (alpha != 0xff)
-		for (; (y >= 0) && !found; y--) {
-			int blockAndMeta = chunk.getBlockAndMetadata(x, y, z);
-			int colour = bc.getColour(blockAndMeta);
-			if (((colour >> 24) & 0xff) != 0xff) {
-				found = true;
-			}
-		}
-		return y + 1;
-	}
 	
 	// get the height shading of a pixel.
 	// requires the pixel to the west and the pixel to the north to have their
@@ -142,35 +134,72 @@ public class ChunkRender {
 			((((int) (b * 255.0)) & 0xff));
 	}
 	
-	public static void render(BlockColours bc, MwChunk chunk, int[] pixels, int offset, int scanSize, int startY) {
-		if (startY < 0) {
-			startY = chunk.maxHeight - 1;
-		}
+	static int getPixelHeightN(int[] pixels, int offset, int scanSize) {
+		return (offset >= scanSize) ? (pixels[offset - scanSize] >> 24) : -1;
+	}
+	
+	static int getPixelHeightW(int[] pixels, int offset, int scanSize) {
+		return ((offset & (scanSize - 1)) >= 1) ? (pixels[offset - 1] >> 24) : -1;
+	}
+	
+	public static void renderSurface(BlockColours bc, IChunk chunk, int[] pixels, int offset, int scanSize, boolean dimensionHasCeiling) {
+		int startY = chunk.getMaxY();
 		for (int z = 0; z < MwChunk.SIZE; z++) {
 			for (int x = 0; x < MwChunk.SIZE; x++) {
-				// get height shading based on neighboring pixel heights.
-				// need to first add a dummy colour value with the block
-				// height in the alpha channel.
-				int pixelOffset = offset + (z * scanSize) + x;
-				int heightN = -1;
-				int heightW = -1;
-				if (pixelOffset >= scanSize) {
-					heightN = ((pixels[pixelOffset - scanSize] >> 24) & 0xff);
-				}
-				if ((pixelOffset & (scanSize - 1)) >= 1) {
-					heightW = ((pixels[pixelOffset - 1] >> 24) & 0xff);
-				}
-				int y = startY;
 				// for the nether dimension start at the first non-opaque block
 				// below the ceiling
-				if (chunk.dimension == -1) {
-					y = getFirstNonOpaqueBlockY(bc, chunk, x, startY, z);
+				int y = startY;
+				if (dimensionHasCeiling) {
+					for (; y >= 0; y--) {
+						int blockAndMeta = chunk.getBlockAndMetadata(x, y, z);
+						int alpha = (bc.getColour(blockAndMeta) >> 24) & 0xff;
+						if (alpha != 0xff) {
+							break;
+						}
+					}
 				}
-				int colour = getColumnColour(bc, chunk, x, y, z, heightW, heightN);
 				
-				pixels[pixelOffset] = colour;
+				int pixelOffset = offset + (z * scanSize) + x;
+				pixels[pixelOffset] = getColumnColour(
+					bc, chunk, x, y, z, 
+					getPixelHeightW(pixels, pixelOffset, scanSize),
+					getPixelHeightN(pixels, pixelOffset, scanSize)
+				);
 			}
 		}
-		//MwUtil.log("chunk (%d, %d): height %d, %d blocks processed", thisx, thisz, maxHeight, count);
+	}
+	
+	public static void renderUnderground(BlockColours bc, IChunk chunk, int[] pixels, int offset, int scanSize, int startY, byte[] mask) {
+		for (int z = 0; z < MwChunk.SIZE; z++) {
+			for (int x = 0; x < MwChunk.SIZE; x++) {
+				
+				// only process columns where the mask bit is set.
+				// process all columns if mask is null.
+				if ((mask != null) && ((mask[(z * 16) + x]) != FLAG_NON_OPAQUE)) {
+					continue;
+				}
+				
+				// get the last non transparent block before the first opaque block searching
+				// towards the sky from startY
+				int lastNonTransparentY = startY;
+				for (int y = startY; y < chunk.getMaxY(); y++) {
+					int blockAndMeta = chunk.getBlockAndMetadata(x, y, z);
+					int alpha = (bc.getColour(blockAndMeta) >> 24) & 0xff;
+					if (alpha == 0xff) {
+						break;
+					}
+					if (alpha > 0) {
+						lastNonTransparentY = y;
+					}
+				}
+				
+				int pixelOffset = offset + (z * scanSize) + x;
+				pixels[pixelOffset] = getColumnColour(
+					bc, chunk, x, lastNonTransparentY, z,
+					getPixelHeightW(pixels, pixelOffset, scanSize),
+					getPixelHeightN(pixels, pixelOffset, scanSize)
+				);
+			}
+		}
 	}
 }

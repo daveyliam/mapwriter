@@ -18,7 +18,7 @@ public class MwChunk implements IChunk {
 	
 	public final byte[] biomeArray;
 	
-	public final int maxHeight;
+	public final int maxY;
 	
 	public MwChunk(int x, int z, int dimension, byte[][] msbArray, byte[][] lsbArray, byte[][] metaArray, byte[][] lightingArray, byte[] biomeArray) {
 		this.x = x;
@@ -32,10 +32,10 @@ public class MwChunk implements IChunk {
 		int maxY = 0;
 		for (int y = 0; y < 16; y++) {
 			if (lsbArray[y] != null) {
-				maxY = y + 1;
+				maxY = (y << 4) + 15;
 			}
 		}
-		this.maxHeight = maxY << 4;
+		this.maxY = maxY;
 	}
 	
 	public String toString() {
@@ -130,7 +130,7 @@ public class MwChunk implements IChunk {
 	}
 	
 	public boolean isEmpty() {
-		return (this.maxHeight <= 0);
+		return (this.maxY <= 0);
 	}
 	
 	public int getBiome(int x, int z) {
@@ -145,6 +145,10 @@ public class MwChunk implements IChunk {
 		
 		//return ((offset & 1) == 1) ? ((light >> 4) & 0xf) : (light & 0xf);
 		return 15;
+	}
+	
+	public int getMaxY() {
+		return this.maxY;
 	}
 	
 	public int getBlockAndMetadata(int x, int y, int z) {
