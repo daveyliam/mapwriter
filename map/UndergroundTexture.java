@@ -42,8 +42,8 @@ public class UndergroundTexture extends Texture {
 		
 		@Override
 		public int getBlockAndMetadata(int x, int y, int z) {
-			int blockID = this.chunk.getBlockID(x, y, z);
-			int meta = this.chunk.getBlockMetadata(x, y, z);
+			int blockID = y < 1 ? 0 : this.chunk.getBlockID(x, y, z);
+			int meta = y < 1 ? 0 : this.chunk.getBlockMetadata(x, y, z);
 			return ((blockID & 0xfff) << 4) | (meta & 0xf);
 		}
 
@@ -54,7 +54,7 @@ public class UndergroundTexture extends Texture {
 
 		@Override
 		public int getLightValue(int x, int y, int z) {
-			return this.chunk.getBlockLightValue(x, y, z, 0);
+			return y < 1 ? 0 : this.chunk.getBlockLightValue(x, y, z, 0);
 		}
 	}
 	
