@@ -32,12 +32,10 @@ public class MapMode {
 	public boolean rotate = false;
 	public boolean circular = false;
 	public boolean coordsEnabled = false;
-	public int borderWidth = 0;
-	public int borderColour = 0;
+	public int borderMode = 1;
 	public int playerArrowSize = 5;
 	public int markerSize = 5;
 	public int trailMarkerSize = 3;
-	public int playerArrowColour = 0xffff0000;
 	public int alphaPercent = 100;
 	
 	public int marginTop = 0;
@@ -61,9 +59,6 @@ public class MapMode {
 		this.playerArrowSize = this.config.getOrSetInt(this.configCategory, "playerArrowSize", this.playerArrowSize, 1, 20);
 		this.markerSize = this.config.getOrSetInt(this.configCategory, "markerSize", this.markerSize, 1, 20);
 		this.alphaPercent = this.config.getOrSetInt(this.configCategory, "alphaPercent", this.alphaPercent, 0, 100);
-		this.borderWidth = this.config.getOrSetInt(this.configCategory, "borderWidth", this.borderWidth, 0, 50);
-		this.borderColour = this.config.getOrSetColour(this.configCategory, "borderColour", this.borderColour);
-		this.playerArrowColour = this.config.getOrSetColour(this.configCategory, "playerArrowColour", this.playerArrowColour);
 		
 		this.heightPercent = this.config.getOrSetInt(this.configCategory, "heightPercent", this.heightPercent, 0, 100);
 		this.marginTop = this.config.getOrSetInt(this.configCategory, "marginTop", this.marginTop, -1, 320);
@@ -74,6 +69,7 @@ public class MapMode {
 		this.rotate = this.config.getOrSetBoolean(this.configCategory, "rotate", this.rotate);
 		this.circular = this.config.getOrSetBoolean(this.configCategory, "circular", this.circular);
 		this.coordsEnabled = this.config.getOrSetBoolean(this.configCategory, "coordsEnabled", this.coordsEnabled);
+		this.borderMode = this.config.getOrSetInt(this.configCategory, "borderMode", this.borderMode, 0, 1);
 		
 		this.trailMarkerSize = Math.max(1, this.markerSize - 1);
 	}

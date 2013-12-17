@@ -37,7 +37,7 @@ public class MapTexture extends Texture {
 	private List<Rect> textureUpdateQueue = new ArrayList<Rect>();
 	
 	public MapTexture(int textureSize, boolean linearScaling) {
-		super(textureSize, textureSize, 0xff000000, GL11.GL_LINEAR, GL11.GL_LINEAR, GL11.GL_REPEAT);
+		super(textureSize, textureSize, 0x00000000, GL11.GL_LINEAR, GL11.GL_LINEAR, GL11.GL_REPEAT);
 		
 		this.setLinearScaling(linearScaling);
 		
@@ -75,6 +75,25 @@ public class MapTexture extends Texture {
 	// methods below this point run in the background thread
 	//
 	
+	public synchronized void setRGBOpaque(int x, int y, int w, int h, int[] pixels, int offset, int scanSize) {
+		// TODO: Remove the need for this function. It would better if the
+		// region pixels were stored as normal pixels (without the height in
+		// the alpha channel). Then we could just directly copy the pixels
+		// to the texture pixelBuf.
+		int bufOffset = (y * this.w) + x;
+		for (int i = 0; i < h; i++) {
+			this.setPixelBufPosition(bufOffset + (i * this.w));
+			int rowOffset = offset + (i * scanSize);
+			for (int j = 0; j < w; j++) {
+				int colour = pixels[rowOffset + j];
+				if(colour != 0) {
+					colour |= 0xff000000;
+				}
+				this.pixelBufPut(colour);
+			}
+		}
+	}
+	
 	public void addTextureUpdate(int x, int z, int w, int h) {
 		synchronized (this.textureUpdateQueue) {
 			this.textureUpdateQueue.add(new Rect(x, z, w, h));
@@ -97,7 +116,7 @@ public class MapTexture extends Texture {
 		if (pixels != null) {
 			this.setRGBOpaque(tx, ty, tw, th, pixels, region.getPixelOffset(x, z), Region.SIZE);
 		} else {
-			this.fillRect(tx, ty, tw, th, 0xff000000);
+			this.fillRect(tx, ty, tw, th, 0x00000000);
 		}
 		
 		this.addTextureUpdate(tx, ty, tw, th);

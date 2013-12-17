@@ -52,9 +52,7 @@ public class BlockColourGen {
 				if (renderColour != 0xffffff) {
 					blockColour = Render.multiplyColours(blockColour, 0xff000000 | renderColour);
 				}
-			} catch (ArrayIndexOutOfBoundsException e) {
-				// do nothing
-			} catch (NullPointerException e) {
+			} catch (RuntimeException e) {
 				// do nothing
 			}
 			break;

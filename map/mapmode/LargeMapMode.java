@@ -12,8 +12,6 @@ public class LargeMapMode extends MapMode {
 		this.marginLeft = 40;
 		this.marginRight = 40;
 		
-		this.borderWidth = 1;
-		this.borderColour = 0xff000000;
 		this.playerArrowSize = 5;
 		this.markerSize = 5;
 		

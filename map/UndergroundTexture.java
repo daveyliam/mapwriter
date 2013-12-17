@@ -59,7 +59,7 @@ public class UndergroundTexture extends Texture {
 	}
 	
 	public UndergroundTexture(Mw mw, int textureSize, boolean linearScaling) {	
-		super(textureSize, textureSize, 0xff000000, GL11.GL_LINEAR, GL11.GL_LINEAR, GL11.GL_REPEAT);
+		super(textureSize, textureSize, 0x00000000, GL11.GL_LINEAR, GL11.GL_LINEAR, GL11.GL_REPEAT);
 		this.setLinearScaling(linearScaling);
 		this.textureSize = textureSize;
 		this.textureChunks = textureSize >> 4;

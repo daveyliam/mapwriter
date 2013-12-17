@@ -170,6 +170,7 @@ public class ChunkRender {
 	}
 	
 	public static void renderUnderground(BlockColours bc, IChunk chunk, int[] pixels, int offset, int scanSize, int startY, byte[] mask) {
+		startY = Math.min(Math.max(0, startY), 255);
 		for (int z = 0; z < MwChunk.SIZE; z++) {
 			for (int x = 0; x < MwChunk.SIZE; x++) {
 				

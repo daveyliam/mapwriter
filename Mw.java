@@ -115,6 +115,7 @@ public class Mw {
 	public String saveDirOverride = "";
 	public boolean regionFileOutputEnabledSP = true;
 	public boolean regionFileOutputEnabledMP = true;
+	public int backgroundTextureMode = 0;
 	//public boolean lightingEnabled = false;
 	
 	// flags and counters
@@ -221,6 +222,7 @@ public class Mw {
 		this.undergroundMode = this.config.getOrSetBoolean(catOptions, "undergroundMode", this.undergroundMode);
 		this.regionFileOutputEnabledSP = this.config.getOrSetBoolean(catOptions, "regionFileOutputEnabledSP", this.regionFileOutputEnabledSP);
 		this.regionFileOutputEnabledMP = this.config.getOrSetBoolean(catOptions, "regionFileOutputEnabledMP", this.regionFileOutputEnabledMP);
+		this.backgroundTextureMode = this.config.getOrSetInt(catOptions, "backgroundTextureMode", this.backgroundTextureMode, 0, 1);
 		//this.lightingEnabled = this.config.getOrSetBoolean(catOptions, "lightingEnabled", this.lightingEnabled);
 		
 		this.maxZoom = this.config.getOrSetInt(catOptions, "zoomOutLevels", this.maxZoom, 1, 256);
@@ -251,6 +253,7 @@ public class Mw {
 		this.config.setInt(catOptions, "maxDeathMarkers", this.maxDeathMarkers);
 		this.config.setInt(catOptions, "chunksPerTick", this.chunksPerTick);
 		this.config.setBoolean(catOptions, "undergroundMode", this.undergroundMode);
+		this.config.setInt(catOptions, "backgroundTextureMode", this.backgroundTextureMode);
 		//this.config.setBoolean(catOptions, "lightingEnabled", this.lightingEnabled);
 		
 		// save config

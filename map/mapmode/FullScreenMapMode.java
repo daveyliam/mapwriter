@@ -12,8 +12,7 @@ public class FullScreenMapMode extends MapMode {
 		this.marginLeft = 0;
 		this.marginRight = 0;
 		
-		this.borderWidth = 0;
-		this.borderColour = 0;
+		this.borderMode = 0;
 		this.playerArrowSize = 5;
 		this.markerSize = 5;
 		this.alphaPercent = 100;

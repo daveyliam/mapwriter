@@ -88,17 +88,6 @@ public class Texture {
 		}
 	}
 	
-	public synchronized void setRGBOpaque(int x, int y, int w, int h, int[] pixels, int offset, int scanSize) {
-		int bufOffset = (y * this.w) + x;
-		for (int i = 0; i < h; i++) {
-			this.pixelBuf.position(bufOffset + (i * this.w));
-			int rowOffset = offset + (i * scanSize);
-			for (int j = 0; j < w; j++) {
-				this.pixelBuf.put(pixels[rowOffset + j] | 0xff000000);
-			}
-		}
-	}
-	
 	public synchronized void setRGB(int x, int y, int colour) {
 		this.pixelBuf.put((y * this.w) + x, colour);
 	}

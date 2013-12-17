@@ -12,8 +12,6 @@ public class SmallMapMode extends MapMode {
 		this.marginLeft = -1;
 		this.marginRight = 10;
 		
-		this.borderWidth = 1;
-		this.borderColour = 0xff000000;
 		this.playerArrowSize = 4;
 		this.markerSize = 3;
 		

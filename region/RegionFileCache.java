@@ -9,11 +9,11 @@ public class RegionFileCache {
 	// simple Least Recently Used (LRU) cache implementation
 	class LruCache extends LinkedHashMap<String, RegionFile> {
 		private static final long serialVersionUID = 1L;
-		static final int MAX_REGIONS_OPEN = 8;
+		static final int MAX_REGION_FILES_OPEN = 8;
 		
 		public LruCache() {
 			// initial capacity, loading factor, true for access time ordering
-			super(MAX_REGIONS_OPEN * 2, 0.5f, true);
+			super(MAX_REGION_FILES_OPEN * 2, 0.5f, true);
 		}
 		
 		// called on every put and putAll call, the entry 'entry' is removed
@@ -21,7 +21,7 @@ public class RegionFileCache {
 		@Override
 		protected boolean removeEldestEntry(Map.Entry<String, RegionFile> entry) {
 			boolean ret = false;
-			if (this.size() > MAX_REGIONS_OPEN) {
+			if (this.size() > MAX_REGION_FILES_OPEN) {
 				RegionFile regionFile = entry.getValue();
 				regionFile.close();
 				ret = true;

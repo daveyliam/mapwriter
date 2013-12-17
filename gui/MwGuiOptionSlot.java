@@ -30,8 +30,13 @@ public class MwGuiOptionSlot extends GuiSlot {
 		"small",
 		"large"
 	};
+	private static final String[] backgroundModeStringArray = {
+		"none",
+		"static",
+		"panning"
+	};
 	
-	private GuiButton[] buttons = new GuiButton[11];
+	private GuiButton[] buttons = new GuiButton[12];
 	
     static final ResourceLocation WIDGET_TEXTURE_LOC = new ResourceLocation("textures/gui/widgets.png");
 	
@@ -50,13 +55,13 @@ public class MwGuiOptionSlot extends GuiSlot {
 			this.buttons[i].displayString = "Texture scaling: " + (this.mw.linearTextureScalingEnabled ? "linear" : "nearest");
 			break;
 		case 4:
-			this.buttons[i].displayString = "Trail Markers: " + (this.mw.playerTrail.enabled);
+			this.buttons[i].displayString = "Trail markers: " + (this.mw.playerTrail.enabled);
 			break;
 		case 5:
-			this.buttons[i].displayString = "Map Colours: " + (this.mw.useSavedBlockColours ? "Frozen" : "Auto");
+			this.buttons[i].displayString = "Map colours: " + (this.mw.useSavedBlockColours ? "frozen" : "auto");
 			break;
 		case 6:
-			this.buttons[i].displayString = "Max Draw Distance: " + Math.round(Math.sqrt(this.mw.maxChunkSaveDistSq));
+			this.buttons[i].displayString = "Max draw distance: " + Math.round(Math.sqrt(this.mw.maxChunkSaveDistSq));
 			break;
 		case 7:
 			this.buttons[i].displayString = "Mini map size: " + this.mw.miniMap.smallMapMode.heightPercent;
@@ -68,7 +73,10 @@ public class MwGuiOptionSlot extends GuiSlot {
 			this.buttons[i].displayString = "Map pixel snapping: " + (this.mw.mapPixelSnapEnabled ? "enabled" : "disabled");
 			break;
 		case 10:
-			this.buttons[i].displayString = "Max Death Markers: " + this.mw.maxDeathMarkers;
+			this.buttons[i].displayString = "Max death markers: " + this.mw.maxDeathMarkers;
+			break;
+		case 11:
+			this.buttons[i].displayString = "Background mode: " + backgroundModeStringArray[this.mw.backgroundTextureMode];
 			break;
 		//case 11:
 		//	this.buttons[i].displayString = "Map Lighting: " + (this.mw.lightingEnabled ? "enabled" : "disabled");
@@ -122,6 +130,7 @@ public class MwGuiOptionSlot extends GuiSlot {
 			// linear scaling
 			this.mw.linearTextureScalingEnabled = !this.mw.linearTextureScalingEnabled;
 			this.mw.mapTexture.setLinearScaling(this.mw.linearTextureScalingEnabled);
+			this.mw.undergroundMapTexture.setLinearScaling(this.mw.linearTextureScalingEnabled);
 			break;
 		case 4:
 			// player trail
@@ -182,6 +191,10 @@ public class MwGuiOptionSlot extends GuiSlot {
 			if (this.mw.maxDeathMarkers > 10) {
 				this.mw.maxDeathMarkers = 0;
 			}
+			break;
+		case 11:
+			// background texture mode
+			this.mw.backgroundTextureMode = (this.mw.backgroundTextureMode + 1) % 3;
 			break;
 		//case 11:
 		//	// lighting

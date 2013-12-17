@@ -22,7 +22,7 @@ public class SurfacePixels {
 	
 	public void clear() {
 		if (this.pixels != null) {
-			Arrays.fill(this.pixels, 0xff000000);
+			Arrays.fill(this.pixels, 0);
 		}
 	}
 	
@@ -33,7 +33,7 @@ public class SurfacePixels {
 		this.pixels = null;
 	}
 	
-	public void save() {
+	private void save() {
 		if (this.pixels != null) {
 			saveImage(this.filename, this.pixels, Region.SIZE, Region.SIZE);
 			this.cannotLoad = false;
@@ -41,10 +41,19 @@ public class SurfacePixels {
 		this.updateCount = 0;
 	}
 	
-	public void load() {
+	private void load() {
 		if (!this.cannotLoad) {
 			this.pixels = loadImage(this.filename, Region.SIZE, Region.SIZE);
-			if (this.pixels == null) {
+			if (this.pixels != null) {
+				// set opaque black pixels to transparent so that
+				// background texture shows
+				for (int i = 0; i < this.pixels.length; i++) {
+					int colour = this.pixels[i];
+					if (colour == 0xff000000) {
+						this.pixels[i] = 0;
+					}
+				}
+			} else {
 				this.cannotLoad = true;
 			}
 			this.updateCount = 0;
