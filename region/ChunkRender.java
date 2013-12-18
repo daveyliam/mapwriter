@@ -135,11 +135,11 @@ public class ChunkRender {
 	}
 	
 	static int getPixelHeightN(int[] pixels, int offset, int scanSize) {
-		return (offset >= scanSize) ? (pixels[offset - scanSize] >> 24) : -1;
+		return (offset >= scanSize) ? ((pixels[offset - scanSize] >> 24) & 0xff) : -1;
 	}
 	
 	static int getPixelHeightW(int[] pixels, int offset, int scanSize) {
-		return ((offset & (scanSize - 1)) >= 1) ? (pixels[offset - 1] >> 24) : -1;
+		return ((offset & (scanSize - 1)) >= 1) ? ((pixels[offset - 1] >> 24) & 0xff) : -1;
 	}
 	
 	public static void renderSurface(BlockColours bc, IChunk chunk, int[] pixels, int offset, int scanSize, boolean dimensionHasCeiling) {

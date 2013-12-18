@@ -130,7 +130,7 @@ public class MwGuiOptionSlot extends GuiSlot {
 			// linear scaling
 			this.mw.linearTextureScalingEnabled = !this.mw.linearTextureScalingEnabled;
 			this.mw.mapTexture.setLinearScaling(this.mw.linearTextureScalingEnabled);
-			this.mw.undergroundMapTexture.setLinearScaling(this.mw.linearTextureScalingEnabled);
+			//this.mw.undergroundMapTexture.setLinearScaling(this.mw.linearTextureScalingEnabled);
 			break;
 		case 4:
 			// player trail

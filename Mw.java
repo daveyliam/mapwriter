@@ -230,8 +230,10 @@ public class Mw {
 		
 		this.configTextureSize = this.config.getOrSetInt(catOptions, "textureSize", this.configTextureSize, 1024, 8192);
 		this.setTextureSize();
-		
-		// load markers from config
+	}
+	
+	public void loadWorldConfig() {
+		// load world specific config file
 		File worldConfigFile = new File(this.worldDir, worldDirConfigName);
 		this.worldConfig = new MwConfig(worldConfigFile);
 		this.worldConfig.load();
@@ -243,7 +245,6 @@ public class Mw {
 	}
 	
 	public void saveConfig() {
-		this.worldConfig.setIntList(catWorld, "dimensionList", this.dimensionList);
 		this.config.setBoolean(catOptions, "linearTextureScaling", this.linearTextureScalingEnabled);
 		this.config.setBoolean(catOptions, "useSavedBlockColours", this.useSavedBlockColours);
 		this.config.setInt(catOptions, "textureSize", this.configTextureSize);
@@ -256,8 +257,11 @@ public class Mw {
 		this.config.setInt(catOptions, "backgroundTextureMode", this.backgroundTextureMode);
 		//this.config.setBoolean(catOptions, "lightingEnabled", this.lightingEnabled);
 		
-		// save config
-		this.config.save();
+		this.config.save();	
+	}
+	
+	public void saveWorldConfig() {
+		this.worldConfig.setIntList(catWorld, "dimensionList", this.dimensionList);
 		this.worldConfig.save();
 	}
 	
@@ -447,6 +451,8 @@ public class Mw {
 	public void onClientLoggedIn(Packet1Login login) {
 		MwUtil.log("onClientLoggedIn: dimension = %d", login.dimension);
 		
+		this.loadConfig();
+		
 		this.worldName = this.getWorldName();
 		
 		// get world and image directories
@@ -466,6 +472,8 @@ public class Mw {
 			this.worldDir = new File(new File(saveDir, "mapwriter_sp_worlds"), this.worldName);
 		}
 		
+		this.loadWorldConfig();
+		
 		// create directories
 		this.imageDir = new File(this.worldDir, "images");
 		if (!this.imageDir.exists()) {
@@ -478,7 +486,6 @@ public class Mw {
 		this.tickCounter = 0;
 		this.onPlayerDeathAlreadyFired = false;
 		
-		this.loadConfig();
 		//this.multiplayer = !this.mc.isIntegratedServerRunning();
 		
 		// marker manager only depends on the config being loaded
@@ -563,6 +570,7 @@ public class Mw {
 			this.undergroundMapTexture.close();
 			this.mapTexture.close();
 			
+			this.saveWorldConfig();
 			this.saveConfig();
 			
 			this.tickCounter = 0;
