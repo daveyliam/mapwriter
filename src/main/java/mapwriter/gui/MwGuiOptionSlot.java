@@ -108,8 +108,8 @@ public class MwGuiOptionSlot extends GuiSlot {
 		return this.buttons.length;
 	}
 
-	@Override
-	protected void elementClicked(int i, boolean doubleClicked) {
+    @Override
+	protected void elementClicked(int i, boolean doubleClicked, int x, int y) {
 		switch(i) {
 		case 0:
 	        // toggle coords
@@ -222,11 +222,11 @@ public class MwGuiOptionSlot extends GuiSlot {
 	protected void drawBackground() {
 	}
 
-	@Override
-	protected void drawSlot(int i, int x, int y, int height, Tessellator tessellator) {
-		GuiButton button = buttons[i];
-		button.xPosition = x;
-		button.yPosition = y;
-		button.drawButton(this.mc, this.mouseX, this.mouseY);
-	}
+    @Override
+    protected void drawSlot(int i, int x, int y, int i4, Tessellator tessellator, int i5, int i6){
+        GuiButton button = buttons[i];
+        button.xPosition = x;
+        button.yPosition = y;
+        button.drawButton(this.mc, this.mouseX, this.mouseY);
+    }
 }

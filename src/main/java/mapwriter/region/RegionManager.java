@@ -1,11 +1,12 @@
 package mapwriter.region;
 
+import org.apache.logging.log4j.Logger;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Logger;
 
 public class RegionManager {
 	
@@ -52,13 +53,13 @@ public class RegionManager {
 	
 	public static void logWarning(String s, Object...args) {
 		if (logger != null) {
-			logger.warning(String.format(s, args));
+			logger.warn(String.format(s, args));
 		}
 	}
 	
 	public static void logError(String s, Object...args) {
 		if (logger != null) {
-			logger.severe(String.format(s, args));
+			logger.error(String.format(s, args));
 		}
 	}
 	

@@ -12,8 +12,8 @@ import mapwriter.tasks.CloseRegionManagerTask;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGameOver;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.network.packet.Packet1Login;
 import net.minecraft.server.integrated.IntegratedServer;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
@@ -319,7 +319,7 @@ public class Mw {
 	public void toggleMarkerMode() {
 		this.markerManager.nextGroup();
 		this.markerManager.update();
-		this.mc.thePlayer.addChatMessage("group " + this.markerManager.getVisibleGroupName() + " selected");
+		this.mc.thePlayer.addChatMessage(new ChatComponentText("group " + this.markerManager.getVisibleGroupName() + " selected"));
 	}
 	
 	// cheap and lazy way to teleport...
@@ -442,8 +442,8 @@ public class Mw {
 		this.multiplayer = true;
 	}
 	
-	public void onClientLoggedIn(Packet1Login login) {
-		MwUtil.log("onClientLoggedIn: dimension = %d", login.dimension);
+	public void onClientLoggedIn(int dim){
+		MwUtil.log("onClientLoggedIn: dimension = %d", dim);
 		
 		this.loadConfig();
 		
@@ -499,7 +499,7 @@ public class Mw {
 		this.regionManager = new RegionManager(this.worldDir, this.imageDir, this.blockColours, this.minZoom, this.maxZoom);
 		// overlay manager depends on mapTexture
 		this.miniMap = new MiniMap(this);
-		this.miniMap.view.setDimension(login.dimension);
+		this.miniMap.view.setDimension(dim);
 		
 		this.chunkManager = new ChunkManager(this);
 		
@@ -689,7 +689,7 @@ public class Mw {
 				// toggle marker mode
 				this.markerManager.nextGroup();
 				this.markerManager.update();
-				this.mc.thePlayer.addChatMessage("group " + this.markerManager.getVisibleGroupName() + " selected");
+				this.mc.thePlayer.addChatMessage(new ChatComponentText("group " + this.markerManager.getVisibleGroupName() + " selected"));
 				
 			} else if (kb == MwKeyHandler.keyTeleport) {
 				// set or remove marker

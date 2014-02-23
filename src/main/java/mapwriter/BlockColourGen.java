@@ -5,7 +5,7 @@ import mapwriter.region.BlockColours.BlockType;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.biome.BiomeGenBase;
 
 // Static class to generate BlockColours.
@@ -16,7 +16,7 @@ import net.minecraft.world.biome.BiomeGenBase;
 
 public class BlockColourGen {
 	
-	private static int getIconMapColour(Icon icon, Texture terrainTexture) {
+	private static int getIconMapColour(IIcon icon, Texture terrainTexture) {
 		// flipped icons have the U and V coords reversed (minU > maxU, minV > maxV).
 		// thanks go to taelnia for fixing this. 
 		int iconX = (int) Math.round(((float) terrainTexture.w) * Math.min(icon.getMinU(), icon.getMaxU()));
@@ -38,7 +38,8 @@ public class BlockColourGen {
 	private static int adjustBlockColourFromType(BlockColours bc, int blockAndMeta, int blockColour) {
 		// for normal blocks multiply the block colour by the render colour.
 		// for other blocks the block colour will be multiplied by the biome colour.
-		Block block = Block.blocksList[blockAndMeta >> 4];
+        int blockid = blockAndMeta >> 4;
+		Block block = (Block) Block.blockRegistry.getObjectById(blockid);
 		BlockType blockType = bc.getBlockType(blockAndMeta);
 		switch (blockType) {
 		
@@ -71,11 +72,11 @@ public class BlockColourGen {
 		// generate array of foliage, grass, and water colour multipliers
 		// for each biome.
 		
-		for (int i = 0; i < BiomeGenBase.biomeList.length; i++) {
-			if (BiomeGenBase.biomeList[i] != null) {
-				bc.setBiomeWaterShading(i, BiomeGenBase.biomeList[i].getWaterColorMultiplier() & 0xffffff);
-				bc.setBiomeGrassShading(i, BiomeGenBase.biomeList[i].getBiomeGrassColor() & 0xffffff);
-				bc.setBiomeFoliageShading(i, BiomeGenBase.biomeList[i].getBiomeFoliageColor() & 0xffffff);
+		for (int i = 0; i < BiomeGenBase.getBiomeGenArray().length; i++) {
+			if (BiomeGenBase.getBiomeGenArray()[i] != null) {
+				bc.setBiomeWaterShading(i, BiomeGenBase.getBiomeGenArray()[i].getWaterColorMultiplier() & 0xffffff);
+				bc.setBiomeGrassShading(i, BiomeGenBase.getBiomeGenArray()[i].getBiomeGrassColor(0,0,0) & 0xffffff); //FIXME 0,0,0?
+				bc.setBiomeFoliageShading(i, BiomeGenBase.getBiomeGenArray()[i].getBiomeFoliageColor(0,0,0) & 0xffffff); //FIXME 0,0,0?
 			} else {
 				bc.setBiomeWaterShading(i, 0xffffff);
 				bc.setBiomeGrassShading(i, 0xffffff);
@@ -112,17 +113,17 @@ public class BlockColourGen {
 		int e_count = 0;
 		int b_count = 0;
 		int s_count = 0;
-		
-		for (int blockID = 0; blockID < Block.blocksList.length; blockID++) {
+
+		for (int blockID = 0; blockID < 4096; blockID++) { //TODO: replace hardcoded 4096 with actual registry size
 			for (int dv = 0; dv < 16; dv++) {
 				
 				int blockAndMeta = ((blockID & 0xfff) << 4) | (dv & 0xf);
-				Block block = Block.blocksList[blockID];
+				Block block = (Block) Block.blockRegistry.getObjectById(blockID);
 				int blockColour = 0;
 				
 				if (block != null) {
 					
-					Icon icon = null;
+					IIcon icon = null;
 					try {
 						icon = block.getIcon(1, dv);
 					} catch (Exception e) {

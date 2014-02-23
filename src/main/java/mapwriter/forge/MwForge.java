@@ -1,5 +1,6 @@
 package mapwriter.forge;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -7,11 +8,20 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
+import cpw.mods.fml.common.network.FMLNetworkEvent;
+import mapwriter.Mw;
 import mapwriter.api.MwAPI;
 import mapwriter.overlay.OverlayGrid;
 import mapwriter.overlay.OverlaySlime;
+import net.minecraft.client.Minecraft;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.common.MinecraftForge;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.net.InetSocketAddress;
 
 @Mod(modid="MapWriter", name="MapWriter", version="2.0")
 public class MwForge {
@@ -25,11 +35,17 @@ public class MwForge {
 	public static CommonProxy proxy;
 	
 	public static Logger logger = LogManager.getLogger("MapWriter");
-	
+
+    private boolean needsJoin = false;
+
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		logger.info("FML Event: preInit");
 		this.config = new MwConfig(event.getSuggestedConfigurationFile());
+
+        FMLCommonHandler.instance().bus().register(new MwKeyHandler());
+        FMLCommonHandler.instance().bus().register(this);
+        MinecraftForge.EVENT_BUS.register(this);
 	}
 	
 	@EventHandler
@@ -47,4 +63,37 @@ public class MwForge {
 		//MwAPI.registerDataProvider("Checker", new OverlayChecker());
 		//MwAPI.setCurrentDataProvider("Slime");
 	}
+
+    @SubscribeEvent
+    public void renderMap(RenderGameOverlayEvent.Post event){
+        if(event.type == RenderGameOverlayEvent.ElementType.ALL){
+            Mw.instance.onTick();
+        }
+    }
+
+    @SubscribeEvent
+    public void onConnected(FMLNetworkEvent.ClientConnectedToServerEvent event){
+        if(event.isLocal){
+            Mw.instance.onConnectionOpened();
+        }else{
+            InetSocketAddress address = (InetSocketAddress) event.manager.getSocketAddress();
+            Mw.instance.onConnectionOpened(address.getHostName(), address.getPort());
+        }
+        this.needsJoin = true;
+    }
+
+    @SubscribeEvent
+    public void onTick(TickEvent.ClientTickEvent event){
+        if(this.needsJoin && event.phase == TickEvent.Phase.START){
+            if(Minecraft.getMinecraft().thePlayer != null){
+                Mw.instance.onClientLoggedIn(Minecraft.getMinecraft().thePlayer.dimension);
+                this.needsJoin = false;
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onConnection(FMLNetworkEvent.ClientDisconnectionFromServerEvent event){
+        Mw.instance.onConnectionClosed();
+    }
 }

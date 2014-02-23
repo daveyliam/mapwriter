@@ -61,6 +61,7 @@ public class ChunkManager {
 	
 	public synchronized void removeChunk(Chunk chunk) {
 		if (!this.closed && (chunk != null)) {
+            if(!this.chunkMap.containsKey(chunk)) return; //FIXME: Is this failsafe enough for unloading?
 			int flags = this.chunkMap.get(chunk);
 			if ((flags & VIEWED_FLAG) != 0) {
 				this.addSaveChunkTask(chunk);

@@ -3,6 +3,7 @@ package mapwriter;
 import mapwriter.forge.MwForge;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.chunk.Chunk;
 
 import java.io.File;
@@ -23,15 +24,15 @@ public class MwUtil {
 	}
 	
 	public static void logWarning(String s, Object...args) {
-		MwForge.logger.warning(String.format(s, args));
+		MwForge.logger.warn(String.format(s, args));
 	}
 	
 	public static void logError(String s, Object...args) {
-		MwForge.logger.severe(String.format(s, args));
+		MwForge.logger.error(String.format(s, args));
 	}
 	
 	public static void debug(String s, Object...args) {
-		MwForge.logger.finest(String.format(s, args));
+		MwForge.logger.debug(String.format(s, args));
 	}
 	
 	public static void log(String s, Object...args) {
@@ -69,7 +70,7 @@ public class MwUtil {
 	public static void printBoth(String msg) {
 		EntityClientPlayerMP thePlayer = Minecraft.getMinecraft().thePlayer;
 		if (thePlayer != null) {
-			thePlayer.addChatMessage(msg);
+			thePlayer.addChatMessage(new ChatComponentText(msg));
 		}
 		MwUtil.log("%s", msg);
 	}

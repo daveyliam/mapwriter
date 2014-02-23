@@ -35,7 +35,7 @@ public class MwGuiOptions extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float f) {
         this.drawDefaultBackground();
         this.optionSlot.drawScreen(mouseX, mouseY, f);
-        this.drawCenteredString(this.fontRenderer, "MapWriter Options", this.width / 2, 10, 0xffffff);
+        this.drawCenteredString(this.fontRendererObj, "MapWriter Options", this.width / 2, 10, 0xffffff);
         super.drawScreen(mouseX, mouseY, f);
     }
 

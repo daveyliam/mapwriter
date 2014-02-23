@@ -40,9 +40,10 @@ public class UndergroundTexture extends Texture {
 		
 		@Override
 		public int getBlockAndMetadata(int x, int y, int z) {
-			int blockID = this.chunk.getBlockID(x, y, z);
+			Block block = this.chunk.getBlock(x, y, z);
+            int blockid = Block.blockRegistry.getIDForObject(block);
 			int meta = this.chunk.getBlockMetadata(x, y, z);
-			return ((blockID & 0xfff) << 4) | (meta & 0xf);
+			return ((blockid & 0xfff) << 4) | (meta & 0xf);
 		}
 
 		@Override
@@ -188,8 +189,7 @@ public class UndergroundTexture extends Texture {
 				if (columnFlag == ChunkRender.FLAG_UNPROCESSED) {
 					// if column not yet processed
 					WorldClient world = this.mw.mc.theWorld;
-					int blockID = world.getBlockId(x, y, z);
-					Block block = Block.blocksList[blockID];
+					Block block = world.getBlock(x, y, z);
 					if ((block == null) || !block.isOpaqueCube()) {
 						// if block is not opaque
 						this.updateFlags[chunkOffset][columnOffset] = (byte) ChunkRender.FLAG_NON_OPAQUE;
