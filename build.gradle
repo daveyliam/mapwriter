@@ -9,29 +9,59 @@ buildscript {
             name = "sonatype"
             url = "https://oss.sonatype.org/content/repositories/snapshots/"
         }
+        maven {
+            name = "reening"
+            url = "http://maven.reening.nl"
+        }
     }
     dependencies {
+        classpath 'com.jcraft:jsch:0.1.50'
         classpath 'net.minecraftforge.gradle:ForgeGradle:1.1-SNAPSHOT'
+        classpath 'jk_5.gradle:ReeningGradleUpload:0.1-SNAPSHOT'
     }
 }
 
+apply plugin: 'reening'
 apply plugin: 'forge'
 
-version = "1.0"
-group= "mapwriter"
-archivesBaseName = "MapWriter"
+group = 'mapwriter'
+version = '2.0'
+archivesBaseName = 'MapWriter'
 
 minecraft {
-    version = "1.7.2-10.12.0.1033"
     assetDir = "runtime/client/assets"
+    version = '1.7.2-10.12.0.1033'
 }
 
-processResources {
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+reening {
+    password = ''
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name = "reening"
+        url = "http://maven.reening.nl"
     }
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
+}
+
+jar {
+    classifier = 'universal'
+    version = "${project.minecraft.version}-${project.version}"
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+    version = "${project.minecraft.version}-${project.version}"
+}
+
+task deobfJar(type: Jar) {
+    from sourceSets.main.output
+    classifier = 'deobf'
+    version = "${project.minecraft.version}-${project.version}"
+}
+
+artifacts {
+    archives sourceJar, deobfJar
 }

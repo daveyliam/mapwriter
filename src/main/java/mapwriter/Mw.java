@@ -591,10 +591,8 @@ public class Mw {
 				// if the player is not dead
 				this.onPlayerDeathAlreadyFired = false;
 				// if in game (no gui screen) center the minimap on the player and render it.
-				if (this.mc.currentScreen == null) {
-					this.miniMap.view.setViewCentreScaled(this.playerX, this.playerZ, this.playerDimension);
-					this.miniMap.drawCurrentMap();
-				}
+			    this.miniMap.view.setViewCentreScaled(this.playerX, this.playerZ, this.playerDimension);
+				this.miniMap.drawCurrentMap();
 			}
 			
 			// process background tasks

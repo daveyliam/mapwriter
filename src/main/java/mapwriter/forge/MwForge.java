@@ -37,6 +37,7 @@ public class MwForge {
 	public static Logger logger = LogManager.getLogger("MapWriter");
 
     private boolean needsJoin = false;
+    public Runnable executor = null;
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
@@ -53,7 +54,7 @@ public class MwForge {
 		logger.info("FML Event: load");
 		proxy.init(this.config);
 	}
-	
+
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		logger.info("FML Event: postInit");
@@ -79,6 +80,7 @@ public class MwForge {
             InetSocketAddress address = (InetSocketAddress) event.manager.getSocketAddress();
             Mw.instance.onConnectionOpened(address.getHostName(), address.getPort());
         }
+        event.manager.channel().pipeline().addBefore("packet_handler", "mapwriter_closedetector", new CloseDetector());
         this.needsJoin = true;
     }
 
@@ -93,7 +95,15 @@ public class MwForge {
     }
 
     @SubscribeEvent
-    public void onConnection(FMLNetworkEvent.ClientDisconnectionFromServerEvent event){
-        Mw.instance.onConnectionClosed();
+    public void onRenderTick(TickEvent.RenderTickEvent event){
+        if(this.executor != null && event.phase == TickEvent.Phase.START){
+            this.executor.run();
+            this.executor = null;
+        }
     }
+
+    /*@SubscribeEvent
+    public void onDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event){
+        Mw.instance.onConnectionClosed();
+    }*/
 }
