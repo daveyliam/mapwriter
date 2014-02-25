@@ -50,3 +50,4 @@ Acknowledgements:
 * ProfMobius for the overlay API.
 * taelnia for extrautils compatibility patch.
 * LoneStar144 for minimap border and arrow textures.
+* jk-5 for updating the mod to be compatible with Minecraft 1.7.
