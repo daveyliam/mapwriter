@@ -1,0 +1,16 @@
+[
+{
+  "modid": "mapwriter",
+  "name": "MapWriter",
+  "description": "Open source mini map mod",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authors": [],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

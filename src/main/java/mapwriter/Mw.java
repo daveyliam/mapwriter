@@ -421,29 +421,29 @@ public class Mw {
 		this.miniMap.view.setUndergroundMode(this.undergroundMode);
 	}
 	
-	////////////////////////////////
-	// Event handling methods
-	////////////////////////////////
-	
-	// single player connection opened event
-	public void onConnectionOpened() {
-		MwUtil.log("connection opened to integrated server");
-		this.multiplayer = false;
-	}
-	
-	// multi player connection opened event
-	public void onConnectionOpened(String server, int port) {
-		MwUtil.log("connection opened to remote server: %s %d", server, port);
-		
-		// set worldname to server_hostname.server_port
-		this.serverName = server;
+	public void setServerDetails(String hostname, int port) {
+		this.serverName = hostname;
 		this.serverPort = port;
-		
-		this.multiplayer = true;
 	}
 	
-	public void onClientLoggedIn(int dim){
-		MwUtil.log("onClientLoggedIn: dimension = %d", dim);
+	////////////////////////////////
+	// Initialization and Cleanup
+	////////////////////////////////
+	
+	public void load() {
+		
+		if (this.ready) {
+			return;
+		}
+		
+		if ((this.mc.theWorld == null) || (this.mc.thePlayer == null)) {
+			MwUtil.log("Mw.load: world or player is null, cannot load yet");
+			return;
+		}
+		
+		MwUtil.log("Mw.load: loading...");
+		
+		this.multiplayer = this.mc.theWorld.isRemote;
 		
 		this.loadConfig();
 		
@@ -499,7 +499,7 @@ public class Mw {
 		this.regionManager = new RegionManager(this.worldDir, this.imageDir, this.blockColours, this.minZoom, this.maxZoom);
 		// overlay manager depends on mapTexture
 		this.miniMap = new MiniMap(this);
-		this.miniMap.view.setDimension(dim);
+		this.miniMap.view.setDimension(this.mc.thePlayer.dimension);
 		
 		this.chunkManager = new ChunkManager(this);
 		
@@ -511,29 +511,9 @@ public class Mw {
 		//}
 	}
 	
-	public void onWorldLoad(World world) {
-		//MwUtil.log("onWorldLoad: %s, name %s, dimension %d",
-		//		world,
-		//		world.getWorldInfo().getWorldName(),
-		//		world.provider.dimensionId);
+	public void close() {
 		
-		this.playerDimension = world.provider.dimensionId;
-		if (this.ready) {
-			this.addDimension(this.playerDimension);
-			this.miniMap.view.setDimension(this.playerDimension);
-		}
-	}
-	
-	public void onWorldUnload(World world) {
-		//MwUtil.log("onWorldUnload: %s, name %s, dimension %d",
-		//		world,
-		//		world.getWorldInfo().getWorldName(),
-		//		world.provider.dimensionId);
-	}
-	
-	public void onConnectionClosed() {
-		
-		MwUtil.log("connection closed");
+		MwUtil.log("Mw.close: closing...");
 		
 		if (this.ready) {
 			this.ready = false;
@@ -571,7 +551,32 @@ public class Mw {
 		}
 	}
 	
+	////////////////////////////////
+	// Event handlers
+	////////////////////////////////
+	
+	public void onWorldLoad(World world) {
+		//MwUtil.log("onWorldLoad: %s, name %s, dimension %d",
+		//		world,
+		//		world.getWorldInfo().getWorldName(),
+		//		world.provider.dimensionId);
+		
+		this.playerDimension = world.provider.dimensionId;
+		if (this.ready) {
+			this.addDimension(this.playerDimension);
+			this.miniMap.view.setDimension(this.playerDimension);
+		}
+	}
+	
+	public void onWorldUnload(World world) {
+		//MwUtil.log("onWorldUnload: %s, name %s, dimension %d",
+		//		world,
+		//		world.getWorldInfo().getWorldName(),
+		//		world.provider.dimensionId);
+	}
+	
 	public void onTick() {
+		this.load();
 		if (this.ready && (this.mc.thePlayer != null)) {
 			
 			this.updatePlayer();
@@ -620,8 +625,13 @@ public class Mw {
 	
 	// add chunk to the set of loaded chunks
 	public void onChunkLoad(Chunk chunk) {
-		if (this.ready && (chunk != null) && (chunk.worldObj instanceof net.minecraft.client.multiplayer.WorldClient)) {
-			this.chunkManager.addChunk(chunk);
+		this.load();
+		if ((chunk != null) && (chunk.worldObj instanceof net.minecraft.client.multiplayer.WorldClient)) {
+			if (this.ready) {
+				this.chunkManager.addChunk(chunk);
+			} else {
+				MwUtil.logInfo("missed chunk (%d, %d)", chunk.xPosition, chunk.zPosition);
+			}
 		}
 	}
 	

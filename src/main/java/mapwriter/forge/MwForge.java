@@ -35,10 +35,7 @@ public class MwForge {
 	public static CommonProxy proxy;
 	
 	public static Logger logger = LogManager.getLogger("MapWriter");
-
-    private boolean needsJoin = false;
-    public Runnable executor = null;
-
+	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		logger.info("FML Event: preInit");
@@ -74,36 +71,20 @@ public class MwForge {
 
     @SubscribeEvent
     public void onConnected(FMLNetworkEvent.ClientConnectedToServerEvent event){
-        if(event.isLocal){
-            Mw.instance.onConnectionOpened();
-        }else{
-            InetSocketAddress address = (InetSocketAddress) event.manager.getSocketAddress();
-            Mw.instance.onConnectionOpened(address.getHostName(), address.getPort());
-        }
-        event.manager.channel().pipeline().addBefore("packet_handler", "mapwriter_closedetector", new CloseDetector());
-        this.needsJoin = true;
+    	if (!event.isLocal) {
+    		InetSocketAddress address = (InetSocketAddress) event.manager.getSocketAddress();
+    		Mw.instance.setServerDetails(address.getHostName(), address.getPort());
+    	}
     }
 
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event){
-        if(this.needsJoin && event.phase == TickEvent.Phase.START){
-            if(Minecraft.getMinecraft().thePlayer != null){
-                Mw.instance.onClientLoggedIn(Minecraft.getMinecraft().thePlayer.dimension);
-                this.needsJoin = false;
+        if (event.phase == TickEvent.Phase.START){
+        	// run the cleanup code when Mw is loaded and the player becomes null.
+        	// a bit hacky, but simpler than checking if the connection has closed.
+            if ((Mw.instance.ready) && (Minecraft.getMinecraft().thePlayer == null)) {
+                Mw.instance.close();
             }
         }
     }
-
-    @SubscribeEvent
-    public void onRenderTick(TickEvent.RenderTickEvent event){
-        if(this.executor != null && event.phase == TickEvent.Phase.START){
-            this.executor.run();
-            this.executor = null;
-        }
-    }
-
-    /*@SubscribeEvent
-    public void onDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event){
-        Mw.instance.onConnectionClosed();
-    }*/
 }

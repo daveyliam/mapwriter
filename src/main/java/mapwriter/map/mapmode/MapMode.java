@@ -1,11 +1,11 @@
 package mapwriter.map.mapmode;
 
+import java.awt.Point;
+
 import mapwriter.forge.MwConfig;
 import mapwriter.map.MapView;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
-
-import java.awt.*;
 
 public class MapMode {
 	private final MwConfig config;
@@ -13,15 +13,13 @@ public class MapMode {
 	
 	private int sw = 320;
 	private int sh = 240;
-	private int dw = 320;
-	private int dh = 240;
 	private double screenScalingFactor = 1.0;
 	
 	// calculated before every frame drawn by updateMapDimensions
 	public int xTranslation = 0;
 	public int yTranslation = 0;
-	public int x = -50;
-	public int y = -50;
+	public int x = -25;
+	public int y = -25;
 	public int w = 50;
 	public int h = 50;
 	public int wPixels = 50;
@@ -90,9 +88,7 @@ public class MapMode {
 	}
 	
 	public void setScreenRes(int dw, int dh, int sw, int sh, double scaling) {
-		if ((dw != this.dw) || (dh != this.dh) ||(sw != this.sw) || (sh != this.sh)) {
-			this.dw = dw;
-			this.dh = dh;
+		if ((sw != this.sw) || (sh != this.sh) || (scaling != this.screenScalingFactor)) {
 			this.sw = sw;
 			this.sh = sh;
 			this.screenScalingFactor = scaling;
@@ -161,24 +157,26 @@ public class MapMode {
 			this.h = size;
 		}
 		
-		int halfW = this.w / 2;
-		int halfH = this.h / 2;
-		this.xTranslation = x + halfW;
-		this.yTranslation = y + halfH;
-		this.x = -halfW;
-		this.y = -halfH;
+		// make sure width and height are multiples of 2
+		this.w &= -2;
+		this.h &= -2;
+		
+		this.xTranslation = x + (this.w >> 1);
+		this.yTranslation = y + (this.h >> 1);
 		
 		if (this.circular) {
 			this.w = this.h;
-			this.x = -halfH;
 		}
+		
+		this.x = -(this.w >> 1);
+		this.y = -(this.h >> 1);
 		
 		this.wPixels = (int) Math.round(((double) this.w) * this.screenScalingFactor);
 		this.hPixels = (int) Math.round(((double) this.h) * this.screenScalingFactor);
 		
 		// calculate coords display location
 		this.textX = 0;
-		this.textY = this.y + this.h + 4;
+		this.textY = (this.h >> 1) + 4;
 		
 		//MwUtil.log("MapMode: map = %d %d %d %d, screen = %d %d", this.x, this.y, this.w, this.h, this.sw, this.sh);
 		//MwUtil.log("MapMode: margins = left %d, right %d, top %d, bottom %d, size = %d",
@@ -197,19 +195,17 @@ public class MapMode {
 	}
 	
 	public Point screenXYtoBlockXZ(MapView mapView, int sx, int sy) {
-		double withinMapX = ((double) (sx - this.xTranslation - this.x)) / ((double) this.w);
-		double withinMapY = ((double) (sy - this.yTranslation - this.y)) / ((double) this.h);
-		int bx = (int) Math.floor((mapView.getMinX() + (withinMapX * mapView.getWidth())));
-		int bz = (int) Math.floor((mapView.getMinZ() + (withinMapY * mapView.getHeight())));
+		double withinMapX = ((double) (sx - this.xTranslation)) / ((double) this.w);
+		double withinMapY = ((double) (sy - this.yTranslation)) / ((double) this.h);
+		int bx = (int) Math.floor((mapView.getX() + (withinMapX * mapView.getWidth())));
+		int bz = (int) Math.floor((mapView.getZ() + (withinMapY * mapView.getHeight())));
 		return new Point(bx, bz);
 	}
 	
 	public Point.Double blockXZtoScreenXY(MapView mapView, double bX, double bZ) {
 		double xNorm = (bX - mapView.getX()) / mapView.getWidth();
 		double zNorm = (bZ - mapView.getZ()) / mapView.getHeight();
-		return new Point.Double(
-				this.x + (this.w * (xNorm + 0.5)),
-				this.y + (this.h * (zNorm + 0.5)));
+		return new Point.Double(this.w * xNorm, this.h * zNorm);
 	}
 	
 	public Point.Double getClampedScreenXY(MapView mapView, double bX, double bZ) {
@@ -253,8 +249,6 @@ public class MapMode {
 		
 		// multiply by the overlay size and add the overlay position to
 		// get the position within the overlay in screen coordinates
-		return new Point.Double(
-				this.x + (this.w * (xRel + 0.5)),
-				this.y + (this.h * (zRel + 0.5)));
+		return new Point.Double(this.w * xRel, this.h * zRel);
 	}
 }

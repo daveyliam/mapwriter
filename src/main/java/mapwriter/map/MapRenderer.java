@@ -1,5 +1,8 @@
 package mapwriter.map;
 
+import java.awt.Point;
+import java.util.ArrayList;
+
 import mapwriter.Mw;
 import mapwriter.Render;
 import mapwriter.api.IMwChunkOverlay;
@@ -7,10 +10,8 @@ import mapwriter.api.IMwDataProvider;
 import mapwriter.api.MwAPI;
 import mapwriter.map.mapmode.MapMode;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GL11;
 
-import java.awt.*;
-import java.util.ArrayList;
+import org.lwjgl.opengl.GL11;
 
 public class MapRenderer {
 	private Mw mw;
@@ -133,9 +134,10 @@ public class MapRenderer {
 		} else {
 			this.mw.mc.renderEngine.bindTexture(this.squareMapTexture);
 		}
-		Render.setColourWithAlphaPercent(0xffffff, this.mapMode.alphaPercent);
+		Render.setColour(0xffffffff);
 		Render.drawTexturedRect(
-			this.mapMode.x / 0.75, this.mapMode.y / 0.75, this.mapMode.w / 0.75, this.mapMode.h / 0.75,
+			this.mapMode.x / 0.75, this.mapMode.y / 0.75,
+			this.mapMode.w / 0.75, this.mapMode.h / 0.75,
 			0.0, 0.0, 1.0, 1.0
 		);
 	}
@@ -198,14 +200,27 @@ public class MapRenderer {
 	
 	private void drawCoords() {
 		// draw coordinates
-		if (this.mapMode.coordsEnabled && (this.mw.coordsMode > 0)) {
+		if (this.mapMode.coordsEnabled) {
 			GL11.glPushMatrix();
 			GL11.glTranslatef(this.mapMode.textX, this.mapMode.textY, 0);
-			if (this.mw.coordsMode == 1) {
+			if (this.mw.coordsMode != 2) {
 				GL11.glScalef(0.5f, 0.5f, 1.0f);
 			}
-			Render.drawCentredString(0, 0, this.mapMode.textColour,
-					"%d, %d, %d", this.mw.playerXInt, this.mw.playerYInt, this.mw.playerZInt);
+			int offset = 0;
+			if (this.mw.coordsMode > 0) {
+				Render.drawCentredString(0, 0, this.mapMode.textColour,
+						"%d, %d, %d", 
+						this.mw.playerXInt,
+						this.mw.playerYInt,
+						this.mw.playerZInt
+				);
+				offset += 12;
+			}
+			if (this.mw.undergroundMode) {
+				Render.drawCentredString(
+					0, offset, this.mapMode.textColour,"underground mode"
+				);
+			}
 			GL11.glPopMatrix();
 		}
 	}

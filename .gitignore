@@ -6,3 +6,7 @@ classes
 *.ipr
 *.iws
 runtime
+.classpath
+.project
+.settings
+bin
