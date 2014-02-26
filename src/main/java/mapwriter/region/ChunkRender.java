@@ -143,20 +143,25 @@ public class ChunkRender {
 	}
 	
 	public static void renderSurface(BlockColours bc, IChunk chunk, int[] pixels, int offset, int scanSize, boolean dimensionHasCeiling) {
-		int startY = chunk.getMaxY();
+		int chunkMaxY = chunk.getMaxY();
 		for (int z = 0; z < MwChunk.SIZE; z++) {
 			for (int x = 0; x < MwChunk.SIZE; x++) {
-				// for the nether dimension start at the first non-opaque block
-				// below the ceiling
-				int y = startY;
+				// for the nether dimension search for the first non-opaque
+				// block below the ceiling.
+				// cannot use y = chunkMaxY as the nether sometimes spawns
+				// mushrooms above the ceiling height. this fixes the
+				// rectangular grey areas (ceiling bedrock) on the nether map.
+				int y;
 				if (dimensionHasCeiling) {
-					for (; y >= 0; y--) {
+					for (y = 127; y >= 0; y--) {
 						int blockAndMeta = chunk.getBlockAndMetadata(x, y, z);
 						int alpha = (bc.getColour(blockAndMeta) >> 24) & 0xff;
 						if (alpha != 0xff) {
 							break;
 						}
 					}
+				} else {
+					y = chunkMaxY;
 				}
 				
 				int pixelOffset = offset + (z * scanSize) + x;
