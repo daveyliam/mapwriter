@@ -19,6 +19,7 @@ public class UndergroundTexture extends Texture {
 	private int px = 0;
 	private int py = 0;
 	private int pz = 0;
+	private int dimension = 0;
 	private int updateX;
 	private int updateZ;
 	private byte[][] updateFlags = new byte[9][256];
@@ -67,6 +68,11 @@ public class UndergroundTexture extends Texture {
 		this.pixels = new int[textureSize * textureSize];
 		Arrays.fill(this.pixels, 0xff000000);
 		this.mw = mw;
+	}
+	
+	public void clear() {
+		Arrays.fill(this.pixels, 0xff000000);
+		this.updateTexture();
 	}
 	
 	public void clearChunkPixels(int cx, int cz) {
@@ -127,6 +133,10 @@ public class UndergroundTexture extends Texture {
 	public void update() {
 		this.clearFlags();
 		
+		if (this.dimension != this.mw.playerDimension) {
+			this.clear();
+			this.dimension = this.mw.playerDimension;
+		}
 		this.px = this.mw.playerXInt;
 		this.py = this.mw.playerYInt;
 		this.pz = this.mw.playerZInt;

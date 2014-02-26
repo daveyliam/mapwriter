@@ -337,13 +337,28 @@ public class Mw {
 		}
 	}
 	
+	public void warpTo(String name) {
+		if (this.teleportEnabled) {
+			//MwUtil.printBoth(String.format("warping to %s", name));
+			this.mc.thePlayer.sendChatMessage(String.format("/warp %s", name));
+		} else {
+			MwUtil.printBoth("teleportation is disabled in mapwriter.cfg");
+		}
+	}
+	
 	public void teleportToMapPos(MapView mapView, int x, int y, int z) {
-		double scale = mapView.getDimensionScaling(this.playerDimension);
-		this.teleportTo((int) (x / scale), y, (int) (z / scale));
+		if (!this.teleportCommand.equals("warp")) {
+			double scale = mapView.getDimensionScaling(this.playerDimension);
+			this.teleportTo((int) (x / scale), y, (int) (z / scale));
+		} else {
+			MwUtil.printBoth("teleport command is set to 'warp', can only warp to markers");
+		}
 	}
 	
 	public void teleportToMarker(Marker marker) {
-		if (marker.dimension == this.playerDimension) {
+		if (this.teleportCommand.equals("warp")) {
+			this.warpTo(marker.name);
+		} else if (marker.dimension == this.playerDimension) {
 			this.teleportTo(marker.x, marker.y, marker.z);
 		} else {
 			MwUtil.printBoth("cannot teleport to marker in different dimension");

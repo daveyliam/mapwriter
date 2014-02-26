@@ -78,37 +78,38 @@ public class MarkerManager {
 	}
 	
 	public String markerToString(Marker marker) {
-		return String.format("%s %d %d %d %d %06x %s",
-				marker.name,
-				marker.x, marker.y, marker.z,
-				marker.dimension,
-				marker.colour & 0xffffff,
-				marker.groupName);
+		return String.format("%s:%d:%d:%d:%d:%06x:%s",
+			marker.name,
+			marker.x, marker.y, marker.z,
+			marker.dimension,
+			marker.colour & 0xffffff,
+			marker.groupName
+		);
 	}
 	
 	public Marker stringToMarker(String s) {
-		String[] split = s.split(" ");
+		// new style delimited with colons
+		String[] split = s.split(":");
+		if (split.length != 7) {
+			// old style was space delimited
+			split = s.split(" ");
+		}
 		Marker marker = null;
-		if ((split.length == 6) || (split.length == 7)) {
+		if (split.length == 7) {
 			try {
 				int x = Integer.parseInt(split[1]);
 				int y = Integer.parseInt(split[2]);
 				int z = Integer.parseInt(split[3]);
-				int i = 4;
-				int dimension = 0;
-				if (split.length == 7) {
-					dimension = Integer.parseInt(split[4]);
-					i++;
-				}
-				int colour = 0xff000000 | Integer.parseInt(split[i++], 16);
+				int dimension = Integer.parseInt(split[4]);
+				int colour = 0xff000000 | Integer.parseInt(split[5], 16);
 				
-				marker = new Marker(split[0], split[i++], x, y, z, dimension, colour);
+				marker = new Marker(split[0], split[6], x, y, z, dimension, colour);
 				
 			} catch (NumberFormatException e) {
 				marker = null;
 			}
 		} else {
-			MwUtil.log("Marker.stringToMarker: incorrect number of parameters %d, need 6 or 7", split.length);
+			MwUtil.log("Marker.stringToMarker: invalid marker '%s'", s);
 		}
 		return marker;
 	}
@@ -118,8 +119,8 @@ public class MarkerManager {
 	}
 	
 	public void addMarker(String name, String groupName, int x, int y, int z, int dimension, int colour) {
-		name = MwUtil.mungeString(name);
-		groupName = MwUtil.mungeString(groupName);
+		name = name.replace(":", "");
+		groupName = groupName.replace(":", "");
 		this.addMarker(new Marker(name, groupName, x, y, z, dimension, colour));
 	}
 	
@@ -266,7 +267,10 @@ public class MarkerManager {
 	
 	public void drawMarkers(MapMode mapMode, MapView mapView) {
 		for (Marker marker : this.visibleMarkerList) {
-			marker.draw(mapMode, mapView, 0xff000000);
+	    	// only draw markers that were set in the current dimension
+			if (mapView.getDimension() == marker.dimension) {
+				marker.draw(mapMode, mapView, 0xff000000);
+			}
 		}
 		if (this.selectedMarker != null) {
 			this.selectedMarker.draw(mapMode, mapView, 0xffffffff);

@@ -139,7 +139,8 @@ public class MwGui extends GuiScreen {
     
     public int getHeightAtBlockPos(int bX, int bZ) {
     	int bY = 0;
-    	if (this.mw.mc.theWorld.provider.dimensionId == this.mapView.getDimension()) {
+    	int worldDimension = this.mw.mc.theWorld.provider.dimensionId;
+    	if ((worldDimension == this.mapView.getDimension()) && (worldDimension != -1)) {
     		bY = this.mw.mc.theWorld.getChunkFromBlockCoords(bX, bZ).getHeightValue(bX & 0xf, bZ & 0xf);
     	}
     	return bY;

@@ -52,7 +52,6 @@ public class Marker {
     }
     
     public void draw(MapMode mapMode, MapView mapView, int borderColour) {
-		// markers are always specified by their overworld coordinates
 		double scale = mapView.getDimensionScaling(this.dimension);
 		Point.Double p = mapMode.getClampedScreenXY(mapView, this.x * scale, this.z * scale);
 		this.screenPos.setLocation(p.x + mapMode.xTranslation, p.y + mapMode.yTranslation);
