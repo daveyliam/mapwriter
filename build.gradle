@@ -42,7 +42,7 @@ processResources
 }
 
 jar {
-    classifier = 'universal'
+    //classifier = 'universal'
     version = "${project.minecraft.version}-${project.version}"
 }
 

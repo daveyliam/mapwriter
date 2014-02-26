@@ -23,7 +23,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.net.InetSocketAddress;
 
-@Mod(modid="MapWriter", name="MapWriter", version="2.0")
+@Mod(modid="MapWriter", name="MapWriter", version="2.0.x")
 public class MwForge {
 	
 	private MwConfig config;
