@@ -138,7 +138,7 @@ public class MapTexture extends Texture {
 			this.updateTextureFromRegion(
 				newRegion, newRegion.x, newRegion.z, newRegion.size, newRegion.size
 			);
-			//MwUtil.log("regionArray[%d] = %s", newRegion.index, newRegion);
+			//regionManager.logInfo("regionArray[%d] = %s", index, newRegion);
 			loaded = true;
 		}
 		return loaded;

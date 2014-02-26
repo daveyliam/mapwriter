@@ -592,7 +592,7 @@ public class Mw {
 					this.onPlayerDeath();
 					this.onPlayerDeathAlreadyFired = true;
 				}
-			} else {
+			} else if (this.mc.currentScreen == null) {
 				// if the player is not dead
 				this.onPlayerDeathAlreadyFired = false;
 				// if in game (no gui screen) center the minimap on the player and render it.

@@ -40,7 +40,7 @@ public class MapRenderer {
 		double zoomScale = (double) (1 << regionZoomLevel);
 		
 		// if the texture UV coordinates do not line up with the texture pixels then the texture
-		// will look blurry when it is rendered.
+		// will look blurry when it is drawn to the screen.
 		// to fix this we round the texture coordinates to the nearest pixel boundary.
 		// this is unnecessary when zoomed in as the texture will be upscaled and look blurry
 		// anyway, so it is disabled in this case.
