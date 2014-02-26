@@ -1,19 +1,42 @@
 package mapwriter.overlay;
 
-import java.awt.Point;
-import java.util.ArrayList;
-import java.util.Random;
-
 import mapwriter.api.IMwChunkOverlay;
 import mapwriter.api.IMwDataProvider;
 import mapwriter.map.MapView;
 import mapwriter.map.mapmode.MapMode;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.util.MathHelper;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Random;
 
 public class OverlaySlime implements IMwDataProvider {
 
-	public class ChunkOverlay implements IMwChunkOverlay{
+    public static boolean seedFound = false;
+    public static boolean seedAsked = false;
+    private static long seed = -1;
+
+    public static void setSeed(long seed){
+        OverlaySlime.seed = seed;
+        OverlaySlime.seedFound = true;
+    }
+
+    public static void askSeed(){
+        EntityClientPlayerMP player = Minecraft.getMinecraft().thePlayer;
+        if(player == null) return;
+        player.sendChatMessage("/seed"); //Send the /seed command to the server
+        seedAsked = true;
+    }
+
+    public static void reset(){
+        seedFound = false;
+        seedAsked = false;
+        seed = -1;
+    }
+
+    public class ChunkOverlay implements IMwChunkOverlay{
 
 		Point coord;
 		
@@ -61,20 +84,27 @@ public class OverlaySlime implements IMwDataProvider {
 		int limitMaxX = Math.min(maxChunkX, cX + 100);
 		int limitMinZ = Math.max(minChunkZ, cZ - 100);
 		int limitMaxZ = Math.min(maxChunkZ, cZ + 100);
-		
-		ArrayList<IMwChunkOverlay> chunks = new ArrayList<IMwChunkOverlay>();
-		for (int x = limitMinX; x <= limitMaxX; x++)
-			for (int z = limitMinZ; z <= limitMaxZ; z++){
 
-				Random rnd = new Random( Minecraft.getMinecraft().theWorld.getSeed() + 
-                        (long) (x * x * 0x4c1906) + 
-                        (long) (x * 0x5ac0db) + 
-                        (long) (z * z) * 0x4307a7L + 
-                        (long) (z * 0x5f24f) ^ 0x3ad8025f);
-				if (rnd.nextInt(10) == 0){
-					chunks.add(new ChunkOverlay(x, z));	
-				};				
-			}
+        if(!seedFound && !seedAsked){
+            //We don't have the seed and we didn't ask for it yet. Let's go!
+            askSeed();
+        }
+
+        ArrayList<IMwChunkOverlay> chunks = new ArrayList<IMwChunkOverlay>();
+        if(seedFound){ //If we know the seed, then add the overlay
+           for (int x = limitMinX; x <= limitMaxX; x++)
+                for (int z = limitMinZ; z <= limitMaxZ; z++){
+
+                    Random rnd = new Random(seed +
+                            (long) (x * x * 0x4c1906) +
+                            (long) (x * 0x5ac0db) +
+                            (long) (z * z) * 0x4307a7L +
+                            (long) (z * 0x5f24f) ^ 0x3ad8025f);
+                    if (rnd.nextInt(10) == 0){
+                        chunks.add(new ChunkOverlay(x, z));
+                    }
+                }
+        }
 				
 		return chunks;
 	}
