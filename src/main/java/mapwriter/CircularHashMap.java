@@ -1,6 +1,10 @@
 package mapwriter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class CircularHashMap<K, V> {
 	/* A hash map where each node is linked to the previous and next nodes

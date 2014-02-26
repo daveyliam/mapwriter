@@ -1,6 +1,6 @@
 package mapwriter.api;
 
-import java.awt.*;
+import java.awt.Point;
 
 public interface IMwChunkOverlay {
 	public Point   getCoordinates();

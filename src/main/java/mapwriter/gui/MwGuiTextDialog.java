@@ -2,6 +2,7 @@ package mapwriter.gui;
 
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
+
 import org.lwjgl.input.Keyboard;
 
 public class MwGuiTextDialog extends GuiScreen {

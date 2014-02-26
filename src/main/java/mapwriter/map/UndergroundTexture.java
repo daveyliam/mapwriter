@@ -1,5 +1,8 @@
 package mapwriter.map;
 
+import java.awt.Point;
+import java.util.Arrays;
+
 import mapwriter.Mw;
 import mapwriter.Texture;
 import mapwriter.region.ChunkRender;
@@ -7,10 +10,8 @@ import mapwriter.region.IChunk;
 import net.minecraft.block.Block;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.world.chunk.Chunk;
-import org.lwjgl.opengl.GL11;
 
-import java.awt.*;
-import java.util.Arrays;
+import org.lwjgl.opengl.GL11;
 
 public class UndergroundTexture extends Texture {
 	

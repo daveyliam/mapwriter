@@ -1,11 +1,11 @@
 package mapwriter.map;
 
+import java.awt.Point;
+import java.util.LinkedList;
+
 import mapwriter.Mw;
 import mapwriter.Render;
 import mapwriter.map.mapmode.MapMode;
-
-import java.awt.*;
-import java.util.LinkedList;
 
 public class Trail {
 	

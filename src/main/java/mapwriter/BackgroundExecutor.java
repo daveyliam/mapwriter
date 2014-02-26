@@ -1,12 +1,12 @@
 package mapwriter;
 
-import mapwriter.tasks.Task;
-
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+
+import mapwriter.tasks.Task;
 
 
 

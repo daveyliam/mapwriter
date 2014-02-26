@@ -1,5 +1,18 @@
 package mapwriter.forge;
 
+import java.net.InetSocketAddress;
+
+import mapwriter.Mw;
+import mapwriter.api.MwAPI;
+import mapwriter.overlay.OverlayGrid;
+import mapwriter.overlay.OverlaySlime;
+import net.minecraft.client.Minecraft;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.common.MinecraftForge;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -11,19 +24,8 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent;
-import mapwriter.Mw;
-import mapwriter.api.MwAPI;
-import mapwriter.overlay.OverlayGrid;
-import mapwriter.overlay.OverlaySlime;
-import net.minecraft.client.Minecraft;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.common.MinecraftForge;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import java.net.InetSocketAddress;
-
-@Mod(modid="MapWriter", name="MapWriter", version="2.0.x")
+@Mod(modid="MapWriter", name="MapWriter", version="2.1.0")
 public class MwForge {
 	
 	private MwConfig config;
@@ -40,8 +42,7 @@ public class MwForge {
 	public void preInit(FMLPreInitializationEvent event) {
 		logger.info("FML Event: preInit");
 		this.config = new MwConfig(event.getSuggestedConfigurationFile());
-
-        FMLCommonHandler.instance().bus().register(new MwKeyHandler());
+		
         FMLCommonHandler.instance().bus().register(this);
         MinecraftForge.EVENT_BUS.register(this);
 	}
@@ -51,7 +52,7 @@ public class MwForge {
 		logger.info("FML Event: load");
 		proxy.init(this.config);
 	}
-
+	
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		logger.info("FML Event: postInit");

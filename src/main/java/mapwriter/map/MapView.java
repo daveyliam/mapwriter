@@ -1,10 +1,10 @@
 package mapwriter.map;
 
+import java.util.List;
+
 import mapwriter.Mw;
 import mapwriter.api.MwAPI;
 import mapwriter.map.mapmode.MapMode;
-
-import java.util.List;
 
 public class MapView {
 	

@@ -1,9 +1,9 @@
 package mapwriter.api;
 
+import java.util.ArrayList;
+
 import mapwriter.map.MapView;
 import mapwriter.map.mapmode.MapMode;
-
-import java.util.ArrayList;
 
 public interface IMwDataProvider {
 	public ArrayList<IMwChunkOverlay> getChunksOverlay(int dim, double centerX, double centerZ, double minX, double minZ, double maxX, double maxZ);

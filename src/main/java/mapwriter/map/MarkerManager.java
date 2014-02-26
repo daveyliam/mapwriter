@@ -1,11 +1,11 @@
 package mapwriter.map;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import mapwriter.MwUtil;
 import mapwriter.forge.MwConfig;
 import mapwriter.map.mapmode.MapMode;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MarkerManager {
 	

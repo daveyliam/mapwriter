@@ -1,12 +1,12 @@
 package mapwriter.map;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import mapwriter.Mw;
 import mapwriter.map.mapmode.LargeMapMode;
 import mapwriter.map.mapmode.MapMode;
 import mapwriter.map.mapmode.SmallMapMode;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MiniMap {
 	private Mw mw;

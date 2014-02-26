@@ -1,10 +1,10 @@
 package mapwriter.tasks;
 
+import java.io.File;
+
 import mapwriter.MwUtil;
 import mapwriter.region.MergeToImage;
 import mapwriter.region.RegionManager;
-
-import java.io.File;
 
 public class MergeTask extends Task {
 	
@@ -29,9 +29,9 @@ public class MergeTask extends Task {
 	public void run() {
 		int count = MergeToImage.merge(this.regionManager, this.x, this.z, this.w, this.h, this.dimension, this.outputDir, this.basename);
 		if (count > 0) {
-			this.msg = String.format("successfully wrote merged images to %s/%s.*.*.png", this.outputDir, this.basename);
+			this.msg = String.format("successfully wrote merged images to directory %s", this.outputDir);
 		} else {
-			this.msg = String.format("merge error: could not write images to %s", this.outputDir);
+			this.msg = String.format("merge error: could not write images to directory %s", this.outputDir);
 		}
 	}
 	

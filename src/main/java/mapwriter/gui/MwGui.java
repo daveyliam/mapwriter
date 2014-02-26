@@ -1,7 +1,7 @@
 package mapwriter.gui;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import java.awt.Point;
+
 import mapwriter.Mw;
 import mapwriter.MwUtil;
 import mapwriter.api.IMwDataProvider;
@@ -16,10 +16,12 @@ import mapwriter.tasks.MergeTask;
 import mapwriter.tasks.RebuildRegionsTask;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
-import java.awt.*;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class MwGui extends GuiScreen {

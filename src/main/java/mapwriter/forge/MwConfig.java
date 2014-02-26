@@ -1,10 +1,10 @@
 package mapwriter.forge;
 
-import mapwriter.MwUtil;
-import net.minecraftforge.common.config.Configuration;
-
 import java.io.File;
 import java.util.List;
+
+import mapwriter.MwUtil;
+import net.minecraftforge.common.config.Configuration;
 
 public class MwConfig extends Configuration {
 	

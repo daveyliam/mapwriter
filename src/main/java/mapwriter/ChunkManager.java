@@ -1,12 +1,12 @@
 package mapwriter;
 
+import java.util.Map;
+
 import mapwriter.region.MwChunk;
 import mapwriter.tasks.SaveChunkTask;
 import mapwriter.tasks.UpdateSurfaceChunksTask;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
-
-import java.util.Map;
 
 public class ChunkManager {
 	public Mw mw;

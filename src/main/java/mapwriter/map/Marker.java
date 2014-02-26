@@ -1,9 +1,9 @@
 package mapwriter.map;
 
+import java.awt.Point;
+
 import mapwriter.Render;
 import mapwriter.map.mapmode.MapMode;
-
-import java.awt.*;
 
 public class Marker {
 	public final String name;

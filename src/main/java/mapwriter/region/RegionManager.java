@@ -1,12 +1,12 @@
 package mapwriter.region;
 
-import org.apache.logging.log4j.Logger;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.apache.logging.log4j.Logger;
 
 public class RegionManager {
 	

@@ -1,11 +1,5 @@
 package mapwriter;
 
-import mapwriter.forge.MwForge;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.world.chunk.Chunk;
-
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -14,6 +8,12 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Pattern;
+
+import mapwriter.forge.MwForge;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.world.chunk.Chunk;
 
 public class MwUtil {
 	

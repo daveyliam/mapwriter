@@ -1,9 +1,9 @@
 package mapwriter.api;
 
-import com.google.common.collect.HashBiMap;
-
 import java.util.ArrayList;
 import java.util.Collection;
+
+import com.google.common.collect.HashBiMap;
 
 public class MwAPI {
 
