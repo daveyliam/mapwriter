@@ -115,6 +115,8 @@ public class MwGui extends GuiScreen {
     
     public void exitGui() {
     	//MwUtil.log("closing GUI");
+    	// set the mini map dimension to the GUI map dimension when closing
+    	this.mw.miniMap.view.setDimension(this.mapView.getDimension());
     	this.mapMode.close();
     	Keyboard.enableRepeatEvents(false);
     	this.mc.displayGuiScreen((GuiScreen) null);
