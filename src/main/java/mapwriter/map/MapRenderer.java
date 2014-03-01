@@ -33,7 +33,7 @@ public class MapRenderer {
 		this.mapView = mapView;
 	}
 	
-	private void drawMapTexture() {
+	private void drawMap() {
 		
 		int regionZoomLevel = Math.max(0, this.mapView.getZoomLevel());
 		double tSize = (double) this.mw.textureSize;
@@ -119,6 +119,16 @@ public class MapRenderer {
 						u, v, u + w, v + h
 				);
 			}
+		}
+		
+		// draw ProfMobius chunk overlay
+		IMwDataProvider provider = this.drawOverlay();
+		
+		// overlay onDraw event
+		if (provider != null) {
+			GL11.glPushMatrix();			
+			provider.onDraw(this.mapView, this.mapMode);
+			GL11.glPopMatrix();			
 		}
 		
 		if (this.mapMode.circular) {
@@ -255,33 +265,23 @@ public class MapRenderer {
 		GL11.glLoadIdentity();
 		
 		// translate to center of minimap
-		// z is -2000 so that it is drawn above the 3D world, but below minecraft
-		// GUI screens
+		// z is -2000 so that it is drawn above the 3D world, but below GUI
+		// elements which are typically at -3000
 		GL11.glTranslated(this.mapMode.xTranslation, this.mapMode.yTranslation, -2000.0);
 		
-		// draw background and the actual map texture
-		this.drawMapTexture();
+		// draw background, the map texture, and enabled overlays
+		this.drawMap();
 		
 		if (this.mapMode.borderMode > 0) {
 			this.drawBorder();
 		}
 		this.drawIcons();
 		
-		// draw ProfMobius chunk overlay
-		IMwDataProvider provider = this.drawOverlay();
-		
 		this.drawCoords();
 		
 		// some shader mods seem to need depth testing re-enabled
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glPopMatrix();
-		
-		// overlay onDraw event
-		if (provider != null) {
-			GL11.glPushMatrix();			
-			provider.onDraw(this.mapView, this.mapMode);
-			GL11.glPopMatrix();			
-		}
 	}
 	
 	private static void paintChunk(MapMode mapMode, MapView mapView, IMwChunkOverlay overlay){
