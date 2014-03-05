@@ -1,5 +1,9 @@
 package mapwriter.forge;
 
+import java.io.File;
+
 public class CommonProxy {
-	public void init(MwConfig config) {}
+	public void preInit(File configFile) {}
+	public void load() {}
+	public void postInit() {}
 }
