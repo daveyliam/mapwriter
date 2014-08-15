@@ -98,7 +98,7 @@ public class MapMode {
 	
 	public void setScreenRes() {
 		Minecraft mc = Minecraft.getMinecraft();
-		ScaledResolution sRes = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
+		ScaledResolution sRes = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
 		this.setScreenRes(mc.displayWidth, mc.displayHeight, sRes.getScaledWidth(), sRes.getScaledHeight(), sRes.getScaleFactor());
 	}
 	
