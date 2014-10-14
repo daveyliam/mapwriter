@@ -1,0 +1,16 @@
+[
+{
+  "modid": "MapWriter",
+  "name": "MapWriter",
+  "description": "An open source mini map mod",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "http://www.minecraftforum.net/topic/1570989-/",
+  "updateUrl": "",
+  "authorList": ["mapwriter"],
+  "credits": "chrixian, ProfMobius, taelnia, jk-5",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
