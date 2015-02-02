@@ -3,6 +3,18 @@ package mapwriter.region;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+
+import org.apache.logging.log4j.Level;
+
+import cpw.mods.fml.common.FMLLog;
+import net.minecraft.block.Block;
+import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.ChunkPosition;
 
 public class MwChunk implements IChunk {
 	public static final int SIZE = 16;
@@ -15,12 +27,13 @@ public class MwChunk implements IChunk {
 	public final byte[][] lsbArray;
 	public final byte[][] metaArray;
 	public final byte[][] lightingArray;
+	public final HashMap tileentityMap;
 	
 	public final byte[] biomeArray;
 	
 	public final int maxY;
 	
-	public MwChunk(int x, int z, int dimension, byte[][] msbArray, byte[][] lsbArray, byte[][] metaArray, byte[][] lightingArray, byte[] biomeArray) {
+	public MwChunk(int x, int z, int dimension, byte[][] msbArray, byte[][] lsbArray, byte[][] metaArray, byte[][] lightingArray, byte[] biomeArray, HashMap TileEntityMap) {
 		this.x = x;
 		this.z = z;
 		this.dimension = dimension;
@@ -29,6 +42,7 @@ public class MwChunk implements IChunk {
 		this.metaArray = metaArray;
 		this.biomeArray = biomeArray;
 		this.lightingArray = lightingArray;
+		this.tileentityMap = TileEntityMap;
 		int maxY = 0;
 		for (int y = 0; y < 16; y++) {
 			if (lsbArray[y] != null) {
@@ -50,6 +64,7 @@ public class MwChunk implements IChunk {
 		byte[][] lsbArray = new byte[16][];
 		byte[][] metaArray = new byte[16][];
 		byte[][] lightingArray = new byte[16][];
+		HashMap TileEntityMap = new HashMap();
 		
         DataInputStream dis = null;
         RegionFile regionFile = regionFileCache.getRegionFile(x << 4, z << 4, dimension);
@@ -89,29 +104,49 @@ public class MwChunk implements IChunk {
 				//  LIST(COMPOUND) "TileTicks"
 				//END
 				//END
+				NBTTagCompound nbttagcompound = CompressedStreamTools.read(dis);
+				NBTTagCompound level = nbttagcompound.getCompoundTag("Level");
 				
-				Nbt root = Nbt.readNextElement(dis);
-				Nbt level = root.getChild("Level");
+				int xNbt = level.getInteger("xPos");
+				int zNbt = level.getInteger("zPos");
 				
-				int xNbt = level.getChild("xPos").getInt();
-				int zNbt = level.getChild("zPos").getInt();
 				if ((xNbt != x) || (zNbt != z)) {
 					RegionManager.logWarning("chunk (%d, %d) has NBT coords (%d, %d)", x, z, xNbt, zNbt);
 				}
 				
-				Nbt sections = level.getChild("Sections");
-			
-				// loop through each of the sections (16 x 16 x 16 block volumes) present
-				for (int i = 0; i < sections.size(); i++) {
-					Nbt section = sections.getChild(i);
-					if (!section.isNull()) {
-						int y = section.getChild("Y").getByte();
-						lsbArray[y & 0xf] = section.getChild("Blocks").getByteArray();
-						msbArray[y & 0xf] = section.getChild("Add").getByteArray();
-						metaArray[y & 0xf] = section.getChild("Data").getByteArray();
-					}
-				}
-				biomeArray = level.getChild("Biomes").getByteArray();
+				NBTTagList sections = level.getTagList("Sections", 10);
+				
+		        for (int k = 0; k < sections.tagCount(); ++k)
+		        {
+		        	NBTTagCompound section = sections.getCompoundTagAt(k);
+							int y = section.getByte("Y");
+							lsbArray[y & 0xf] = section.getByteArray("Blocks");
+				            if (section.hasKey("Add", 7))
+				            {
+				            	msbArray[y & 0xf] = section.getByteArray("Add");
+				            }
+							metaArray[y & 0xf] = section.getByteArray("Data");
+		        }
+
+				biomeArray = level.getByteArray("Biomes");
+
+		        	NBTTagList nbttaglist2 = level.getTagList("TileEntities", 10);
+
+		            if (nbttaglist2 != null)
+		            {
+		                for (int i1 = 0; i1 < nbttaglist2.tagCount(); ++i1)
+		                {
+		                    NBTTagCompound nbttagcompound4 = nbttaglist2.getCompoundTagAt(i1);
+		                    TileEntity tileentity = TileEntity.createAndLoadEntity(nbttagcompound4);
+		                    if (tileentity != null)
+		                    {
+		                    	ChunkPosition chunkposition = new ChunkPosition(tileentity.xCoord, tileentity.yCoord, tileentity.zCoord);
+		                    	
+		                    	TileEntityMap.put(chunkposition, tileentity);
+		                    }
+		                }
+		            }
+		        	
 				
 			} catch (IOException e) {
 				RegionManager.logError("%s: could not read chunk (%d, %d) from region file\n", e, x, z);
@@ -126,7 +161,7 @@ public class MwChunk implements IChunk {
 			//this.log("MwChunk.read: chunk (%d, %d) input stream is null", this.x, this.z); 
 		}
 		
-		return new MwChunk(x, z, dimension, msbArray, lsbArray, metaArray, lightingArray, biomeArray);
+		return new MwChunk(x, z, dimension, msbArray, lsbArray, metaArray, lightingArray, biomeArray,TileEntityMap);
 	}
 	
 	public boolean isEmpty() {
@@ -154,14 +189,68 @@ public class MwChunk implements IChunk {
 	public int getBlockAndMetadata(int x, int y, int z) {
 		int yi = (y >> 4) & 0xf;
 		int offset = ((y & 0xf) << 8) | ((z & 0xf) << 4) | (x & 0xf);
-		
+		ChunkPosition chunkposition = new ChunkPosition(x, y, z);
 		int lsb  = ((this.lsbArray  != null) && (this.lsbArray[yi]  != null)) ? this.lsbArray[yi][offset]       : 0;
-		int msb  = ((this.msbArray  != null) && (this.msbArray[yi]  != null)) ? this.msbArray[yi][offset  >> 1] : 0;
+		int msb  = ((this.msbArray  != null) && (this.msbArray[yi]  != null) && (this.msbArray[yi].length  != 0)) ? this.msbArray[yi][offset  >> 1] : 0;
 		int meta = ((this.metaArray != null) && (this.metaArray[yi] != null)) ? this.metaArray[yi][offset >> 1] : 0;
 		
-		return ((offset & 1) == 1) ?
-				((msb & 0xf0) << 8)  | ((lsb & 0xff) << 4) | ((meta & 0xf0) >> 4) :
-				((msb & 0x0f) << 12) | ((lsb & 0xff) << 4) | (meta & 0x0f);
+		if (this.tileentityMap.containsKey(chunkposition))
+		{
+			 TileEntity value = (TileEntity)this.tileentityMap.get(chunkposition);
+			 NBTTagCompound tag = new NBTTagCompound();
+			 value.writeToNBT(tag);
+			 int id = 0;
+			 
+			 if (tag.getString("id") == "savedMultipart")
+			 {
+				String material = tag.getTagList("parts", 10).getCompoundTagAt(0).getString("material");
+				int end = material.indexOf("_");
+				
+				if (end != -1)
+				{
+				id = Block.getIdFromBlock(Block.getBlockFromName(material.substring(5, end)));
+				
+				lsb = (id & 255);
+				if (id > 255){msb = (id & 3840) >> 8;}
+		        else    {msb = 0;}
+				
+				meta = Integer.parseInt(material.substring(end+1));
+				}
+				else
+				{
+					id = Block.getIdFromBlock(Block.getBlockFromName(material.substring(5)));
+					
+					lsb = (id & 255);
+					if (id > 255){msb = (id & 3840) >> 8;}
+			        else    {msb = 0;}
+					
+					meta = 0;
+				}
+			 }
+			 else if (tag.getString("id") =="TileEntityCarpentersBlock")
+			 {
+				NBTTagList TagList = tag.getTagList("cbAttrList", 10);
+				String sid = TagList.getCompoundTagAt(0).getString("id");
+				String smeta = TagList.getCompoundTagAt(0).getString("Damage"); 
+				if (sid != "")
+				{
+					id = Integer.parseInt(sid.substring(0, sid.length()-1));
+					
+					lsb = (id & 255);
+					if (id > 255){msb = (id & 3840) >> 8;}
+			        else    {msb = 0;}
+					
+					if (smeta != "")
+					{
+						meta = Integer.parseInt(smeta.substring(0, smeta.length()-1));
+					}
+				}
+			 }
+		 }
+
+		//return ((offset & 1) == 1) ?
+		//		((msb & 0xf0) << 8)  | ((lsb & 0xff) << 4) | ((meta & 0xf0) >> 4) :
+		return		((msb & 0x0f) << 12) | ((lsb & 0xff) << 4) | (meta & 0x0f);
 	}
 	
 	public Nbt getNbt() {
@@ -190,6 +279,30 @@ public class MwChunk implements IChunk {
 		level.addChild(new Nbt(Nbt.TAG_INT, "zPos", this.z));
 		level.addChild(sections);
 		
+		Nbt tileentitys = new Nbt(Nbt.TAG_LIST, "TileEntities", null);
+		if (!this.tileentityMap.isEmpty())
+		{
+				Nbt nbttileentity = new Nbt(Nbt.TAG_COMPOUND, "", null);
+				
+		        Iterator iterator = this.tileentityMap.values().iterator();
+
+		        while (iterator.hasNext())
+		        {
+		            TileEntity tileentity = (TileEntity)iterator.next();
+		            NBTTagCompound nbttagcompound = new NBTTagCompound();
+		            try {
+		            tileentity.writeToNBT(nbttagcompound);
+		            nbttileentity.addChild(new Nbt(Nbt.TAG_COMPOUND,"",nbttagcompound));
+		            int test = 0;
+		            }
+		            catch (Exception e)
+		            {
+		            }
+		        }
+			
+			//level.addChild(nbttileentity);
+		        level.addChild(new Nbt(Nbt.TAG_COMPOUND,"test",null));
+		}
 		if (this.biomeArray != null) {
 			level.addChild(new Nbt(Nbt.TAG_BYTE_ARRAY, "Biomes", this.biomeArray));
 		}
@@ -200,6 +313,69 @@ public class MwChunk implements IChunk {
 		return root;
 	}
 	
+    private NBTTagCompound writeChunkToNBT()
+    {
+        NBTTagCompound nbttagcompound = new NBTTagCompound();
+        NBTTagCompound nbttagcompound1 = new NBTTagCompound();
+        nbttagcompound.setTag("Level", nbttagcompound1);
+        
+        nbttagcompound1.setByte("V", (byte)1);
+        nbttagcompound1.setInteger("xPos", this.x);
+        nbttagcompound1.setInteger("zPos", this.z);
+        
+        NBTTagList nbttaglist = new NBTTagList();
+        
+        int i = 16;
+        NBTTagCompound nbttagcompound2;
+
+        for (int y = 0; y < i; ++y)
+        {        	
+            if ((this.lsbArray != null) && (this.lsbArray[y] != null))
+            {
+            	nbttagcompound2 = new NBTTagCompound();
+            	nbttagcompound2.setByte("Y", (byte)y);
+            	nbttagcompound2.setByteArray("Blocks", this.lsbArray[y]);
+
+                if ((this.msbArray != null) && (this.msbArray[y] != null))
+                {
+                	nbttagcompound2.setByteArray("Add", this.msbArray[y]);
+                }
+
+                nbttagcompound2.setByteArray("Data", this.metaArray[y]);
+                nbttaglist.appendTag(nbttagcompound2);
+            }
+        }
+
+        nbttagcompound1.setTag("Sections", nbttaglist);
+        nbttagcompound1.setByteArray("Biomes", this.biomeArray);
+
+        NBTTagList nbttaglist2 = new NBTTagList();
+        Iterator iterator1;
+
+        NBTTagList nbttaglist3 = new NBTTagList();
+        
+        iterator1 = this.tileentityMap.values().iterator();
+
+        while (iterator1.hasNext())
+        {
+            TileEntity tileentity = (TileEntity)iterator1.next();
+            nbttagcompound2 = new NBTTagCompound();
+            try {
+            tileentity.writeToNBT(nbttagcompound2);
+            nbttaglist3.appendTag(nbttagcompound2);
+            }
+            catch (Exception e)
+            {
+                FMLLog.log(Level.ERROR, e,
+                        "A TileEntity type %s has throw an exception trying to write state. It will not persist. Report this to the mod author",
+                        tileentity.getClass().getName());
+            }
+        }
+        nbttagcompound1.setTag("TileEntities", nbttaglist3);
+        
+        return nbttagcompound;
+    }
+	
 	public synchronized boolean write(RegionFileCache regionFileCache) {
 		boolean error = false;
 		RegionFile regionFile = regionFileCache.getRegionFile(this.x << 4, this.z << 4, this.dimension);
@@ -209,10 +385,11 @@ public class MwChunk implements IChunk {
 		if (!error) {
 			DataOutputStream dos = regionFile.getChunkDataOutputStream(this.x & 31, this.z & 31);
 			if (dos != null) {
-				Nbt chunkNbt = this.getNbt();
+				//Nbt chunkNbt = this.getNbt();
 				try {
 					//RegionManager.logInfo("writing chunk (%d, %d) to region file", this.x, this.z);
-					chunkNbt.writeElement(dos);
+					//chunkNbt.writeElement(dos);
+					CompressedStreamTools.write(writeChunkToNBT(), dos);
 				} catch (IOException e) {
 					RegionManager.logError("%s: could not write chunk (%d, %d) to region file", e, this.x, this.z);
 					error = true;

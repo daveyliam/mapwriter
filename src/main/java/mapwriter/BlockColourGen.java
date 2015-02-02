@@ -114,11 +114,14 @@ public class BlockColourGen {
 		int b_count = 0;
 		int s_count = 0;
 
-		for (int blockID = 0; blockID < 4096; blockID++) { //TODO: replace hardcoded 4096 with actual registry size
-			for (int dv = 0; dv < 16; dv++) {
+		//for (int blockID = 0; blockID < 4096; blockID++) { //TODO: replace hardcoded 4096 with actual registry size
+		for (Object oblock : Block.blockRegistry){
+			Block block = (Block)oblock;
+			int blockID = block.getIdFromBlock(block);
+			
+			for (int dv = 0; dv < 17; dv++) {
 				
 				int blockAndMeta = ((blockID & 0xfff) << 4) | (dv & 0xf);
-				Block block = (Block) Block.blockRegistry.getObjectById(blockID);
 				int blockColour = 0;
 				
 				if (block != null) {
@@ -143,6 +146,11 @@ public class BlockColourGen {
 							s_count++;
 						} else {
 							blockColour = getIconMapColour(icon, terrainTexture);
+							if (blockColour == 0)
+							{
+								icon = block.getIcon(1, 16);	
+								blockColour = getIconMapColour(icon, terrainTexture);
+							}
 							u1Last = u1;
 							u2Last = u2;
 							v1Last = v1;
