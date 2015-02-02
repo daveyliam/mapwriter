@@ -21,7 +21,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent;
 
-@Mod(modid="MapWriter", name="MapWriter", version="2.3.2")
+@Mod(modid="MapWriter", name="MapWriter", version="2.2.2")
 public class MwForge {
 	
 	@Instance("MapWriter")
