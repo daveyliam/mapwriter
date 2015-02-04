@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 
 import mapwriter.forge.MwForge;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.chunk.Chunk;
 

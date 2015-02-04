@@ -1,6 +1,5 @@
 package mapwriter.forge;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import mapwriter.Mw;
 import mapwriter.overlay.OverlaySlime;
 import net.minecraft.util.ChatComponentText;
@@ -8,6 +7,7 @@ import net.minecraft.util.ChatComponentTranslation;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class EventHandler {
 	

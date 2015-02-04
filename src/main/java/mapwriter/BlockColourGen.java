@@ -5,7 +5,6 @@ import mapwriter.region.BlockColours.BlockType;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.util.IIcon;
 import net.minecraft.world.biome.BiomeGenBase;
 
 // Static class to generate BlockColours.

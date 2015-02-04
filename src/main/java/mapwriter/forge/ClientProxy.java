@@ -8,7 +8,7 @@ import mapwriter.overlay.OverlayGrid;
 import mapwriter.overlay.OverlaySlime;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
-import cpw.mods.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class ClientProxy extends CommonProxy {
 	

@@ -1,11 +1,21 @@
 package mapwriter;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import mapwriter.forge.MwConfig;
 import mapwriter.forge.MwForge;
 import mapwriter.forge.MwKeyHandler;
 import mapwriter.gui.MwGui;
 import mapwriter.gui.MwGuiMarkerDialog;
-import mapwriter.map.*;
+import mapwriter.map.MapTexture;
+import mapwriter.map.MapView;
+import mapwriter.map.Marker;
+import mapwriter.map.MarkerManager;
+import mapwriter.map.MiniMap;
+import mapwriter.map.Trail;
+import mapwriter.map.UndergroundTexture;
 import mapwriter.overlay.OverlaySlime;
 import mapwriter.region.BlockColours;
 import mapwriter.region.RegionManager;
@@ -17,10 +27,6 @@ import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /*
 

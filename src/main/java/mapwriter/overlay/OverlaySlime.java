@@ -1,16 +1,15 @@
 package mapwriter.overlay;
 
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.Random;
+
 import mapwriter.api.IMwChunkOverlay;
 import mapwriter.api.IMwDataProvider;
 import mapwriter.map.MapView;
 import mapwriter.map.mapmode.MapMode;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.util.MathHelper;
-
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Random;
 
 public class OverlaySlime implements IMwDataProvider {
 

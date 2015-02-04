@@ -7,15 +7,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.logging.log4j.Level;
-
-import cpw.mods.fml.common.FMLLog;
 import net.minecraft.block.Block;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.ChunkPosition;
+import net.minecraftforge.fml.common.FMLLog;
+
+import org.apache.logging.log4j.Level;
 
 public class MwChunk implements IChunk {
 	public static final int SIZE = 16;
