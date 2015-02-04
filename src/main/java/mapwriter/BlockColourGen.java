@@ -120,7 +120,7 @@ public class BlockColourGen {
 			Block block = (Block)oblock;
 			int blockID = Block.getIdFromBlock(block);
 			
-			for (int dv = 0; dv < 17; dv++) {
+			for (int dv = 0; dv < 16; dv++) {
 				
 				int blockAndMeta = ((blockID & 0xfff) << 4) | (dv & 0xf);
 				int blockColour = 0;
