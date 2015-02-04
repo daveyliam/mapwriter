@@ -2,12 +2,16 @@ package mapwriter.forge;
 
 import java.net.InetSocketAddress;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import mapwriter.Mw;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -16,9 +20,6 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @Mod(modid="MapWriter", name="MapWriter", version="2.2.2")
 public class MwForge {
@@ -58,7 +59,7 @@ public class MwForge {
     @SubscribeEvent
     public void onConnected(FMLNetworkEvent.ClientConnectedToServerEvent event){
     	if (!event.isLocal) {
-    		InetSocketAddress address = (InetSocketAddress) event.manager.getSocketAddress();
+    		InetSocketAddress address = (InetSocketAddress) event.manager.getRemoteAddress();
     		Mw.instance.setServerDetails(address.getHostName(), address.getPort());
     	}
     }

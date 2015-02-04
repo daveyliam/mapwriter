@@ -77,7 +77,8 @@ public class ChunkRender {
 		double b = 0.0;
 		for (; y > 0; y--) {
 			int blockAndMeta = chunk.getBlockAndMetadata(x, y, z);
-			
+			int block = blockAndMeta >> 4;
+			int meta = (blockAndMeta | 0xfff0) ^ 0xfff0;
 			int c1 = bc.getColour(blockAndMeta);
 			int alpha = (c1 >> 24) & 0xff;
 			// no need to process block if it is transparent
@@ -102,8 +103,8 @@ public class ChunkRender {
 				b = b + (a * c1A * c1B * c2B);
 				a = a * (1.0 - c1A);
 			}
-			// break when an opaque block is encountered
-			if (alpha == 0xff) {
+			 //break when an opaque block is encountered
+			if (alpha == 255) {
 				break;
 			}
 		}
@@ -161,7 +162,7 @@ public class ChunkRender {
 						}
 					}
 				} else {
-					y = chunkMaxY;
+					y = chunkMaxY-1;
 				}
 				
 				int pixelOffset = offset + (z * scanSize) + x;

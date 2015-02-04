@@ -1,6 +1,7 @@
 package mapwriter.gui;
 
 import java.awt.Point;
+import java.io.IOException;
 
 import mapwriter.Mw;
 import mapwriter.MwUtil;
@@ -16,6 +17,7 @@ import mapwriter.tasks.MergeTask;
 import mapwriter.tasks.RebuildRegionsTask;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -140,9 +142,9 @@ public class MwGui extends GuiScreen {
     
     public int getHeightAtBlockPos(int bX, int bZ) {
     	int bY = 0;
-    	int worldDimension = this.mw.mc.theWorld.provider.dimensionId;
+    	int worldDimension = this.mw.mc.theWorld.provider.getDimensionId();
     	if ((worldDimension == this.mapView.getDimension()) && (worldDimension != -1)) {
-    		bY = this.mw.mc.theWorld.getChunkFromBlockCoords(bX, bZ).getHeightValue(bX & 0xf, bZ & 0xf);
+    		bY = this.mw.mc.theWorld.getChunkFromBlockCoords(new BlockPos(bX,0, bZ)).getHeight(bX & 0xf, bZ & 0xf);
     	}
     	return bY;
     }
@@ -306,7 +308,7 @@ public class MwGui extends GuiScreen {
     // override GuiScreen's handleMouseInput to process
     // the scroll wheel.
     @Override
-    public void handleMouseInput() {
+    public void handleMouseInput() throws IOException {
     	if (MwAPI.getCurrentDataProvider() != null && MwAPI.getCurrentDataProvider().onMouseInput(this.mapView, this.mapMode))
     		return;
     	
@@ -488,8 +490,8 @@ public class MwGui extends GuiScreen {
           	s = String.format("cursor: (%d, ?, %d)", bX, bZ);
           }
     	 if (this.mc.theWorld != null) {
-    		 if (!this.mc.theWorld.getChunkFromBlockCoords(bX, bZ).isEmpty()) {
-    			 s += String.format(", biome: %s", this.mc.theWorld.getBiomeGenForCoords(bX, bZ).biomeName);
+    		 if (!this.mc.theWorld.getChunkFromBlockCoords(new BlockPos(bX,0, bZ)).isEmpty()) {
+    			 s += String.format(", biome: %s", this.mc.theWorld.getBiomeGenForCoords(new BlockPos(bX,0, bZ)).biomeName);
     		 }
     	 }
          
@@ -604,7 +606,7 @@ public class MwGui extends GuiScreen {
         
         // draw name of player under mouse cursor
         if (this.isPlayerNearScreenPos(mouseX, mouseY)) {
-        	this.drawMouseOverHint(mouseX, mouseY, this.mc.thePlayer.getDisplayName(),
+        	this.drawMouseOverHint(mouseX, mouseY, this.mc.thePlayer.getDisplayNameString(),
         			this.mw.playerXInt,
 					this.mw.playerYInt,
 					this.mw.playerZInt);

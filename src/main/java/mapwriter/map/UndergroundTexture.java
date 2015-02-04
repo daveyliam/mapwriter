@@ -9,6 +9,7 @@ import mapwriter.region.ChunkRender;
 import mapwriter.region.IChunk;
 import net.minecraft.block.Block;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.chunk.Chunk;
 
 import org.lwjgl.opengl.GL11;
@@ -44,7 +45,7 @@ public class UndergroundTexture extends Texture {
 		public int getBlockAndMetadata(int x, int y, int z) {
 			Block block = this.chunk.getBlock(x, y, z);
             int blockid = Block.blockRegistry.getIDForObject(block);
-			int meta = this.chunk.getBlockMetadata(x, y, z);
+			int meta = this.chunk.getBlockMetadata(new BlockPos(x, y, z));
 			return ((blockid & 0xfff) << 4) | (meta & 0xf);
 		}
 
@@ -55,7 +56,7 @@ public class UndergroundTexture extends Texture {
 
 		@Override
 		public int getLightValue(int x, int y, int z) {
-			return this.chunk.getBlockLightValue(x, y, z, 0);
+			return this.chunk.getBlock(new BlockPos(x,y,z)).getLightValue();
 		}
 	}
 	
@@ -200,7 +201,7 @@ public class UndergroundTexture extends Texture {
 				if (columnFlag == ChunkRender.FLAG_UNPROCESSED) {
 					// if column not yet processed
 					WorldClient world = this.mw.mc.theWorld;
-					Block block = world.getBlock(x, y, z);
+					Block block = world.getBlockState(new BlockPos(x,y,z)).getBlock();
 					if ((block == null) || !block.isOpaqueCube()) {
 						// if block is not opaque
 						this.updateFlags[chunkOffset][columnOffset] = (byte) ChunkRender.FLAG_NON_OPAQUE;

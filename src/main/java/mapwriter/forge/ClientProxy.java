@@ -6,7 +6,6 @@ import mapwriter.Mw;
 import mapwriter.api.MwAPI;
 import mapwriter.overlay.OverlayGrid;
 import mapwriter.overlay.OverlaySlime;
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
@@ -25,7 +24,7 @@ public class ClientProxy extends CommonProxy {
 		// temporary workaround for user defined key bindings not being loaded
 		// at game start. see https://github.com/MinecraftForge/FML/issues/378
 		// for more info.
-		Minecraft.getMinecraft().gameSettings.loadOptions();
+		//Minecraft.getMinecraft().gameSettings.loadOptions();
 	}
 	
 	public void postInit() {

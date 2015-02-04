@@ -9,6 +9,7 @@ import mapwriter.api.IMwDataProvider;
 import mapwriter.map.MapView;
 import mapwriter.map.mapmode.MapMode;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.MathHelper;
 
 public class OverlaySlime implements IMwDataProvider {
@@ -23,7 +24,7 @@ public class OverlaySlime implements IMwDataProvider {
     }
 
     public static void askSeed(){
-        EntityClientPlayerMP player = Minecraft.getMinecraft().thePlayer;
+    	EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
         if(player == null) return;
         player.sendChatMessage("/seed"); //Send the /seed command to the server
         seedAsked = true;
@@ -69,7 +70,7 @@ public class OverlaySlime implements IMwDataProvider {
 		// We should pass the center of the map too to reduce the display like in this case
 		// and the zoom lvl, to provide higher level informations
 		
-		if (Minecraft.getMinecraft().thePlayer.getEntityWorld().provider.dimensionId != dim)
+		if (Minecraft.getMinecraft().thePlayer.getEntityWorld().provider.getDimensionId() != dim)
 			return new ArrayList<IMwChunkOverlay>();
 		
 		int minChunkX = (MathHelper.ceiling_double_int(minX) >> 4) - 1;

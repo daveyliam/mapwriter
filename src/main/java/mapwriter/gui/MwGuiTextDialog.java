@@ -1,5 +1,7 @@
 package mapwriter.gui;
 
+import java.io.IOException;
+
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 
@@ -33,7 +35,7 @@ public class MwGuiTextDialog extends GuiScreen {
 			this.text = this.textField.getText();
 		}
     	int w = this.width * textDialogWidthPercent / 100;
-    	this.textField = new GuiTextField(this.fontRendererObj,
+    	this.textField = new GuiTextField(0,this.fontRendererObj,
     			(this.width - w) / 2 + 5,
     			textDialogY,
     			w - 10,
@@ -127,7 +129,7 @@ public class MwGuiTextDialog extends GuiScreen {
         super.drawScreen(mouseX, mouseY, f);
     }
 
-    protected void mouseClicked(int x, int y, int button) {
+    protected void mouseClicked(int x, int y, int button) throws IOException {
         super.mouseClicked(x, y, button);
     }
 

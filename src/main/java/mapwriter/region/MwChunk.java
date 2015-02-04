@@ -12,6 +12,8 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.chunk.NibbleArray;
 import net.minecraftforge.fml.common.FMLLog;
 
 import org.apache.logging.log4j.Level;
@@ -23,9 +25,7 @@ public class MwChunk implements IChunk {
 	public final int z;
 	public final int dimension;
 	
-	public final byte[][] msbArray;
-	public final byte[][] lsbArray;
-	public final byte[][] metaArray;
+	char[][] dataArray = new char[16][]; 
 	public final byte[][] lightingArray;
 	public final Map tileentityMap;
 	
@@ -33,19 +33,17 @@ public class MwChunk implements IChunk {
 	
 	public final int maxY;
 	
-	public MwChunk(int x, int z, int dimension, byte[][] msbArray, byte[][] lsbArray, byte[][] metaArray, byte[][] lightingArray, byte[] biomeArray, Map TileEntityMap) {
+	public MwChunk(int x, int z, int dimension, char[][] data, byte[][] lightingArray, byte[] biomeArray, Map TileEntityMap) {
 		this.x = x;
 		this.z = z;
 		this.dimension = dimension;
-		this.msbArray = msbArray;
-		this.lsbArray = lsbArray;
-		this.metaArray = metaArray;
 		this.biomeArray = biomeArray;
 		this.lightingArray = lightingArray;
 		this.tileentityMap = TileEntityMap;
+		this.dataArray = data;
 		int maxY = 0;
 		for (int y = 0; y < 16; y++) {
-			if (lsbArray[y] != null) {
+			if (data[y] != null) {
 				maxY = (y << 4) + 15;
 			}
 		}
@@ -60,9 +58,8 @@ public class MwChunk implements IChunk {
 	public static MwChunk read(int x, int z, int dimension, RegionFileCache regionFileCache) {
 		
 		byte[] biomeArray = null;
-		byte[][] msbArray = new byte[16][];
 		byte[][] lsbArray = new byte[16][];
-		byte[][] metaArray = new byte[16][];
+		char[][] data = new char[16][];
 		byte[][] lightingArray = new byte[16][];
 		Map TileEntityMap = new HashMap();
 		
@@ -121,11 +118,19 @@ public class MwChunk implements IChunk {
 		        	NBTTagCompound section = sections.getCompoundTagAt(k);
 							int y = section.getByte("Y");
 							lsbArray[y & 0xf] = section.getByteArray("Blocks");
-				            if (section.hasKey("Add", 7))
+				            NibbleArray nibblearray = new NibbleArray(section.getByteArray("Data"));
+				            NibbleArray nibblearray1 = section.hasKey("Add", 7) ? new NibbleArray(section.getByteArray("Add")) : null;
+						
+				            data[y & 0xf]  = new char[lsbArray[y].length];
+
+				            for (int l = 0; l < data[y & 0xf].length; ++l)
 				            {
-				            	msbArray[y & 0xf] = section.getByteArray("Add");
+				                int i1 = l & 15;
+				                int j1 = l >> 8 & 15;
+				                int k1 = l >> 4 & 15;
+				                int l1 = nibblearray1 != null ? nibblearray1.get(i1, j1, k1) : 0;
+				                data[y & 0xf][l] = (char)(l1 << 12 | (lsbArray[y][l] & 255) << 4 | nibblearray.get(i1, j1, k1));
 				            }
-							metaArray[y & 0xf] = section.getByteArray("Data");
 		        }
 
 				biomeArray = level.getByteArray("Biomes");
@@ -140,9 +145,7 @@ public class MwChunk implements IChunk {
 		                    TileEntity tileentity = TileEntity.createAndLoadEntity(nbttagcompound4);
 		                    if (tileentity != null)
 		                    {
-		                    	ChunkPosition chunkposition = new ChunkPosition(tileentity.xCoord, tileentity.yCoord, tileentity.zCoord);
-		                    	
-		                    	TileEntityMap.put(chunkposition, tileentity);
+		                    	TileEntityMap.put(tileentity.getPos(), tileentity);
 		                    }
 		                }
 		            }
@@ -161,7 +164,7 @@ public class MwChunk implements IChunk {
 			//this.log("MwChunk.read: chunk (%d, %d) input stream is null", this.x, this.z); 
 		}
 		
-		return new MwChunk(x, z, dimension, msbArray, lsbArray, metaArray, lightingArray, biomeArray,TileEntityMap);
+		return new MwChunk(x, z, dimension,data , lightingArray, biomeArray,TileEntityMap);
 	}
 	
 	public boolean isEmpty() {
@@ -189,17 +192,21 @@ public class MwChunk implements IChunk {
 	public int getBlockAndMetadata(int x, int y, int z) {
 		int yi = (y >> 4) & 0xf;
 		int offset = ((y & 0xf) << 8) | ((z & 0xf) << 4) | (x & 0xf);
-		ChunkPosition chunkposition = new ChunkPosition(x, y, z);
-		int lsb  = ((this.lsbArray  != null) && (this.lsbArray[yi]  != null)&& (this.lsbArray[yi].length  != 0)) ? this.lsbArray[yi][offset]       : 0;
-		int msb  = ((this.msbArray  != null) && (this.msbArray[yi]  != null) && (this.msbArray[yi].length  != 0)) ? this.msbArray[yi][offset  >> 1] : 0;
-		int meta = ((this.metaArray != null) && (this.metaArray[yi] != null)&& (this.metaArray[yi].length  != 0)) ? this.metaArray[yi][offset >> 1] : 0;
+		
+		int lsb = 0;
+		int msb = 0;
+		int meta = 0;
+		
+		BlockPos pos = new BlockPos(x,y,z);
+		
+		char data = ((this.dataArray  != null) && (this.dataArray[yi]  != null) && (this.dataArray[yi].length != 0)) ? this.dataArray[yi][offset] : 0;
 		
 		//check if the block has a tileentity if so use the blockdata in the tileentity 
 		//(forgemultipart and carpenterblocks both save the block to be rendered in the tileentity map)
-		
-		if (this.tileentityMap.containsKey(chunkposition))
+		if (this.tileentityMap.containsKey(pos))
 		{
-			 TileEntity value = (TileEntity)this.tileentityMap.get(chunkposition);
+			
+			 TileEntity value = (TileEntity)this.tileentityMap.get(pos);
 			 NBTTagCompound tag = new NBTTagCompound();
 			 value.writeToNBT(tag);
 			 int id = 0;
@@ -209,16 +216,19 @@ public class MwChunk implements IChunk {
 				String material = tag.getTagList("parts", 10).getCompoundTagAt(0).getString("material");
 				int end = material.indexOf("_");
 				
+				//block with metadata
 				if (end != -1)
 				{
 				id = Block.getIdFromBlock(Block.getBlockFromName(material.substring(5, end)));
 				
 				lsb = (id & 255);
+								
 				if (id > 255){msb = (id & 3840) >> 8;}
 		        else    {msb = 0;}
 				
 				meta = Integer.parseInt(material.substring(end+1));
 				}
+				//block without metadata
 				else
 				{
 					id = Block.getIdFromBlock(Block.getBlockFromName(material.substring(5)));
@@ -226,9 +236,8 @@ public class MwChunk implements IChunk {
 					lsb = (id & 255);
 					if (id > 255){msb = (id & 3840) >> 8;}
 			        else    {msb = 0;}
-					
-					meta = 0;
 				}
+				data = (char)(((msb & 0x0f) << 12) | ((lsb & 0xff) << 4) | (meta & 0x0f));
 			 }
 			 else if (tag.getString("id") =="TileEntityCarpentersBlock")
 			 {
@@ -247,13 +256,15 @@ public class MwChunk implements IChunk {
 					{
 						meta = Integer.parseInt(smeta.substring(0, smeta.length()-1));
 					}
+					
+					data = (char)(((msb & 0x0f) << 12) | ((lsb & 0xff) << 4) | (meta & 0x0f));
 				}
 			 }
 		 }
 
 		//return ((offset & 1) == 1) ?
 		//		((msb & 0xf0) << 8)  | ((lsb & 0xff) << 4) | ((meta & 0xf0) >> 4) :
-		return		((msb & 0x0f) << 12) | ((lsb & 0xff) << 4) | (meta & 0x0f);
+		return (int)data;
 	}
 	
 	//changed to use the NBTTagCompound that minecraft uses. this makes the local way of saving anvill data the same as Minecraft world data
@@ -263,7 +274,6 @@ public class MwChunk implements IChunk {
         NBTTagCompound nbttagcompound1 = new NBTTagCompound();
         nbttagcompound.setTag("Level", nbttagcompound1);
         
-        nbttagcompound1.setByte("V", (byte)1);
         nbttagcompound1.setInteger("xPos", this.x);
         nbttagcompound1.setInteger("zPos", this.z);
         
@@ -272,23 +282,47 @@ public class MwChunk implements IChunk {
         int i = 16;
         NBTTagCompound nbttagcompound2;
 
-        for (int y = 0; y < i; ++y)
-        {        	
-            if ((this.lsbArray != null) && (this.lsbArray[y] != null))
-            {
-            	nbttagcompound2 = new NBTTagCompound();
-            	nbttagcompound2.setByte("Y", (byte)y);
-            	nbttagcompound2.setByteArray("Blocks", this.lsbArray[y]);
+        for (int y = 0; y < this.dataArray.length; y++)
+        {     
+        	
+        	byte[] abyte = new byte[this.dataArray[y].length];
+            NibbleArray nibblearray = new NibbleArray();
+            NibbleArray nibblearray1 = null;
 
-                if ((this.msbArray != null) && (this.msbArray[y] != null))
+            for (int k = 0; k < this.dataArray[y].length; ++k)
+            {
+                char c0 = this.dataArray[y][k];
+                int l = k & 15;
+                int i1 = k >> 8 & 15;
+                int j1 = k >> 4 & 15;
+
+                if (c0 >> 12 != 0)
                 {
-                	nbttagcompound2.setByteArray("Add", this.msbArray[y]);
+                    if (nibblearray1 == null)
+                    {
+                        nibblearray1 = new NibbleArray();
+                    }
+
+                    nibblearray1.set(l, i1, j1, c0 >> 12);
                 }
 
-                nbttagcompound2.setByteArray("Data", this.metaArray[y]);
+                abyte[k] = (byte)(c0 >> 4 & 255);
+                nibblearray.set(l, i1, j1, c0 & 15);
+            }
+            
+            
+            	nbttagcompound2 = new NBTTagCompound();
+            	nbttagcompound2.setByte("Y", (byte)y);
+            	nbttagcompound2.setByteArray("Blocks", abyte);
+
+                if (nibblearray1 != null)
+                {
+                	nbttagcompound2.setByteArray("Add", nibblearray1.getData());
+                }
+
+                nbttagcompound2.setByteArray("Data", nibblearray.getData());
                 nbttaglist.appendTag(nbttagcompound2);
             }
-        }
 
         nbttagcompound1.setTag("Sections", nbttaglist);
         nbttagcompound1.setByteArray("Biomes", this.biomeArray);

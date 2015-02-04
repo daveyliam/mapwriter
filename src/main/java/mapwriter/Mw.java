@@ -162,7 +162,6 @@ public class Mw {
 	
 	public Mw(MwConfig config) {
 		// client only initialization
-		// oops, no idea why I was using a ModLoader method to get the Minecraft instance before
 		this.mc = Minecraft.getMinecraft();
 		
 		// load config
@@ -177,6 +176,8 @@ public class Mw {
 		RegionManager.logger = MwForge.logger;
 		
 		instance = this;
+		
+		this.loadConfig();
 	}
 	
 	public String getWorldName() {
@@ -468,8 +469,6 @@ public class Mw {
 		IntegratedServer server = this.mc.getIntegratedServer();
 		this.multiplayer = (server == null);
 		
-		this.loadConfig();
-		
 		this.worldName = this.getWorldName();
 		
 		// get world and image directories
@@ -586,7 +585,7 @@ public class Mw {
 		//		world.getWorldInfo().getWorldName(),
 		//		world.provider.dimensionId);
 		
-		this.playerDimension = world.provider.dimensionId;
+		this.playerDimension = world.provider.getDimensionId();
 		if (this.ready) {
 			this.addDimension(this.playerDimension);
 			this.miniMap.view.setDimension(this.playerDimension);
@@ -651,7 +650,7 @@ public class Mw {
 	// add chunk to the set of loaded chunks
 	public void onChunkLoad(Chunk chunk) {
 		this.load();
-		if ((chunk != null) && (chunk.worldObj instanceof net.minecraft.client.multiplayer.WorldClient)) {
+		if ((chunk != null) && (chunk.getWorld() instanceof net.minecraft.client.multiplayer.WorldClient)) {
 			if (this.ready) {
 				this.chunkManager.addChunk(chunk);
 			} else {
@@ -663,7 +662,7 @@ public class Mw {
 	// remove chunk from the set of loaded chunks.
 	// convert to mwchunk and write chunk to region file if in multiplayer.
 	public void onChunkUnload(Chunk chunk) {
-		if (this.ready && (chunk != null) && (chunk.worldObj instanceof net.minecraft.client.multiplayer.WorldClient)) {
+		if (this.ready && (chunk != null) && (chunk.getWorld() instanceof net.minecraft.client.multiplayer.WorldClient)) {
 			this.chunkManager.removeChunk(chunk);
 		}
 	}

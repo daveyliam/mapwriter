@@ -2,11 +2,12 @@ package mapwriter.forge;
 
 import mapwriter.Mw;
 import net.minecraft.client.settings.KeyBinding;
+
+import org.lwjgl.input.Keyboard;
+
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
-
-import org.lwjgl.input.Keyboard;
 
 public class MwKeyHandler {
 
@@ -33,35 +34,35 @@ public class MwKeyHandler {
 
     @SubscribeEvent
     public void onKeyPress(InputEvent.KeyInputEvent event){
-        if(keyMapGui.getIsKeyPressed()){
+        if(keyMapGui.isPressed()){
             KeyBinding.setKeyBindState(keyMapGui.getKeyCode(), false);
             Mw.instance.onKeyDown(keyMapGui);
         }
-        if(keyNewMarker.getIsKeyPressed()){
+        if(keyNewMarker.isPressed()){
             KeyBinding.setKeyBindState(keyNewMarker.getKeyCode(), false);
             Mw.instance.onKeyDown(keyNewMarker);
         }
-        if(keyMapMode.getIsKeyPressed()){
+        if(keyMapMode.isPressed()){
             KeyBinding.setKeyBindState(keyMapMode.getKeyCode(), false);
             Mw.instance.onKeyDown(keyMapMode);
         }
-        if(keyNextGroup.getIsKeyPressed()){
+        if(keyNextGroup.isPressed()){
             KeyBinding.setKeyBindState(keyNextGroup.getKeyCode(), false);
             Mw.instance.onKeyDown(keyNextGroup);
         }
-        if(keyTeleport.getIsKeyPressed()){
+        if(keyTeleport.isPressed()){
             KeyBinding.setKeyBindState(keyTeleport.getKeyCode(), false);
             Mw.instance.onKeyDown(keyTeleport);
         }
-        if(keyZoomIn.getIsKeyPressed()){
+        if(keyZoomIn.isPressed()){
             KeyBinding.setKeyBindState(keyZoomIn.getKeyCode(), false);
             Mw.instance.onKeyDown(keyZoomIn);
         }
-        if(keyZoomOut.getIsKeyPressed()){
+        if(keyZoomOut.isPressed()){
             KeyBinding.setKeyBindState(keyZoomOut.getKeyCode(), false);
             Mw.instance.onKeyDown(keyZoomOut);
         }
-        if(keyUndergroundMode.getIsKeyPressed()){
+        if(keyUndergroundMode.isPressed()){
             KeyBinding.setKeyBindState(keyUndergroundMode.getKeyCode(), false);
             Mw.instance.onKeyDown(keyUndergroundMode);
         }

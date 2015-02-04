@@ -1,5 +1,7 @@
 package mapwriter.gui;
 
+import java.io.IOException;
+
 import mapwriter.Mw;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -38,12 +40,22 @@ public class MwGuiOptions extends GuiScreen {
         this.drawCenteredString(this.fontRendererObj, "MapWriter Options", this.width / 2, 10, 0xffffff);
         super.drawScreen(mouseX, mouseY, f);
     }
-
-    protected void mouseClicked(int x, int y, int button) {
-        super.mouseClicked(x, y, button);
+    
+    public void handleMouseInput() throws IOException
+    {
+        if (this.optionSlot != null)
+        {
+            this.optionSlot.handleMouseInput();
+        }
+        super.handleMouseInput();
     }
 
-    protected void keyTyped(char c, int k) {
+    protected void mouseClicked(int x, int y, int button) throws IOException {
+    	super.mouseClicked(x, y, button);
+    }
+    
+
+    protected void keyTyped(char c, int k) throws IOException {
         if (this.optionSlot.keyTyped(c, k)) {
             super.keyTyped(c, k);
         }

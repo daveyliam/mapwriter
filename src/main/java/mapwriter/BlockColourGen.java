@@ -4,7 +4,9 @@ import mapwriter.region.BlockColours;
 import mapwriter.region.BlockColours.BlockType;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.biome.BiomeGenBase;
 
 // Static class to generate BlockColours.
@@ -15,7 +17,7 @@ import net.minecraft.world.biome.BiomeGenBase;
 
 public class BlockColourGen {
 	
-	private static int getIconMapColour(IIcon icon, Texture terrainTexture) {
+	private static int getIconMapColour(TextureAtlasSprite icon, Texture terrainTexture) {
 		// flipped icons have the U and V coords reversed (minU > maxU, minV > maxV).
 		// thanks go to taelnia for fixing this. 
 		int iconX = (int) Math.round(((float) terrainTexture.w) * Math.min(icon.getMinU(), icon.getMaxU()));
@@ -48,7 +50,7 @@ public class BlockColourGen {
 			// fix crash when mods don't implement getRenderColor for all
 			// block meta values.
 			try {
-				int renderColour = block.getRenderColor(blockAndMeta & 0xf);
+				int renderColour = block.getRenderColor(block.getStateFromMeta(blockAndMeta & 0xf));
 				if (renderColour != 0xffffff) {
 					blockColour = Render.multiplyColours(blockColour, 0xff000000 | renderColour);
 				}
@@ -74,8 +76,8 @@ public class BlockColourGen {
 		for (int i = 0; i < BiomeGenBase.getBiomeGenArray().length; i++) {
 			if (BiomeGenBase.getBiomeGenArray()[i] != null) {
 				bc.setBiomeWaterShading(i, BiomeGenBase.getBiomeGenArray()[i].getWaterColorMultiplier() & 0xffffff);
-				bc.setBiomeGrassShading(i, BiomeGenBase.getBiomeGenArray()[i].getBiomeGrassColor(0,0,0) & 0xffffff); //FIXME 0,0,0?
-				bc.setBiomeFoliageShading(i, BiomeGenBase.getBiomeGenArray()[i].getBiomeFoliageColor(0,0,0) & 0xffffff); //FIXME 0,0,0?
+				bc.setBiomeGrassShading(i, BiomeGenBase.getBiomeGenArray()[i].getGrassColorAtPos(new BlockPos(0, 0, 0)) & 0xffffff); //FIXME 0,0,0?
+				bc.setBiomeFoliageShading(i, BiomeGenBase.getBiomeGenArray()[i].getFoliageColorAtPos(new BlockPos(0, 0, 0)) & 0xffffff); //FIXME 0,0,0?
 			} else {
 				bc.setBiomeWaterShading(i, 0xffffff);
 				bc.setBiomeGrassShading(i, 0xffffff);
@@ -116,7 +118,7 @@ public class BlockColourGen {
 		//for (int blockID = 0; blockID < 4096; blockID++) { //TODO: replace hardcoded 4096 with actual registry size
 		for (Object oblock : Block.blockRegistry){
 			Block block = (Block)oblock;
-			int blockID = block.getIdFromBlock(block);
+			int blockID = Block.getIdFromBlock(block);
 			
 			for (int dv = 0; dv < 17; dv++) {
 				
@@ -125,9 +127,9 @@ public class BlockColourGen {
 				
 				if (block != null) {
 					
-					IIcon icon = null;
+					TextureAtlasSprite icon = null;
 					try {
-						icon = block.getIcon(1, dv);
+						icon = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getTexture(block.getStateFromMeta(dv));
 					} catch (Exception e) {
 						//MwUtil.log("genFromTextures: exception caught when requesting block texture for %03x:%x", blockID, dv);
 						//e.printStackTrace();
@@ -148,11 +150,12 @@ public class BlockColourGen {
 							
 							//request icon with meta 16, carpenterblocks uses this method to get the real texture
 							//this makes the carpenterblocks render as brown blocks on the map
-							if (blockColour == 0)
-							{
-								icon = block.getIcon(1, 16);	
-								blockColour = getIconMapColour(icon, terrainTexture);
-							}
+							//FIXME:check how carpenterblocks fixes this 
+							//if (blockColour == 0)
+							//{
+							//	icon = block.getIcon(1, 16);	
+							//	blockColour = getIconMapColour(icon, terrainTexture);
+							//}
 							u1Last = u1;
 							u2Last = u2;
 							v1Last = v1;

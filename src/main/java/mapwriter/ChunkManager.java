@@ -32,29 +32,24 @@ public class ChunkManager {
 	// only MwChunk's should be used in the background thread.
 	// make this a full copy of chunk data to prevent possible race conditions <-- done
 	public static MwChunk copyToMwChunk(Chunk chunk) {
-		
-		byte[][] msbArray = new byte[16][];
-		byte[][] lsbArray = new byte[16][];
-		byte[][] metaArray = new byte[16][];
 		byte[][] lightingArray = new byte[16][];
 		Map TileEntityMap = new HashMap();
-		TileEntityMap.putAll(chunk.chunkTileEntityMap);
+		TileEntityMap.putAll(chunk.getTileEntityMap());
+		char[][] dataArray = new char[16][]; 
 		
 		ExtendedBlockStorage[] storageArrays = chunk.getBlockStorageArray();
 		if (storageArrays != null) {
 			for (ExtendedBlockStorage storage : storageArrays) {
 				if (storage != null) {
 					int y = (storage.getYLocation() >> 4) & 0xf;
-					lsbArray[y] = Arrays.copyOf(storage.getBlockLSBArray(), storage.getBlockLSBArray().length);
-					msbArray[y] = (storage.getBlockMSBArray() != null) ? Arrays.copyOf(storage.getBlockMSBArray().data, storage.getBlockMSBArray().data.length)  : null;
-					metaArray[y] = (storage.getMetadataArray() != null) ? Arrays.copyOf(storage.getMetadataArray().data, storage.getMetadataArray().data.length) : null;
-					lightingArray[y] = (storage.getBlocklightArray() != null) ? Arrays.copyOf(storage.getBlocklightArray().data, storage.getBlocklightArray().data.length) : null;
+					dataArray[y] = storage.getData();
+					lightingArray[y] = (storage.getBlocklightArray() != null) ? Arrays.copyOf(storage.getBlocklightArray().getData(), storage.getBlocklightArray().getData().length) : null;
 				}
 			}
 		}
 		
-		return new MwChunk(chunk.xPosition, chunk.zPosition, chunk.worldObj.provider.dimensionId,
-				msbArray, lsbArray, metaArray, lightingArray, Arrays.copyOf(chunk.getBiomeArray(),chunk.getBiomeArray().length),TileEntityMap);
+		return new MwChunk(chunk.xPosition, chunk.zPosition, chunk.getWorld().provider.getDimensionId(),
+				dataArray, lightingArray, Arrays.copyOf(chunk.getBiomeArray(),chunk.getBiomeArray().length),TileEntityMap);
 	}
 	
 	public synchronized void addChunk(Chunk chunk) {
