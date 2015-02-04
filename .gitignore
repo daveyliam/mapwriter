@@ -15,3 +15,6 @@ bin
 /Deploy.bat
 /FixDependicies.bat
 /Install Forge.bat
+.nb-gradle
+.nb-gradle-properties
+eclipse

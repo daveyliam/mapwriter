@@ -42,6 +42,7 @@ version = "${project.config.mod_version}"
 minecraft {
 version = config.mc_version + "-" + config.forge_version
 runDir = "eclipse"
+mappings = config.mcp_version
 }
 
 
