@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.logging.log4j.Level;
 
@@ -27,13 +28,13 @@ public class MwChunk implements IChunk {
 	public final byte[][] lsbArray;
 	public final byte[][] metaArray;
 	public final byte[][] lightingArray;
-	public final HashMap tileentityMap;
+	public final Map tileentityMap;
 	
 	public final byte[] biomeArray;
 	
 	public final int maxY;
 	
-	public MwChunk(int x, int z, int dimension, byte[][] msbArray, byte[][] lsbArray, byte[][] metaArray, byte[][] lightingArray, byte[] biomeArray, HashMap TileEntityMap) {
+	public MwChunk(int x, int z, int dimension, byte[][] msbArray, byte[][] lsbArray, byte[][] metaArray, byte[][] lightingArray, byte[] biomeArray, Map TileEntityMap) {
 		this.x = x;
 		this.z = z;
 		this.dimension = dimension;
@@ -64,7 +65,7 @@ public class MwChunk implements IChunk {
 		byte[][] lsbArray = new byte[16][];
 		byte[][] metaArray = new byte[16][];
 		byte[][] lightingArray = new byte[16][];
-		HashMap TileEntityMap = new HashMap();
+		Map TileEntityMap = new HashMap();
 		
         DataInputStream dis = null;
         RegionFile regionFile = regionFileCache.getRegionFile(x << 4, z << 4, dimension);

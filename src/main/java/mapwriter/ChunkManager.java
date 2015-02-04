@@ -37,7 +37,7 @@ public class ChunkManager {
 		byte[][] lsbArray = new byte[16][];
 		byte[][] metaArray = new byte[16][];
 		byte[][] lightingArray = new byte[16][];
-		HashMap TileEntityMap = new HashMap();
+		Map TileEntityMap = new HashMap();
 		TileEntityMap.putAll(chunk.chunkTileEntityMap);
 		
 		ExtendedBlockStorage[] storageArrays = chunk.getBlockStorageArray();
