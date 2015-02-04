@@ -195,6 +195,9 @@ public class MwChunk implements IChunk {
 		int msb  = ((this.msbArray  != null) && (this.msbArray[yi]  != null) && (this.msbArray[yi].length  != 0)) ? this.msbArray[yi][offset  >> 1] : 0;
 		int meta = ((this.metaArray != null) && (this.metaArray[yi] != null)&& (this.metaArray[yi].length  != 0)) ? this.metaArray[yi][offset >> 1] : 0;
 		
+		//check if the block has a tileentity if so use the blockdata in the tileentity 
+		//(forgemultipart and carpenterblocks both save the block to be rendered in the tileentity map)
+		
 		if (this.tileentityMap.containsKey(chunkposition))
 		{
 			 TileEntity value = (TileEntity)this.tileentityMap.get(chunkposition);
@@ -314,6 +317,7 @@ public class MwChunk implements IChunk {
 		return root;
 	}
 	
+	//changed to use the NBTTagCompound that minecraft uses. this makes the local way of saving anvill data the same as Minecraft world data
     private NBTTagCompound writeChunkToNBT()
     {
         NBTTagCompound nbttagcompound = new NBTTagCompound();
@@ -390,6 +394,7 @@ public class MwChunk implements IChunk {
 				try {
 					//RegionManager.logInfo("writing chunk (%d, %d) to region file", this.x, this.z);
 					//chunkNbt.writeElement(dos);
+					//use minecraft build in save tool for saving the Anvil Data
 					CompressedStreamTools.write(writeChunkToNBT(), dos);
 				} catch (IOException e) {
 					RegionManager.logError("%s: could not write chunk (%d, %d) to region file", e, this.x, this.z);

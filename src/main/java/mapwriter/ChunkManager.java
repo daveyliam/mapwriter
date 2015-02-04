@@ -30,7 +30,7 @@ public class ChunkManager {
 	
 	// create MwChunk from Minecraft chunk.
 	// only MwChunk's should be used in the background thread.
-	// TODO: make this a full copy of chunk data to prevent possible race conditions
+	// make this a full copy of chunk data to prevent possible race conditions <-- done
 	public static MwChunk copyToMwChunk(Chunk chunk) {
 		
 		byte[][] msbArray = new byte[16][];
