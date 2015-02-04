@@ -10,11 +10,9 @@ runtime
 .project
 .settings
 bin
-/Build.bat
-/Clean.bat
-/Deploy.bat
-/FixDependicies.bat
-/Install Forge.bat
-.nb-gradle
-.nb-gradle-properties
+Build.bat
+Clean.bat
+Deploy.bat
+FixDependicies.bat
+Install Forge.bat
 eclipse
