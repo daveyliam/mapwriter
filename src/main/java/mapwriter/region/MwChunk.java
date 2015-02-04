@@ -257,66 +257,6 @@ public class MwChunk implements IChunk {
 		return		((msb & 0x0f) << 12) | ((lsb & 0xff) << 4) | (meta & 0x0f);
 	}
 	
-	public Nbt getNbt() {
-		Nbt sections = new Nbt(Nbt.TAG_LIST, "Sections", null);
-		
-		for (int y = 0; y < 16; y++) {
-			Nbt section = new Nbt(Nbt.TAG_COMPOUND, "", null);
-			
-			section.addChild(new Nbt(Nbt.TAG_BYTE, "Y", (byte) y));
-			
-			if ((this.lsbArray != null) && (this.lsbArray[y] != null)) {
-				section.addChild(new Nbt(Nbt.TAG_BYTE_ARRAY, "Blocks", this.lsbArray[y]));
-			}
-			if ((this.msbArray != null) && (this.msbArray[y] != null)) {
-				section.addChild(new Nbt(Nbt.TAG_BYTE_ARRAY, "Add", this.msbArray[y]));
-			}
-			if ((this.metaArray != null) && (this.metaArray[y] != null)) {
-				section.addChild(new Nbt(Nbt.TAG_BYTE_ARRAY, "Data", this.metaArray[y]));
-			}
-			
-			sections.addChild(section);
-		}
-		
-		Nbt level = new Nbt(Nbt.TAG_COMPOUND, "Level", null);
-		level.addChild(new Nbt(Nbt.TAG_INT, "xPos", this.x));
-		level.addChild(new Nbt(Nbt.TAG_INT, "zPos", this.z));
-		level.addChild(sections);
-		
-		Nbt tileentitys = new Nbt(Nbt.TAG_LIST, "TileEntities", null);
-		if (!this.tileentityMap.isEmpty())
-		{
-				Nbt nbttileentity = new Nbt(Nbt.TAG_COMPOUND, "", null);
-				
-		        Iterator iterator = this.tileentityMap.values().iterator();
-
-		        while (iterator.hasNext())
-		        {
-		            TileEntity tileentity = (TileEntity)iterator.next();
-		            NBTTagCompound nbttagcompound = new NBTTagCompound();
-		            try {
-		            tileentity.writeToNBT(nbttagcompound);
-		            nbttileentity.addChild(new Nbt(Nbt.TAG_COMPOUND,"",nbttagcompound));
-		            int test = 0;
-		            }
-		            catch (Exception e)
-		            {
-		            }
-		        }
-			
-			//level.addChild(nbttileentity);
-		        level.addChild(new Nbt(Nbt.TAG_COMPOUND,"test",null));
-		}
-		if (this.biomeArray != null) {
-			level.addChild(new Nbt(Nbt.TAG_BYTE_ARRAY, "Biomes", this.biomeArray));
-		}
-		
-		Nbt root = new Nbt(Nbt.TAG_COMPOUND, "", null);
-		root.addChild(level);
-		
-		return root;
-	}
-	
 	//changed to use the NBTTagCompound that minecraft uses. this makes the local way of saving anvill data the same as Minecraft world data
     private NBTTagCompound writeChunkToNBT()
     {
