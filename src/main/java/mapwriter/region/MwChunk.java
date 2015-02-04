@@ -191,9 +191,9 @@ public class MwChunk implements IChunk {
 		int yi = (y >> 4) & 0xf;
 		int offset = ((y & 0xf) << 8) | ((z & 0xf) << 4) | (x & 0xf);
 		ChunkPosition chunkposition = new ChunkPosition(x, y, z);
-		int lsb  = ((this.lsbArray  != null) && (this.lsbArray[yi]  != null)) ? this.lsbArray[yi][offset]       : 0;
+		int lsb  = ((this.lsbArray  != null) && (this.lsbArray[yi]  != null)&& (this.lsbArray[yi].length  != 0)) ? this.lsbArray[yi][offset]       : 0;
 		int msb  = ((this.msbArray  != null) && (this.msbArray[yi]  != null) && (this.msbArray[yi].length  != 0)) ? this.msbArray[yi][offset  >> 1] : 0;
-		int meta = ((this.metaArray != null) && (this.metaArray[yi] != null)) ? this.metaArray[yi][offset >> 1] : 0;
+		int meta = ((this.metaArray != null) && (this.metaArray[yi] != null)&& (this.metaArray[yi].length  != 0)) ? this.metaArray[yi][offset >> 1] : 0;
 		
 		if (this.tileentityMap.containsKey(chunkposition))
 		{
