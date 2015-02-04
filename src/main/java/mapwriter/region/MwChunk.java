@@ -283,8 +283,9 @@ public class MwChunk implements IChunk {
         NBTTagCompound nbttagcompound2;
 
         for (int y = 0; y < this.dataArray.length; y++)
-        {     
-        	
+        {    
+        	if (this.dataArray[y] != null)
+        	{
         	byte[] abyte = new byte[this.dataArray[y].length];
             NibbleArray nibblearray = new NibbleArray();
             NibbleArray nibblearray1 = null;
@@ -325,6 +326,7 @@ public class MwChunk implements IChunk {
             }
 
         nbttagcompound1.setTag("Sections", nbttaglist);
+        }
         nbttagcompound1.setByteArray("Biomes", this.biomeArray);
 
         NBTTagList nbttaglist2 = new NBTTagList();
