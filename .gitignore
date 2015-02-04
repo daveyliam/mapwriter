@@ -10,8 +10,9 @@ runtime
 .project
 .settings
 bin
-/Build.bat
-/Clean.bat
-/Deploy.bat
-/FixDependicies.bat
-/Install Forge.bat
+Build.bat
+Clean.bat
+Deploy.bat
+FixDependicies.bat
+Install Forge.bat
+eclipse
