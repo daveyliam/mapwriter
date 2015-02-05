@@ -23,6 +23,7 @@ import mapwriter.tasks.CloseRegionManagerTask;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGameOver;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
@@ -611,12 +612,13 @@ public class Mw {
 			
 			// check if the game over screen is being displayed and if so 
 			// (thanks to Chrixian for this method of checking when the player is dead)
-			if (this.mc.currentScreen instanceof GuiGameOver) {
-				if (!this.onPlayerDeathAlreadyFired) {
-					this.onPlayerDeath();
-					this.onPlayerDeathAlreadyFired = true;
-				}
-			} else if (!(this.mc.currentScreen instanceof MwGui)) {
+			//if (this.mc.currentScreen instanceof GuiGameOver) {
+			//	if (!this.onPlayerDeathAlreadyFired) {
+			//		this.onPlayerDeath();
+			//		this.onPlayerDeathAlreadyFired = true;
+			//	}
+			//} 
+			if (!(this.mc.currentScreen instanceof MwGui)) {
 				// if the player is not dead
 				this.onPlayerDeathAlreadyFired = false;
 				// if in game (no gui screen) center the minimap on the player and render it.
@@ -669,7 +671,7 @@ public class Mw {
 	
 	// from onTick when mc.currentScreen is an instance of GuiGameOver
 	// it's the only option to detect death client side
-	public void onPlayerDeath() {
+	public void onPlayerDeath(EntityPlayerMP player) {
 		if (this.ready && (this.maxDeathMarkers > 0)) {
 			this.updatePlayer();
 			int deleteCount = this.markerManager.countMarkersInGroup("playerDeaths") - this.maxDeathMarkers + 1;
@@ -679,6 +681,7 @@ public class Mw {
 				// earliest death marker added.
 				this.markerManager.delMarker(null, "playerDeaths");
 			}
+			
 			this.markerManager.addMarker(MwUtil.getCurrentDateString(), "playerDeaths", this.playerXInt, this.playerYInt, this.playerZInt, this.playerDimension, 0xffff0000);
 			this.markerManager.setVisibleGroupName("playerDeaths");
 			this.markerManager.update();
