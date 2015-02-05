@@ -81,6 +81,13 @@ public class ChunkRender {
 			int meta = (blockAndMeta | 0xfff0) ^ 0xfff0;
 			int c1 = bc.getColour(blockAndMeta);
 			int alpha = (c1 >> 24) & 0xff;
+			
+			//this is the color that gets returned for air, so set aplha to 0 so the game continues to the next block in the colum
+			if (c1 == -8650628)
+			{
+				alpha = 0;
+			}
+			
 			// no need to process block if it is transparent
 			if (alpha > 0) {
 				int biome = chunk.getBiome(x, z);
