@@ -48,18 +48,31 @@ may run in the order:
 public class BackgroundExecutor {
 	
 	private ExecutorService executor;
+	private ExecutorService executor2;
 	private LinkedList<Task> taskQueue;
 	public boolean closed = false;
 	
 	public BackgroundExecutor() {
 		this.executor = Executors.newSingleThreadExecutor();
 		this.taskQueue = new LinkedList<Task>();
+		this.executor2 = Executors.newSingleThreadExecutor();
 	}
 	
 	// add a task to the queue
 	public boolean addTask(Task task) {
 		if (!this.closed) {
 			Future<?> future = this.executor.submit(task);
+			task.setFuture(future);
+			this.taskQueue.add(task);
+		} else {
+			MwUtil.log("MwExecutor.addTask: error: cannot add task to closed executor");
+		}
+		return this.closed;
+	}
+	
+	public boolean addTask2(Task task) {
+		if (!this.closed) {
+			Future<?> future = this.executor2.submit(task);
 			task.setFuture(future);
 			this.taskQueue.add(task);
 		} else {
