@@ -164,6 +164,12 @@ public class ChunkRender {
 					for (y = 127; y >= 0; y--) {
 						int blockAndMeta = chunk.getBlockAndMetadata(x, y, z);
 						int alpha = (bc.getColour(blockAndMeta) >> 24) & 0xff;
+						
+						if (bc.getColour(blockAndMeta) == -8650628)
+						{
+							alpha = 0;
+						}
+						
 						if (alpha != 0xff) {
 							break;
 						}
@@ -199,6 +205,12 @@ public class ChunkRender {
 				for (int y = startY; y < chunk.getMaxY(); y++) {
 					int blockAndMeta = chunk.getBlockAndMetadata(x, y, z);
 					int alpha = (bc.getColour(blockAndMeta) >> 24) & 0xff;
+					
+					if (bc.getColour(blockAndMeta) == -8650628)
+					{
+						alpha = 0;
+					}
+					
 					if (alpha == 0xff) {
 						break;
 					}

@@ -307,7 +307,12 @@ public class Mw {
 		this.mapRotationDegrees = -this.mc.thePlayer.rotationYaw + 180;
 		
 		// set by onWorldLoad
-		//this.playerDimension = this.mc.theWorld.provider.dimensionId;
+		this.playerDimension = this.mc.theWorld.provider.getDimensionId();
+		if (this.miniMap.view.getDimension() != this.playerDimension)
+		{
+		this.addDimension(this.playerDimension);
+		this.miniMap.view.setDimension(this.playerDimension);
+		}
 	}
 	
 	public void addDimension(int dimension) {
@@ -586,7 +591,7 @@ public class Mw {
 		//		world.getWorldInfo().getWorldName(),
 		//		world.provider.dimensionId);
 		
-		this.playerDimension = world.provider.getDimensionId();
+		//this.playerDimension = world.provider.getDimensionId();
 		if (this.ready) {
 			this.addDimension(this.playerDimension);
 			this.miniMap.view.setDimension(this.playerDimension);
