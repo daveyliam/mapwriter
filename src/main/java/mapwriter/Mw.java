@@ -121,7 +121,6 @@ public class Mw {
 	//public boolean lightingEnabled = false;
 	
 	// flags and counters
-	private boolean onPlayerDeathAlreadyFired = false;
 	public boolean ready = false;
 	public boolean multiplayer = false;
 	public int tickCounter = 0;
@@ -506,7 +505,6 @@ public class Mw {
 		}
 		
 		this.tickCounter = 0;
-		this.onPlayerDeathAlreadyFired = false;
 		
 		//this.multiplayer = !this.mc.isIntegratedServerRunning();
 		
@@ -596,8 +594,6 @@ public class Mw {
 			}
 
 			if (!(this.mc.currentScreen instanceof MwGui)) {
-				// if the player is not dead
-				this.onPlayerDeathAlreadyFired = false;
 				// if in game (no gui screen) center the minimap on the player and render it.
 			    this.miniMap.view.setViewCentreScaled(this.playerX, this.playerZ, this.playerDimension);
 				this.miniMap.drawCurrentMap();
