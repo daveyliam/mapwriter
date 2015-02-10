@@ -144,7 +144,7 @@ public class MwGui extends GuiScreen {
     	int bY = 0;
     	int worldDimension = this.mw.mc.theWorld.provider.getDimensionId();
     	if ((worldDimension == this.mapView.getDimension()) && (worldDimension != -1)) {
-    		bY = this.mw.mc.theWorld.getChunkFromBlockCoords(new BlockPos(bX,0, bZ)).getHeight(bX & 0xf, bZ & 0xf);
+    		bY = this.mw.mc.theWorld.getHeight(new BlockPos(bX,0, bZ)).getY();
     	}
     	return bY;
     }
