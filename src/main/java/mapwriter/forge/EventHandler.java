@@ -7,6 +7,7 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -86,4 +87,11 @@ public class EventHandler {
 			}
 		}
 	}
+	
+    @SubscribeEvent
+    public void renderMap(RenderGameOverlayEvent.Post event){
+        if(event.type == RenderGameOverlayEvent.ElementType.ALL){
+            Mw.instance.onTick();
+        }
+    }
 }

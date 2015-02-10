@@ -35,7 +35,6 @@ public class MwForge {
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
         FMLCommonHandler.instance().bus().register(this);
-        MinecraftForge.EVENT_BUS.register(this);
         proxy.preInit(event.getSuggestedConfigurationFile());
 	}
 	
@@ -48,13 +47,6 @@ public class MwForge {
 	public void postInit(FMLPostInitializationEvent event) {
 		proxy.postInit();
 	}
-	
-    @SubscribeEvent
-    public void renderMap(RenderGameOverlayEvent.Post event){
-        if(event.type == RenderGameOverlayEvent.ElementType.ALL){
-            Mw.instance.onTick();
-        }
-    }
 
     @SubscribeEvent
     public void onConnected(FMLNetworkEvent.ClientConnectedToServerEvent event){
