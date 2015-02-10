@@ -56,7 +56,7 @@ public class UndergroundTexture extends Texture {
 
 		@Override
 		public int getLightValue(int x, int y, int z) {
-			return this.chunk.getBlock(new BlockPos(x,y,z)).getLightValue();
+			return this.chunk.getLightSubtracted(new BlockPos(x,y,z),0);
 		}
 	}
 	
