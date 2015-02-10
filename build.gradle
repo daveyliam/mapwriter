@@ -16,14 +16,10 @@ buildscript {
 }
 
 apply plugin: 'forge'
-apply plugin: 'maven'
 
 repositories {
 	mavenLocal()
 } 
-
-group= "vectron"
-archivesBaseName = "MapWriter"
 
 // Define properties file
 ext.configFile = file "build.properties"
@@ -35,13 +31,17 @@ configFile.withReader {
     project.ext.config = new ConfigSlurper().parse prop
 }
 
+group= config.mod_group
+archivesBaseName = config.mod_name
+
 dependencies {
 }
 
-version = "${project.config.mod_version}"
+version = config.mod_version
 minecraft {
 version = config.mc_version + "-" + config.forge_version
 runDir = "eclipse"
+//mappings = config.mcp_version
 }
 
 
@@ -65,11 +65,14 @@ processResources
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
+}
 
 version = "${project.minecraft.version}-${project.version}"
+
 jar {
-classifier = 'universal'
+//classifier = 'universal'
 }
+
 
 task sourceJar(type: Jar) {
     from sourceSets.main.java
@@ -80,9 +83,8 @@ task sourceJar(type: Jar) {
 task devJar(type: Jar) {
 from sourceSets.main.output
 classifier = 'dev'
-	}
+}
 
-	artifacts {
+artifacts {
     		archives sourceJar, devJar
-	}
 }
