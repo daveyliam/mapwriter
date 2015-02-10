@@ -585,26 +585,6 @@ public class Mw {
 	// Event handlers
 	////////////////////////////////
 	
-	public void onWorldLoad(World world) {
-		//MwUtil.log("onWorldLoad: %s, name %s, dimension %d",
-		//		world,
-		//		world.getWorldInfo().getWorldName(),
-		//		world.provider.dimensionId);
-		
-		//this.playerDimension = world.provider.getDimensionId();
-		if (this.ready) {
-			this.addDimension(this.playerDimension);
-			this.miniMap.view.setDimension(this.playerDimension);
-		}
-	}
-	
-	public void onWorldUnload(World world) {
-		//MwUtil.log("onWorldUnload: %s, name %s, dimension %d",
-		//		world,
-		//		world.getWorldInfo().getWorldName(),
-		//		world.provider.dimensionId);
-	}
-	
 	public void onTick() {
 		this.load();
 		if (this.ready && (this.mc.thePlayer != null)) {
@@ -614,15 +594,7 @@ public class Mw {
 			if (this.undergroundMode && ((this.tickCounter % 30) == 0)) {
 				this.undergroundMapTexture.update();
 			}
-			
-			// check if the game over screen is being displayed and if so 
-			// (thanks to Chrixian for this method of checking when the player is dead)
-			//if (this.mc.currentScreen instanceof GuiGameOver) {
-			//	if (!this.onPlayerDeathAlreadyFired) {
-			//		this.onPlayerDeath();
-			//		this.onPlayerDeathAlreadyFired = true;
-			//	}
-			//} 
+
 			if (!(this.mc.currentScreen instanceof MwGui)) {
 				// if the player is not dead
 				this.onPlayerDeathAlreadyFired = false;

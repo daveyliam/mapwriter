@@ -37,20 +37,6 @@ public class EventHandler {
 	}
 
 	@SubscribeEvent
-	public void eventWorldLoad(WorldEvent.Load event) {
-		if (event.world.isRemote) {
-			this.mw.onWorldLoad(event.world);
-		}
-	}
-
-	@SubscribeEvent
-	public void eventWorldUnload(WorldEvent.Unload event) {
-		if (event.world.isRemote) {
-			this.mw.onWorldUnload(event.world);
-		}
-	}
-
-	@SubscribeEvent
 	public void onClientChat(ClientChatReceivedEvent event) {
 		if (OverlaySlime.seedFound || !OverlaySlime.seedAsked)
 			return;
