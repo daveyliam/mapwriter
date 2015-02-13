@@ -5,6 +5,7 @@ import mapwriter.forge.MwForge;
 import mapwriter.forge.MwKeyHandler;
 import mapwriter.gui.MwGui;
 import mapwriter.gui.MwGuiMarkerDialog;
+import mapwriter.gui.MwGuiMarkerDialogNew;
 import mapwriter.map.*;
 import mapwriter.overlay.OverlaySlime;
 import mapwriter.region.BlockColours;
@@ -111,6 +112,7 @@ public class Mw {
 	public boolean regionFileOutputEnabledSP = true;
 	public boolean regionFileOutputEnabledMP = true;
 	public int backgroundTextureMode = 0;
+	public boolean newMarkerDialog = true;
 	//public boolean lightingEnabled = false;
 	
 	// flags and counters
@@ -219,6 +221,7 @@ public class Mw {
 		this.regionFileOutputEnabledMP = this.config.getOrSetBoolean(catOptions, "regionFileOutputEnabledMP", this.regionFileOutputEnabledMP);
 		this.backgroundTextureMode = this.config.getOrSetInt(catOptions, "backgroundTextureMode", this.backgroundTextureMode, 0, 1);
 		//this.lightingEnabled = this.config.getOrSetBoolean(catOptions, "lightingEnabled", this.lightingEnabled);
+		this.newMarkerDialog = this.config.getOrSetBoolean(catOptions, "newMarkerDialog", this.newMarkerDialog);
 		
 		this.maxZoom = this.config.getOrSetInt(catOptions, "zoomOutLevels", this.maxZoom, 1, 256);
 		this.minZoom = -this.config.getOrSetInt(catOptions, "zoomInLevels", -this.minZoom, 1, 256);
@@ -251,6 +254,7 @@ public class Mw {
 		this.config.setBoolean(catOptions, "undergroundMode", this.undergroundMode);
 		this.config.setInt(catOptions, "backgroundTextureMode", this.backgroundTextureMode);
 		//this.config.setBoolean(catOptions, "lightingEnabled", this.lightingEnabled);
+		this.config.setBoolean(catOptions, "newMarkerDialog", this.newMarkerDialog);
 		
 		this.config.save();	
 	}
@@ -699,18 +703,36 @@ public class Mw {
 				if (group.equals("none")) {
 					group = "group";
 				}
-				this.mc.displayGuiScreen(
-					new MwGuiMarkerDialog(
-						null,
-						this.markerManager,
-						"",
-						group,
-						this.playerXInt,
-						this.playerYInt,
-						this.playerZInt,
-						this.playerDimension
-					)
-				);
+        		if (this.newMarkerDialog)
+        		{				
+        			this.mc.displayGuiScreen(
+    					new MwGuiMarkerDialogNew(
+    							null,
+    							this.markerManager,
+    							"",
+    							group,
+    							this.playerXInt,
+    							this.playerYInt,
+    							this.playerZInt,
+    							this.playerDimension
+    						)
+    					);
+        		}
+        		else
+        		{
+    				this.mc.displayGuiScreen(
+    						new MwGuiMarkerDialog(
+    							null,
+    							this.markerManager,
+    							"",
+    							group,
+    							this.playerXInt,
+    							this.playerYInt,
+    							this.playerZInt,
+    							this.playerDimension
+    						)
+    					);
+        		}
 			
 			} else if (kb == MwKeyHandler.keyNextGroup) {
 				// toggle marker mode

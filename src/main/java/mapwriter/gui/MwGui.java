@@ -391,16 +391,35 @@ public class MwGui extends GuiScreen {
         			my = (this.mouseBlockY > 0) ? this.mouseBlockY : this.mw.defaultTeleportHeight;
         			mz = this.mouseBlockZ;
         		}
-        		this.mc.displayGuiScreen(
-        			new MwGuiMarkerDialog(
-        				this,
-        				this.mw.markerManager,
-        				"",
-        				group,
-        				mx, my, mz,
-        				this.mapView.getDimension()
-        			)
-        		);
+        		
+        		if (mw.newMarkerDialog)
+        		{
+            		this.mc.displayGuiScreen(
+                			new MwGuiMarkerDialogNew(
+                				this,
+                				this.mw.markerManager,
+                				"",
+                				group,
+                				mx, my, mz,
+                				this.mapView.getDimension()
+                			)
+                		);	
+        		}
+        		else
+        		{
+            		this.mc.displayGuiScreen(
+                			new MwGuiMarkerDialog(
+                				this,
+                				this.mw.markerManager,
+                				"",
+                				group,
+                				mx, my, mz,
+                				this.mapView.getDimension()
+                			)
+                		);
+        		}
+        		
+
     		}
     	}
 

@@ -36,7 +36,7 @@ public class MwGuiOptionSlot extends GuiSlot {
 		"panning"
 	};
 	
-	private GuiButton[] buttons = new GuiButton[12];
+	private GuiButton[] buttons = new GuiButton[13];
 	
     static final ResourceLocation WIDGET_TEXTURE_LOC = new ResourceLocation("textures/gui/widgets.png");
 	
@@ -81,6 +81,9 @@ public class MwGuiOptionSlot extends GuiSlot {
 		//case 11:
 		//	this.buttons[i].displayString = "Map Lighting: " + (this.mw.lightingEnabled ? "enabled" : "disabled");
 		//	break;	
+		case 12:
+			this.buttons[i].displayString = "Old/New Marker Dialog: " + (this.mw.newMarkerDialog ? "New" : "Old");
+			break;		
 		default:
 			break;
 		}
@@ -200,6 +203,9 @@ public class MwGuiOptionSlot extends GuiSlot {
 		//	// lighting
 		//	this.mw.lightingEnabled = !this.mw.lightingEnabled;
 		//	break;
+		case 12:
+			this.mw.newMarkerDialog = !this.mw.newMarkerDialog;
+			break;	
 		default:
 			break;
 		}
