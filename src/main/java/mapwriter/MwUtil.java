@@ -17,7 +17,7 @@ import net.minecraft.world.chunk.Chunk;
 
 public class MwUtil {
 	
-	public final static Pattern patternInvalidChars = Pattern.compile("[^a-zA-Z0-9_]");
+	public final static Pattern patternInvalidChars = Pattern.compile("[^\\p{IsAlphabetic}\\p{Digit}_]");
 	
 	public static void logInfo(String s, Object...args) {
 		MwForge.logger.info(String.format(s, args));
