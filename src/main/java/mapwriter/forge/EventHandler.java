@@ -1,13 +1,16 @@
 package mapwriter.forge;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import mapwriter.Mw;
+import mapwriter.config.ConfigurationHandler;
 import mapwriter.overlay.OverlaySlime;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
+import cpw.mods.fml.client.event.ConfigChangedEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class EventHandler {
 	
@@ -66,5 +69,13 @@ public class EventHandler {
         }catch(Exception e){
             //e.printStackTrace();
         }
+    }
+
+    @SubscribeEvent
+    public void onTextureStitchEventPost(TextureStitchEvent.Post event){ 
+    	if (event.map.getTextureType() == 0)
+    	{
+    		mw.reloadBlockColours();
+    	}
     }
 }
