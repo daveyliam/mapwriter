@@ -463,8 +463,7 @@ public class Mw {
 		
 		MwUtil.log("Mw.load: loading...");
 		
-		IntegratedServer server = this.mc.getIntegratedServer();
-		this.multiplayer = (server == null);
+		this.multiplayer = !this.mc.isIntegratedServerRunning();
 		
 		this.loadConfig();
 		
@@ -515,7 +514,7 @@ public class Mw {
 		// mapTexture depends on config being loaded
 		this.mapTexture = new MapTexture(this.textureSize, this.linearTextureScalingEnabled);
 		this.undergroundMapTexture = new UndergroundTexture(this, this.textureSize, this.linearTextureScalingEnabled);
-		this.reloadBlockColours();
+		//this.reloadBlockColours();
 		// region manager depends on config, mapTexture, and block colours
 		this.regionManager = new RegionManager(this.worldDir, this.imageDir, this.blockColours, this.minZoom, this.maxZoom);
 		// overlay manager depends on mapTexture
@@ -525,11 +524,12 @@ public class Mw {
 		this.chunkManager = new ChunkManager(this);
 		
 		this.ready = true;
-		
 		//if (!zoomLevelsExist) {
 			//printBoth("recreating zoom levels");
 			//this.regionManager.recreateAllZoomLevels();
 		//}
+		
+		MwUtil.log("Mw.load: Done");
 	}
 	
 	public void close() {
