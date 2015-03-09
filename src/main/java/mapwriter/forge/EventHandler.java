@@ -1,7 +1,6 @@
 package mapwriter.forge;
 
 import mapwriter.Mw;
-import mapwriter.config.ConfigurationHandler;
 import mapwriter.overlay.OverlaySlime;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatComponentTranslation;
