@@ -7,6 +7,7 @@ import java.util.Map;
 import mapwriter.region.MwChunk;
 import mapwriter.tasks.SaveChunkTask;
 import mapwriter.tasks.UpdateSurfaceChunksTask;
+import mapwriter.util.Config;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 
@@ -96,7 +97,7 @@ public class ChunkManager {
 	}
 	
 	public void updateSurfaceChunks() {
-		int chunksToUpdate = Math.min(this.chunkMap.size(), this.mw.chunksPerTick);
+		int chunksToUpdate = Math.min(this.chunkMap.size(), Config.chunksPerTick);
 		MwChunk[] chunkArray = new MwChunk[chunksToUpdate];
 		for (int i = 0; i < chunksToUpdate; i++) {
 			Map.Entry<Chunk, Integer> entry = this.chunkMap.getNextEntry();
@@ -106,7 +107,7 @@ public class ChunkManager {
 				Chunk chunk = entry.getKey();
 
 				int flags = entry.getValue();
-				if (MwUtil.distToChunkSq(this.mw.playerXInt, this.mw.playerZInt, chunk) <= this.mw.maxChunkSaveDistSq) {
+				if (MwUtil.distToChunkSq(this.mw.playerXInt, this.mw.playerZInt, chunk) <= Config.maxChunkSaveDistSq) {
 					flags |= (VISIBLE_FLAG | VIEWED_FLAG);
 				} else {
 					flags &= ~VISIBLE_FLAG;
@@ -139,8 +140,8 @@ public class ChunkManager {
 	}
 	
 	private void addSaveChunkTask(Chunk chunk) {
-		if ((this.mw.multiplayer && this.mw.regionFileOutputEnabledMP) || 
-			(!this.mw.multiplayer && this.mw.regionFileOutputEnabledSP)) {
+		if ((this.mw.multiplayer && Config.regionFileOutputEnabledMP) || 
+			(!this.mw.multiplayer && Config.regionFileOutputEnabledSP)) {
 			if (!chunk.isEmpty()) {
 				this.mw.executor.addTask2(new SaveChunkTask(copyToMwChunk(chunk), this.mw.regionManager));
 			}

@@ -2,13 +2,12 @@ package mapwriter.map.mapmode;
 
 import java.awt.Point;
 
-import mapwriter.forge.MwConfig;
+import mapwriter.handler.ConfigurationHandler;
 import mapwriter.map.MapView;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 
 public class MapMode {
-	private final MwConfig config;
 	public final String configCategory;
 	
 	private int sw = 320;
@@ -46,41 +45,40 @@ public class MapMode {
 	public int textY = 0;
 	public int textColour = 0xffffffff;
 	
-	public MapMode(MwConfig config, String configCategory) {
-		this.config = config;
+	public MapMode(String configCategory) {
 		this.configCategory = configCategory;
 	}
 	
 	public void loadConfig() {
 		// get options from config file
-		this.enabled = this.config.getOrSetBoolean(this.configCategory, "enabled", this.enabled);
-		this.playerArrowSize = this.config.getOrSetInt(this.configCategory, "playerArrowSize", this.playerArrowSize, 1, 20);
-		this.markerSize = this.config.getOrSetInt(this.configCategory, "markerSize", this.markerSize, 1, 20);
-		this.alphaPercent = this.config.getOrSetInt(this.configCategory, "alphaPercent", this.alphaPercent, 0, 100);
+		this.enabled = ConfigurationHandler.configuration.getBoolean("enabled", this.configCategory, this.enabled, "");
+		this.playerArrowSize = ConfigurationHandler.configuration.getInt("playerArrowSize", this.configCategory, this.playerArrowSize, 1, 20, "");
+		this.markerSize = ConfigurationHandler.configuration.getInt("markerSize", this.configCategory, this.markerSize, 1, 20, "");
+		this.alphaPercent = ConfigurationHandler.configuration.getInt("alphaPercent", this.configCategory, this.alphaPercent, 0, 100, "");
 		
-		this.heightPercent = this.config.getOrSetInt(this.configCategory, "heightPercent", this.heightPercent, 0, 100);
-		this.marginTop = this.config.getOrSetInt(this.configCategory, "marginTop", this.marginTop, -1, 320);
-		this.marginBottom = this.config.getOrSetInt(this.configCategory, "marginBottom", this.marginBottom, -1, 320);
-		this.marginLeft = this.config.getOrSetInt(this.configCategory, "marginLeft", this.marginLeft, -1, 320);
-		this.marginRight = this.config.getOrSetInt(this.configCategory, "marginRight", this.marginRight, -1, 320);
+		this.heightPercent = ConfigurationHandler.configuration.getInt("heightPercent",this.configCategory, this.heightPercent, 0, 100, "");
+		this.marginTop = ConfigurationHandler.configuration.getInt("marginTop", this.configCategory, this.marginTop, -1, 320, "");
+		this.marginBottom = ConfigurationHandler.configuration.getInt("marginBottom", this.configCategory, this.marginBottom, -1, 320, "");
+		this.marginLeft = ConfigurationHandler.configuration.getInt("marginLeft", this.configCategory, this.marginLeft, -1, 320, "");
+		this.marginRight = ConfigurationHandler.configuration.getInt("marginRight", this.configCategory, this.marginRight, -1, 320, "");
 		
-		this.rotate = this.config.getOrSetBoolean(this.configCategory, "rotate", this.rotate);
-		this.circular = this.config.getOrSetBoolean(this.configCategory, "circular", this.circular);
-		this.coordsEnabled = this.config.getOrSetBoolean(this.configCategory, "coordsEnabled", this.coordsEnabled);
-		this.borderMode = this.config.getOrSetInt(this.configCategory, "borderMode", this.borderMode, 0, 1);
+		this.rotate = ConfigurationHandler.configuration.getBoolean("rotate", this.configCategory, this.rotate, "");
+		this.circular = ConfigurationHandler.configuration.getBoolean("circular", this.configCategory, this.circular, "");
+		this.coordsEnabled = ConfigurationHandler.configuration.getBoolean("coordsEnabled", this.configCategory, this.coordsEnabled, "");
+		this.borderMode = ConfigurationHandler.configuration.getInt("borderMode", this.configCategory, this.borderMode, 0, 1, "");
 		
 		this.trailMarkerSize = Math.max(1, this.markerSize - 1);
 	}
 	
 	public void saveConfig() {
-		this.config.setBoolean(this.configCategory, "enabled", this.enabled);
-		this.config.setInt(this.configCategory, "heightPercent", this.heightPercent);
-		this.config.setInt(this.configCategory, "marginTop", this.marginTop);
-		this.config.setInt(this.configCategory, "marginBottom", this.marginBottom);
-		this.config.setInt(this.configCategory, "marginLeft", this.marginLeft);
-		this.config.setInt(this.configCategory, "marginRight", this.marginRight);
-		this.config.setBoolean(this.configCategory, "rotate", this.rotate);
-		this.config.setBoolean(this.configCategory, "circular", this.circular);
+		//this.config.setBoolean(this.configCategory, "enabled", this.enabled);
+		//this.config.setInt(this.configCategory, "heightPercent", this.heightPercent);
+		//this.config.setInt(this.configCategory, "marginTop", this.marginTop);
+		//this.config.setInt(this.configCategory, "marginBottom", this.marginBottom);
+		//this.config.setInt(this.configCategory, "marginLeft", this.marginLeft);
+		//this.config.setInt(this.configCategory, "marginRight", this.marginRight);
+		//this.config.setBoolean(this.configCategory, "rotate", this.rotate);
+		//this.config.setBoolean(this.configCategory, "circular", this.circular);
 	}
 	
 	public void close() {

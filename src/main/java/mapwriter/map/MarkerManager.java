@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mapwriter.MwUtil;
-import mapwriter.forge.MwConfig;
 import mapwriter.map.mapmode.MapMode;
+import net.minecraftforge.common.config.Configuration;
 
 public class MarkerManager {
 	
@@ -21,7 +21,7 @@ public class MarkerManager {
 	public MarkerManager() {
 	}
 	
-	public void load(MwConfig config, String category) {
+	public void load(Configuration config, String category) {
 		this.markerList.clear();
 		
 		if (config.hasCategory(category)) {
@@ -45,7 +45,7 @@ public class MarkerManager {
 		this.update();
 	}
 	
-	public void save(MwConfig config, String category) {
+	public void save(Configuration config, String category) {
 		config.get(category, "markerCount", 0).set(this.markerList.size());
 		config.get(category, "visibleGroup", "").set(this.visibleGroupName);
 		

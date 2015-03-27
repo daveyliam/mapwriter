@@ -1,10 +1,9 @@
 package mapwriter.map.mapmode;
 
-import mapwriter.forge.MwConfig;
 
 public class FullScreenMapMode extends MapMode {
-	public FullScreenMapMode(MwConfig config) {
-		super(config, "fullScreenMap");
+	public FullScreenMapMode() {
+		super("fullScreenMap");
 		
 		this.heightPercent = -1;
 		this.marginTop = 0;

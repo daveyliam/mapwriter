@@ -1,6 +1,7 @@
 package mapwriter.gui;
 
 import mapwriter.Mw;
+import mapwriter.util.Config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -42,25 +43,25 @@ public class MwGuiOptionSlot extends GuiSlot {
 	public void updateButtonLabel(int i) {
 		switch(i) {
 		case 0:
-			this.buttons[i].displayString = "Draw coords: " + coordsModeStringArray[this.mw.coordsMode];
+			this.buttons[i].displayString = "Draw coords: " + coordsModeStringArray[Config.coordsMode];
 			break;
 		case 1:
 			this.buttons[i].displayString = "Circular mode: " + this.mw.miniMap.smallMapMode.circular;
 			break;
 		case 2:
-			this.buttons[i].displayString = "Texture size: " + this.mw.configTextureSize;
+			this.buttons[i].displayString = "Texture size: " + Config.configTextureSize;
 			break;
 		case 3:	
-			this.buttons[i].displayString = "Texture scaling: " + (this.mw.linearTextureScalingEnabled ? "linear" : "nearest");
+			this.buttons[i].displayString = "Texture scaling: " + (Config.linearTextureScalingEnabled ? "linear" : "nearest");
 			break;
 		case 4:
 			this.buttons[i].displayString = "Trail markers: " + (this.mw.playerTrail.enabled);
 			break;
 		case 5:
-			this.buttons[i].displayString = "Map colours: " + (this.mw.useSavedBlockColours ? "frozen" : "auto");
+			this.buttons[i].displayString = "Map colours: " + (Config.useSavedBlockColours ? "frozen" : "auto");
 			break;
 		case 6:
-			this.buttons[i].displayString = "Max draw distance: " + Math.round(Math.sqrt(this.mw.maxChunkSaveDistSq));
+			this.buttons[i].displayString = "Max draw distance: " + Math.round(Math.sqrt(Config.maxChunkSaveDistSq));
 			break;
 		case 7:
 			this.buttons[i].displayString = "Mini map size: " + this.mw.miniMap.smallMapMode.heightPercent;
@@ -69,13 +70,13 @@ public class MwGuiOptionSlot extends GuiSlot {
 			this.buttons[i].displayString = "Mini map position: " + miniMapPositionStringArray[this.miniMapPositionIndex];
 			break;
 		case 9:
-			this.buttons[i].displayString = "Map pixel snapping: " + (this.mw.mapPixelSnapEnabled ? "enabled" : "disabled");
+			this.buttons[i].displayString = "Map pixel snapping: " + (Config.mapPixelSnapEnabled ? "enabled" : "disabled");
 			break;
 		case 10:
-			this.buttons[i].displayString = "Max death markers: " + this.mw.maxDeathMarkers;
+			this.buttons[i].displayString = "Max death markers: " + Config.maxDeathMarkers;
 			break;
 		case 11:
-			this.buttons[i].displayString = "Background mode: " + backgroundModeStringArray[this.mw.backgroundTextureMode];
+			this.buttons[i].displayString = "Background mode: " + backgroundModeStringArray[Config.backgroundTextureMode];
 			break;
 		//case 11:
 		//	this.buttons[i].displayString = "Map Lighting: " + (this.mw.lightingEnabled ? "enabled" : "disabled");
@@ -120,15 +121,15 @@ public class MwGuiOptionSlot extends GuiSlot {
 			break;
 		case 2:
 			// toggle texture size
-			this.mw.configTextureSize *= 2;
-			if (this.mw.configTextureSize > 4096) {
-				this.mw.configTextureSize = 1024;
+			Config.configTextureSize *= 2;
+			if (Config.configTextureSize > 4096) {
+				Config.configTextureSize = 1024;
 			}
 			break;
 		case 3:
 			// linear scaling
-			this.mw.linearTextureScalingEnabled = !this.mw.linearTextureScalingEnabled;
-			this.mw.mapTexture.setLinearScaling(this.mw.linearTextureScalingEnabled);
+			Config.linearTextureScalingEnabled = !Config.linearTextureScalingEnabled;
+			this.mw.mapTexture.setLinearScaling(Config.linearTextureScalingEnabled);
 			//this.mw.undergroundMapTexture.setLinearScaling(this.mw.linearTextureScalingEnabled);
 			break;
 		case 4:
@@ -137,19 +138,19 @@ public class MwGuiOptionSlot extends GuiSlot {
 			break;
 		case 5:
 			// map colours
-			this.mw.useSavedBlockColours = !this.mw.useSavedBlockColours;
+			Config.useSavedBlockColours = !Config.useSavedBlockColours;
 			// reload block colours before saving in case player changed
 			// texture packs before pressing button.
 			this.mw.reloadBlockColours();
 			break;
 		case 6:
 			// toggle max chunk save dist
-			int d = Math.round((float) Math.sqrt(this.mw.maxChunkSaveDistSq));
+			int d = Math.round((float) Math.sqrt(Config.maxChunkSaveDistSq));
 			d += 32;
 			if (d > 256) {
 				d = 64;
 			}
-			this.mw.maxChunkSaveDistSq = d * d;
+			Config.maxChunkSaveDistSq = d * d;
 			break;
 		case 7:
 			this.mw.miniMap.smallMapMode.toggleHeightPercent();
@@ -182,18 +183,18 @@ public class MwGuiOptionSlot extends GuiSlot {
 			}
 		case 9:
 			// map scroll pixel snapping
-			this.mw.mapPixelSnapEnabled = !this.mw.mapPixelSnapEnabled;
+			Config.mapPixelSnapEnabled = !Config.mapPixelSnapEnabled;
 			break;
 		case 10:
 			// max death markers
-			this.mw.maxDeathMarkers++;
-			if (this.mw.maxDeathMarkers > 10) {
-				this.mw.maxDeathMarkers = 0;
+			Config.maxDeathMarkers++;
+			if (Config.maxDeathMarkers > 10) {
+				Config.maxDeathMarkers = 0;
 			}
 			break;
 		case 11:
 			// background texture mode
-			this.mw.backgroundTextureMode = (this.mw.backgroundTextureMode + 1) % 3;
+			Config.backgroundTextureMode = (Config.backgroundTextureMode + 1) % 3;
 			break;
 		//case 11:
 		//	// lighting

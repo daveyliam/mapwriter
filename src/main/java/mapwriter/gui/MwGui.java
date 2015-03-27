@@ -15,6 +15,7 @@ import mapwriter.map.mapmode.FullScreenMapMode;
 import mapwriter.map.mapmode.MapMode;
 import mapwriter.tasks.MergeTask;
 import mapwriter.tasks.RebuildRegionsTask;
+import mapwriter.util.Config;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.BlockPos;
@@ -82,7 +83,7 @@ public class MwGui extends GuiScreen {
     
     public MwGui(Mw mw) {
     	this.mw = mw;
-    	this.mapMode = new FullScreenMapMode(mw.config);
+    	this.mapMode = new FullScreenMapMode();
     	this.mapView = new MapView(this.mw);
     	this.map = new MapRenderer(this.mw, this.mapMode, this.mapView);
     	
@@ -256,7 +257,7 @@ public class MwGui extends GuiScreen {
         				this.mw,
         				this.mapView,
         				this.mouseBlockX,
-        				this.mw.defaultTeleportHeight,
+        				Config.defaultTeleportHeight,
         				this.mouseBlockZ
         			)
         		);
@@ -299,7 +300,7 @@ public class MwGui extends GuiScreen {
 	        	this.mw.markerManager.update();
     		} else if (key == MwKeyHandler.keyUndergroundMode.getKeyCode()) {
     			this.mw.toggleUndergroundMode();
-    			this.mapView.setUndergroundMode(this.mw.undergroundMode);
+    			this.mapView.setUndergroundMode(Config.undergroundMode);
 			}
 			break;
         }
@@ -389,7 +390,7 @@ public class MwGui extends GuiScreen {
         		} else {
         			// marker at mouse pointer location
         			mx = this.mouseBlockX;
-        			my = (this.mouseBlockY > 0) ? this.mouseBlockY : this.mw.defaultTeleportHeight;
+        			my = (this.mouseBlockY > 0) ? this.mouseBlockY : Config.defaultTeleportHeight;
         			mz = this.mouseBlockZ;
         		}
         		this.mc.displayGuiScreen(
@@ -420,7 +421,7 @@ public class MwGui extends GuiScreen {
 
     // mouse button released. 0 = LMB, 1 = RMB, 2 = MMB
     // not called on mouse movement.
-    protected void mouseMovedOrUp(int x, int y, int button) {
+    protected void mouseReleased(int x, int y, int button) {
     	//MwUtil.log("MwGui.mouseMovedOrUp(%d, %d, %d)", x, y, button);
     	if (button == 0) {
     		this.mouseLeftHeld = 0;

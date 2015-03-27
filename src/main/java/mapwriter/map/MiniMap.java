@@ -7,6 +7,8 @@ import mapwriter.Mw;
 import mapwriter.map.mapmode.LargeMapMode;
 import mapwriter.map.mapmode.MapMode;
 import mapwriter.map.mapmode.SmallMapMode;
+import mapwriter.util.Config;
+import mapwriter.util.Reference;
 
 public class MiniMap {
 	private Mw mw;
@@ -27,25 +29,19 @@ public class MiniMap {
 	private List<MapRenderer> mapList;
 	private MapRenderer currentMap = null;
 	
-	public int modeIndex = 0;
-	
 	public MiniMap(Mw mw) {
 		this.mw = mw;
 		
-		// load config file options
-		this.modeIndex = mw.config.getOrSetInt(Mw.catOptions, "overlayModeIndex", this.modeIndex, 0, 1000);
-		int zoomLevel = mw.config.getOrSetInt(Mw.catOptions, "overlayZoomLevel", 0, mw.minZoom, mw.maxZoom);
-		
 		// map view shared between large and small map modes
 		this.view = new MapView(mw);
-		this.view.setZoomLevel(zoomLevel);
+		this.view.setZoomLevel(Config.zoomLevel);
 		
 		// small map mode
-		this.smallMapMode = new SmallMapMode(this.mw.config);
+		this.smallMapMode = new SmallMapMode();
 		this.smallMap = new MapRenderer(mw, this.smallMapMode, this.view);
 		
 		// large map mode
-		this.largeMapMode = new LargeMapMode(this.mw.config);
+		this.largeMapMode = new LargeMapMode();
 		this.largeMap = new MapRenderer(mw, this.largeMapMode, this.view);
 		
 		this.mapList = new ArrayList<MapRenderer>();
@@ -63,7 +59,7 @@ public class MiniMap {
 		
 		// sanitize overlayModeIndex loaded from config
 		this.nextOverlayMode(0);
-		this.currentMap = this.mapList.get(this.modeIndex);
+		this.currentMap = this.mapList.get(Config.modeIndex);
 	}
 	
 	public void close() {
@@ -72,16 +68,13 @@ public class MiniMap {
 		
 		this.smallMapMode.close();
 		this.largeMapMode.close();
-		
-		this.mw.config.setInt(Mw.catOptions, "overlayModeIndex", this.modeIndex);
-		this.mw.config.setInt(Mw.catOptions, "overlayZoomLevel", this.view.getZoomLevel());
 	}
 	
 	// toggle between small map, underground map and no map
 	public MapRenderer nextOverlayMode(int increment) {
 		int size = this.mapList.size();
-		this.modeIndex = (this.modeIndex + size + increment) % size;
-		this.currentMap = this.mapList.get(this.modeIndex);
+		Config.modeIndex = (Config.modeIndex + size + increment) % size;
+		this.currentMap = this.mapList.get(Config.modeIndex);
 		return this.currentMap;
 	}
 	

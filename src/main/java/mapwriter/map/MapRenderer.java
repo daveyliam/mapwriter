@@ -9,6 +9,7 @@ import mapwriter.api.IMwChunkOverlay;
 import mapwriter.api.IMwDataProvider;
 import mapwriter.api.MwAPI;
 import mapwriter.map.mapmode.MapMode;
+import mapwriter.util.Config;
 import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
@@ -36,7 +37,7 @@ public class MapRenderer {
 	private void drawMap() {
 		
 		int regionZoomLevel = Math.max(0, this.mapView.getZoomLevel());
-		double tSize = (double) this.mw.textureSize;
+		double tSize = (double) Config.textureSize;
 		double zoomScale = (double) (1 << regionZoomLevel);
 		
 		// if the texture UV coordinates do not line up with the texture pixels then the texture
@@ -48,7 +49,7 @@ public class MapRenderer {
 		// pixel boundaries when zoomed in.
 		
 		double u, v, w, h;
-		if ((!this.mapMode.circular) && (this.mw.mapPixelSnapEnabled) && (this.mapView.getZoomLevel() >= 0)) {
+		if ((!this.mapMode.circular) && (Config.mapPixelSnapEnabled) && (this.mapView.getZoomLevel() >= 0)) {
 			u = (Math.round(this.mapView.getMinX() / zoomScale) / tSize) % 1.0;
 			v = (Math.round(this.mapView.getMinZ() / zoomScale) / tSize) % 1.0;
 			w = Math.round(this.mapView.getWidth() / zoomScale) / tSize;
@@ -88,10 +89,10 @@ public class MapRenderer {
 			this.mw.mapTexture.requestView(req, this.mw.executor, this.mw.regionManager);
 			
 			// draw the background texture
-			if (this.mw.backgroundTextureMode > 0) {
+			if (Config.backgroundTextureMode > 0) {
 				double bu1 = 0.0; double bu2 = 1.0;
 				double bv1 = 0.0; double bv2 = 1.0;
-				if (this.mw.backgroundTextureMode == 2) {
+				if (Config.backgroundTextureMode == 2) {
 					// background moves with map if mode is 2
 					double bSize = tSize / 256.0;
 					bu1 = u * bSize; bu2 = (u + w) * bSize;
@@ -213,11 +214,11 @@ public class MapRenderer {
 		if (this.mapMode.coordsEnabled) {
 			GL11.glPushMatrix();
 			GL11.glTranslatef(this.mapMode.textX, this.mapMode.textY, 0);
-			if (this.mw.coordsMode != 2) {
+			if (Config.coordsMode != 2) {
 				GL11.glScalef(0.5f, 0.5f, 1.0f);
 			}
 			int offset = 0;
-			if (this.mw.coordsMode > 0) {
+			if (Config.coordsMode > 0) {
 				Render.drawCentredString(0, 0, this.mapMode.textColour,
 						"%d, %d, %d", 
 						this.mw.playerXInt,
@@ -226,7 +227,7 @@ public class MapRenderer {
 				);
 				offset += 12;
 			}
-			if (this.mw.undergroundMode) {
+			if (Config.undergroundMode) {
 				Render.drawCentredString(
 					0, offset, this.mapMode.textColour,"underground mode"
 				);
@@ -259,7 +260,7 @@ public class MapRenderer {
 		
 		this.mapMode.setScreenRes();
 		this.mapView.setMapWH(this.mapMode);
-		this.mapView.setTextureSize(this.mw.textureSize);
+		this.mapView.setTextureSize(Config.textureSize);
 		
 		GL11.glPushMatrix();
 		GL11.glLoadIdentity();

@@ -2,6 +2,7 @@ package mapwriter.gui;
 
 import mapwriter.Mw;
 import mapwriter.map.MapView;
+import mapwriter.util.Config;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -28,7 +29,7 @@ public class MwGuiTeleportDialog extends MwGuiTextDialog {
 		int height = this.getInputAsInt();
 		if (this.inputValid) {
     		height = Math.min(Math.max(0, height), 255);
-    		this.mw.defaultTeleportHeight = height;
+    		Config.defaultTeleportHeight = height;
     		this.mw.teleportToMapPos(this.mapView, this.teleportX, height, this.teleportZ);
     		done = true;
 		}

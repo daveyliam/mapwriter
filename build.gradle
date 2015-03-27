@@ -25,27 +25,26 @@ repositories {
 ext.configFile = file "build.properties"
 
 configFile.withReader {
-    // Load config. It shall from now be referenced as simply config or project.config
-    def prop = new Properties()
-    prop.load(it)
-    project.ext.config = new ConfigSlurper().parse prop
+// Load config. It shall from now be referenced as simply config or project.config
+def prop = new Properties()
+prop.load(it)
+project.ext.config = new ConfigSlurper().parse prop
 }
-
-group= config.mod_group
-archivesBaseName = config.mod_name
 
 dependencies {
 }
 
+group= config.mod_group
 version = config.mod_version
+archivesBaseName = config.mod_name
+
+
 minecraft {
 version = config.mc_version + "-" + config.forge_version
 runDir = "eclipse"
 mappings = config.mcp_version
+replace '@MOD_VERSION@', config.mod_version
 }
-
-
-def root = project.projectDir.parentFile
 
 processResources
 {
@@ -67,17 +66,13 @@ processResources
     }
 }
 
-version = "${project.minecraft.version}-${project.version}"
-
 jar {
-//classifier = 'universal'
+classifier = 'universal'
 }
 
-
 task sourceJar(type: Jar) {
-    from sourceSets.main.java
-    from new File(root, "dev")
-    classifier = 'sources'
+    from sourceSets.main.allSource
+    classifier = 'src'
 }
 
 task devJar(type: Jar) {
@@ -86,5 +81,6 @@ classifier = 'dev'
 }
 
 artifacts {
-    		archives sourceJar, devJar
+    		archives sourceJar
+			archives devJar
 }

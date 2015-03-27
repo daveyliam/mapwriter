@@ -5,7 +5,9 @@ import java.util.LinkedList;
 
 import mapwriter.Mw;
 import mapwriter.Render;
+import mapwriter.handler.ConfigurationHandler;
 import mapwriter.map.mapmode.MapMode;
+import mapwriter.util.Reference;
 
 public class Trail {
 	
@@ -53,15 +55,15 @@ public class Trail {
 	public Trail(Mw mw, String name) {
 		this.mw = mw;
 		this.name = name;
-		this.enabled = this.mw.config.getOrSetBoolean(Mw.catOptions, this.name + "TrailEnabled", false);
-		this.maxLength = this.mw.config.getOrSetInt(Mw.catOptions, this.name + "TrailMaxLength", this.maxLength, 1, 200);
-		this.intervalMillis = (long) this.mw.config.getOrSetInt(Mw.catOptions, this.name + "TrailMarkerIntervalMillis", (int) this.intervalMillis, 100, 360000);
+		this.enabled = ConfigurationHandler.configuration.getBoolean(this.name + "TrailEnabled", Reference.catOptions, false, "");
+		this.maxLength = ConfigurationHandler.configuration.getInt(this.name + "TrailMaxLength", Reference.catOptions, this.maxLength, 1, 200, "");
+		this.intervalMillis = (long) ConfigurationHandler.configuration.getInt(this.name + "TrailMarkerIntervalMillis", Reference.catOptions, (int) this.intervalMillis, 100, 360000, "");
 	}
 	
 	public void close() {
-		this.mw.config.setBoolean(Mw.catOptions, this.name + "TrailEnabled", this.enabled);
-		this.mw.config.setInt(Mw.catOptions, this.name + "TrailMaxLength", this.maxLength);
-		this.mw.config.setInt(Mw.catOptions, this.name + "TrailMarkerIntervalMillis", (int) this.intervalMillis);
+		//this.mw.config.setBoolean(Mw.catOptions, this.name + "TrailEnabled", this.enabled);
+		//this.mw.config.setInt(Mw.catOptions, this.name + "TrailMaxLength", this.maxLength);
+		//this.mw.config.setInt(Mw.catOptions, this.name + "TrailMarkerIntervalMillis", (int) this.intervalMillis);
 		this.trailMarkerList.clear();
 	}
 	
