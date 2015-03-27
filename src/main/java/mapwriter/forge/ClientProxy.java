@@ -21,7 +21,11 @@ public class ClientProxy extends CommonProxy {
 	public void load() {
 		Mw mw = new Mw(this.config);
 		MinecraftForge.EVENT_BUS.register(new EventHandler(mw));
-		FMLCommonHandler.instance().bus().register(new MwKeyHandler());
+
+		Object eventhandler = new MwKeyHandler();
+		FMLCommonHandler.instance().bus().register(eventhandler);
+		MinecraftForge.EVENT_BUS.register(eventhandler);
+		
 		// temporary workaround for user defined key bindings not being loaded
 		// at game start. see https://github.com/MinecraftForge/FML/issues/378
 		// for more info.
