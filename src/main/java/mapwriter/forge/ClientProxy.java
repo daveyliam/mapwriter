@@ -21,8 +21,10 @@ public class ClientProxy extends CommonProxy {
 	public void load() {
 		Mw mw = new Mw();
 		MinecraftForge.EVENT_BUS.register(new EventHandler(mw));
-		FMLCommonHandler.instance().bus().register(new MwKeyHandler());
-		MinecraftForge.EVENT_BUS.register(new MwKeyHandler());
+		
+		Object eventhandler = new MwKeyHandler();
+		FMLCommonHandler.instance().bus().register(eventhandler);
+		MinecraftForge.EVENT_BUS.register(eventhandler);
 	}
 	
 	public void postInit() {
