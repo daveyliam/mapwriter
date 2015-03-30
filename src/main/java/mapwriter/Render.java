@@ -1,5 +1,6 @@
 package mapwriter;
 
+import mapwriter.util.Logging;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
@@ -131,7 +132,7 @@ public class Render {
 		int h = getTextureHeight();
 		int depth = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL12.GL_TEXTURE_DEPTH);
 		int format = GL11.glGetTexLevelParameteri(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_INTERNAL_FORMAT);
-		MwUtil.log("texture %d parameters: width=%d, height=%d, depth=%d, format=%08x", texture, w, h, depth, format);		
+		Logging.log("texture %d parameters: width=%d, height=%d, depth=%d, format=%08x", texture, w, h, depth, format);		
 	}
 	
 	public static int getMaxTextureSize() {
@@ -169,7 +170,7 @@ public class Render {
 	        tessellator.draw();
 			GL11.glDisable(GL11.GL_BLEND);
 		} catch (NullPointerException e) {
-			MwUtil.log("MwRender.drawTexturedRect: null pointer exception");
+			Logging.log("MwRender.drawTexturedRect: null pointer exception");
 		}
 	}
 	

@@ -7,6 +7,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import mapwriter.tasks.Task;
+import mapwriter.util.Logging;
 
 
 
@@ -65,7 +66,7 @@ public class BackgroundExecutor {
 			task.setFuture(future);
 			this.taskQueue.add(task);
 		} else {
-			MwUtil.log("MwExecutor.addTask: error: cannot add task to closed executor");
+			Logging.log("MwExecutor.addTask: error: cannot add task to closed executor");
 		}
 		return this.closed;
 	}
@@ -76,7 +77,7 @@ public class BackgroundExecutor {
 			task.setFuture(future);
 			this.taskQueue.add(task);
 		} else {
-			MwUtil.log("MwExecutor.addTask: error: cannot add task to closed executor");
+			Logging.log("MwExecutor.addTask: error: cannot add task to closed executor");
 		}
 		return this.closed;
 	}
@@ -128,7 +129,7 @@ public class BackgroundExecutor {
 			error = !this.executor.awaitTermination(10L, TimeUnit.SECONDS);
 			error = false;
 		} catch (InterruptedException e) {
-			MwUtil.log("error: IO task was interrupted during shutdown");
+			Logging.log("error: IO task was interrupted during shutdown");
 			e.printStackTrace();
 		}
 		this.closed = true;

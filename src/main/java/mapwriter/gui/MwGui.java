@@ -4,7 +4,6 @@ import java.awt.Point;
 import java.io.IOException;
 
 import mapwriter.Mw;
-import mapwriter.MwUtil;
 import mapwriter.api.IMwDataProvider;
 import mapwriter.api.MwAPI;
 import mapwriter.forge.MwKeyHandler;
@@ -16,6 +15,9 @@ import mapwriter.map.mapmode.MapMode;
 import mapwriter.tasks.MergeTask;
 import mapwriter.tasks.RebuildRegionsTask;
 import mapwriter.util.Config;
+import mapwriter.util.Logging;
+import mapwriter.util.Reference;
+import mapwriter.util.Utils;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.BlockPos;
@@ -175,11 +177,11 @@ public class MwGui extends GuiScreen {
 					this.mw.worldDir,
 					this.mw.worldDir.getName()));
 			
-			MwUtil.printBoth("merging to '" + this.mw.worldDir.getAbsolutePath() + "'");
+			Utils.printBoth("merging to '" + this.mw.worldDir.getAbsolutePath() + "'");
     }
     
     public void regenerateView() {
-    	MwUtil.printBoth(String.format("regenerating %dx%d blocks starting from (%d, %d)",
+    	Utils.printBoth(String.format("regenerating %dx%d blocks starting from (%d, %d)",
 				(int) this.mapView.getWidth(),
 				(int) this.mapView.getHeight(),
 				(int) this.mapView.getMinX(),
@@ -323,13 +325,8 @@ public class MwGui extends GuiScreen {
     }
     
     // mouse button clicked. 0 = LMB, 1 = RMB, 2 = MMB
-    protected void mouseClicked(int x, int y, int button) {
-    	//MwUtil.log("MwGui.mouseClicked(%d, %d, %d)", x, y, button);
-    	
-    	//int bX = this.mouseToBlockX(x);
-		//int bZ = this.mouseToBlockZ(y);
-		//int bY = this.getHeightAtBlockPos(bX, bZ);
-    	
+    protected void mouseClicked(int x, int y, int button) 
+    {
     	Marker marker = this.getMarkerNearScreenPos(x, y);
     	Marker prevMarker = this.mw.markerManager.selectedMarker;
     	
@@ -343,8 +340,19 @@ public class MwGui extends GuiScreen {
         				this.mapView.getDimension()
         			)
         		);
-    		} else if (this.optionsLabel.posWithin(x, y)) {
-    			this.mc.displayGuiScreen(new MwGuiOptions(this, this.mw));
+    		} else if (this.optionsLabel.posWithin(x, y)) 
+    		{    			
+                try
+                {
+                	GuiScreen newScreen = ModGuiConfig.class.getConstructor(GuiScreen.class).newInstance(this);
+                    this.mc.displayGuiScreen(newScreen);
+                }
+                catch (Exception e)
+                {
+                	Logging.logError("There was a critical issue trying to build the config GUI for %s", Reference.MOD_ID);
+                }
+                
+    			//this.mc.displayGuiScreen(new MwGuiOptions(this, this.mw));
     		} else {
 	    		this.mouseLeftHeld = 1;
 	    		this.mouseLeftDragStartX = x;

@@ -2,6 +2,7 @@ package mapwriter;
 
 import mapwriter.region.BlockColours;
 import mapwriter.region.BlockColours.BlockType;
+import mapwriter.util.Logging;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -88,7 +89,7 @@ public class BlockColourGen {
 	
 	public static void genBlockColours(BlockColours bc) {
 		
-		MwUtil.log("generating block map colours from textures");
+		Logging.log("generating block map colours from textures");
 
 		// copy terrain texture to MwRender pixel bytebuffer
 		
@@ -101,7 +102,7 @@ public class BlockColourGen {
 		
 		// create texture object from the currently bound GL texture
 		if (terrainTextureId == 0) {
-			MwUtil.log("error: could get terrain texture ID");
+			Logging.log("error: could get terrain texture ID");
 			return;
 		}
 		Texture terrainTexture = new Texture(terrainTextureId);
@@ -182,7 +183,7 @@ public class BlockColourGen {
 			}
 		}
 		
-		MwUtil.log("processed %d block textures, %d skipped, %d exceptions", b_count, s_count, e_count);
+		Logging.log("processed %d block textures, %d skipped, %d exceptions", b_count, s_count, e_count);
 		
 		genBiomeColours(bc);
 	}

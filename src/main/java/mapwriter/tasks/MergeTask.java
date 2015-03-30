@@ -2,9 +2,9 @@ package mapwriter.tasks;
 
 import java.io.File;
 
-import mapwriter.MwUtil;
 import mapwriter.region.MergeToImage;
 import mapwriter.region.RegionManager;
+import mapwriter.util.Utils;
 
 public class MergeTask extends Task {
 	
@@ -37,7 +37,7 @@ public class MergeTask extends Task {
 	
 	@Override
 	public void onComplete() {
-		MwUtil.printBoth(this.msg);
+		Utils.printBoth(this.msg);
 	}
 
 }

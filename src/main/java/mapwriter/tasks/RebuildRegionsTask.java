@@ -1,9 +1,9 @@
 package mapwriter.tasks;
 
 import mapwriter.Mw;
-import mapwriter.MwUtil;
 import mapwriter.region.BlockColours;
 import mapwriter.region.RegionManager;
+import mapwriter.util.Utils;
 
 public class RebuildRegionsTask extends Task {
 	
@@ -30,7 +30,7 @@ public class RebuildRegionsTask extends Task {
 	
 	@Override
 	public void onComplete() {
-		MwUtil.printBoth("rebuild task complete");
+		Utils.printBoth("rebuild task complete");
 	}
 
 }

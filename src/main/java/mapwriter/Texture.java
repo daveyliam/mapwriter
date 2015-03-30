@@ -2,6 +2,9 @@ package mapwriter;
 
 import java.nio.IntBuffer;
 
+import mapwriter.util.Logging;
+import mapwriter.util.Utils;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
@@ -17,7 +20,7 @@ public class Texture {
 		this.id = GL11.glGenTextures();
 		this.w = w;
 		this.h = h;
-		this.pixelBuf = MwUtil.allocateDirectIntBuffer(w * h);
+		this.pixelBuf = Utils.allocateDirectIntBuffer(w * h);
 		this.fillRect(0, 0, w, h, fillColour);
 		this.pixelBuf.position(0);
 		this.bind();
@@ -35,9 +38,9 @@ public class Texture {
 		this.bind();
 		this.w = Render.getTextureWidth();
 		this.h = Render.getTextureHeight();
-		this.pixelBuf = MwUtil.allocateDirectIntBuffer(this.w * this.h);
+		this.pixelBuf = Utils.allocateDirectIntBuffer(this.w * this.h);
 		this.getPixelsFromExistingTexture();
-		MwUtil.log("created new MwTexture from GL texture id %d (%dx%d) (%d pixels)", this.id, this.w, this.h, this.pixelBuf.limit());
+		Logging.log("created new MwTexture from GL texture id %d (%dx%d) (%d pixels)", this.id, this.w, this.h, this.pixelBuf.limit());
 	}
 	
 	// free up the resources used by the GL texture
@@ -46,7 +49,7 @@ public class Texture {
 			try {
 				GL11.glDeleteTextures(this.id);
 			} catch (NullPointerException e) {
-				MwUtil.log("MwTexture.close: null pointer exception (texture %d)", this.id);
+				Logging.log("MwTexture.close: null pointer exception (texture %d)", this.id);
 			}
 			this.id = 0;
 		}
@@ -129,7 +132,7 @@ public class Texture {
 			GL11.glTexSubImage2D(GL11.GL_TEXTURE_2D, 0, x, y, w, h, GL12.GL_BGRA, GL11.GL_UNSIGNED_BYTE, this.pixelBuf);
 			GL11.glPixelStorei(GL11.GL_UNPACK_ROW_LENGTH, 0);
 		} catch (NullPointerException e) {
-			MwUtil.log("MwTexture.updatePixels: null pointer exception (texture %d)", this.id);
+			Logging.log("MwTexture.updatePixels: null pointer exception (texture %d)", this.id);
 		}
 	}
 	
@@ -149,7 +152,7 @@ public class Texture {
 			// this.pixelBuf.flip()
 			this.pixelBuf.limit(this.w * this.h);
 		} catch (NullPointerException e) {
-			MwUtil.log("MwTexture.getPixels: null pointer exception (texture %d)", this.id);
+			Logging.log("MwTexture.getPixels: null pointer exception (texture %d)", this.id);
 		}
 	}
 }

@@ -1,5 +1,7 @@
 package mapwriter.util;
 
+import java.util.regex.Pattern;
+
 public final class Reference 
 {
 	public static final String MOD_ID = "MapWriter";
@@ -12,4 +14,6 @@ public final class Reference
 	public final static String catOptions = "options";
 	
 	public final static String PlayerTrailName = "player";
+	
+	public final static Pattern patternInvalidChars = Pattern.compile("[^a-zA-Z0-9_]");
 }

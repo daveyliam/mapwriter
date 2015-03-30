@@ -8,6 +8,7 @@ import mapwriter.region.MwChunk;
 import mapwriter.tasks.SaveChunkTask;
 import mapwriter.tasks.UpdateSurfaceChunksTask;
 import mapwriter.util.Config;
+import mapwriter.util.Utils;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 
@@ -107,7 +108,7 @@ public class ChunkManager {
 				Chunk chunk = entry.getKey();
 
 				int flags = entry.getValue();
-				if (MwUtil.distToChunkSq(this.mw.playerXInt, this.mw.playerZInt, chunk) <= Config.maxChunkSaveDistSq) {
+				if (Utils.distToChunkSq(this.mw.playerXInt, this.mw.playerZInt, chunk) <= Config.maxChunkSaveDistSq) {
 					flags |= (VISIBLE_FLAG | VIEWED_FLAG);
 				} else {
 					flags &= ~VISIBLE_FLAG;

@@ -3,8 +3,9 @@ package mapwriter.map;
 import java.util.ArrayList;
 import java.util.List;
 
-import mapwriter.MwUtil;
 import mapwriter.map.mapmode.MapMode;
+import mapwriter.util.Logging;
+import mapwriter.util.Utils;
 import net.minecraftforge.common.config.Configuration;
 
 public class MarkerManager {
@@ -36,7 +37,7 @@ public class MarkerManager {
 					if (marker != null) {
 						this.addMarker(marker);
 					} else {
-						MwUtil.log("error: could not load " + key + " from config file");
+						Logging.log("error: could not load " + key + " from config file");
 					}
 				}
 			}
@@ -60,7 +61,7 @@ public class MarkerManager {
 	
 	public void setVisibleGroupName(String groupName) {
 		if (groupName != null) {
-			this.visibleGroupName = MwUtil.mungeString(groupName);
+			this.visibleGroupName = Utils.mungeString(groupName);
 		} else {
 			this.visibleGroupName = "none";
 		}
@@ -109,7 +110,7 @@ public class MarkerManager {
 				marker = null;
 			}
 		} else {
-			MwUtil.log("Marker.stringToMarker: invalid marker '%s'", s);
+			Logging.log("Marker.stringToMarker: invalid marker '%s'", s);
 		}
 		return marker;
 	}

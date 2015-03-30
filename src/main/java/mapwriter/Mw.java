@@ -21,6 +21,7 @@ import mapwriter.region.BlockColours;
 import mapwriter.region.RegionManager;
 import mapwriter.tasks.CloseRegionManagerTask;
 import mapwriter.util.Config;
+import mapwriter.util.Logging;
 import mapwriter.util.Reference;
 import mapwriter.util.Utils;
 import net.minecraft.client.Minecraft;
@@ -123,7 +124,7 @@ public class Mw {
 		
 		// strip invalid characters from the server name so that it
 		// can't be something malicious like '..\..\..\windows\'
-		worldName = MwUtil.mungeString(worldName);
+		worldName = Utils.mungeString(worldName);
 		
 		// if something went wrong make sure the name is not blank
 		// (causes crash on start up due to empty configuration section)
@@ -159,9 +160,9 @@ public class Mw {
 			}
 			textureSize /= 2;
 			
-			MwUtil.log("GL reported max texture size = %d", maxTextureSize);
-			MwUtil.log("texture size from config = %d", Config.configTextureSize);
-			MwUtil.log("setting map texture size to = %d", textureSize);
+			Logging.log("GL reported max texture size = %d", maxTextureSize);
+			Logging.log("texture size from config = %d", Config.configTextureSize);
+			Logging.log("setting map texture size to = %d", textureSize);
 			
 			Config.textureSize = textureSize;
 			if (this.ready) {
@@ -223,7 +224,7 @@ public class Mw {
 		if (Config.teleportEnabled) {
 			this.mc.thePlayer.sendChatMessage(String.format("/%s %d %d %d", Config.teleportCommand, x, y, z));
 		} else {
-			MwUtil.printBoth("teleportation is disabled in mapwriter.cfg");
+			Utils.printBoth("teleportation is disabled in mapwriter.cfg");
 		}
 	}
 	
@@ -232,7 +233,7 @@ public class Mw {
 			//MwUtil.printBoth(String.format("warping to %s", name));
 			this.mc.thePlayer.sendChatMessage(String.format("/warp %s", name));
 		} else {
-			MwUtil.printBoth("teleportation is disabled in mapwriter.cfg");
+			Utils.printBoth("teleportation is disabled in mapwriter.cfg");
 		}
 	}
 	
@@ -241,7 +242,7 @@ public class Mw {
 			double scale = mapView.getDimensionScaling(this.playerDimension);
 			this.teleportTo((int) (x / scale), y, (int) (z / scale));
 		} else {
-			MwUtil.printBoth("teleport command is set to 'warp', can only warp to markers");
+			Utils.printBoth("teleport command is set to 'warp', can only warp to markers");
 		}
 	}
 	
@@ -251,29 +252,29 @@ public class Mw {
 		} else if (marker.dimension == this.playerDimension) {
 			this.teleportTo(marker.x, marker.y, marker.z);
 		} else {
-			MwUtil.printBoth("cannot teleport to marker in different dimension");
+			Utils.printBoth("cannot teleport to marker in different dimension");
 		}
 	}
 	
 	public void loadBlockColourOverrides(BlockColours bc) {
 		File f = new File(this.configDir, blockColourOverridesFileName);
 		if (f.isFile()) {
-			MwUtil.logInfo("loading block colour overrides file %s", f);
+			Logging.logInfo("loading block colour overrides file %s", f);
 			bc.loadFromFile(f);
 		} else {
-			MwUtil.logInfo("recreating block colour overrides file %s", f);
+			Logging.logInfo("recreating block colour overrides file %s", f);
 			BlockColours.writeOverridesFile(f);
 			if (f.isFile()) {
 				bc.loadFromFile(f);
 			} else {
-				MwUtil.logError("could not load block colour overrides from file %s", f);
+				Logging.logError("could not load block colour overrides from file %s", f);
 			}
 		}
 	}
 	
 	public void saveBlockColours(BlockColours bc) {
 		File f = new File(this.configDir, blockColourSaveFileName);
-		MwUtil.logInfo("saving block colours to '%s'", f);
+		Logging.logInfo("saving block colours to '%s'", f);
 		bc.saveToFile(f);
 	}
 	
@@ -282,12 +283,12 @@ public class Mw {
 		File f = new File(this.configDir, blockColourSaveFileName);
 		if (Config.useSavedBlockColours && f.isFile()) {
 			// load block colours from file
-			MwUtil.logInfo("loading block colours from %s", f);
+			Logging.logInfo("loading block colours from %s", f);
 			bc.loadFromFile(f);
 			this.loadBlockColourOverrides(bc);
 		} else {
 			// generate block colours from current texture pack
-			MwUtil.logInfo("generating block colours");
+			Logging.logInfo("generating block colours");
 			// block type overrides need to be loaded before the block colours are generated
 			this.loadBlockColourOverrides(bc);
 			BlockColourGen.genBlockColours(bc);
@@ -348,11 +349,11 @@ public class Mw {
 		}
 		
 		if ((this.mc.theWorld == null) || (this.mc.thePlayer == null)) {
-			MwUtil.log("Mw.load: world or player is null, cannot load yet");
+			Logging.log("Mw.load: world or player is null, cannot load yet");
 			return;
 		}
 		
-		MwUtil.log("Mw.load: loading...");
+		Logging.log("Mw.load: loading...");
 		
 		IntegratedServer server = this.mc.getIntegratedServer();
 		this.multiplayer = (server == null);
@@ -366,7 +367,7 @@ public class Mw {
 			if (d.isDirectory()) {
 				saveDir = d;
 			} else {
-				MwUtil.log("error: no such directory %s", Config.saveDirOverride);
+				Logging.log("error: no such directory %s", Config.saveDirOverride);
 			}
 		}
 		
@@ -384,7 +385,7 @@ public class Mw {
 			this.imageDir.mkdirs();
 		}
 		if (!this.imageDir.isDirectory()) {
-			MwUtil.log("Mapwriter: ERROR: could not create images directory '%s'", this.imageDir.getPath());
+			Logging.log("Mapwriter: ERROR: could not create images directory '%s'", this.imageDir.getPath());
 		}
 		
 		this.tickCounter = 0;
@@ -422,7 +423,7 @@ public class Mw {
 	
 	public void close() {
 		
-		MwUtil.log("Mw.close: closing...");
+		Logging.log("Mw.close: closing...");
 		
 		if (this.ready) {
 			this.ready = false;
@@ -435,11 +436,11 @@ public class Mw {
 			this.executor.addTask(new CloseRegionManagerTask(this.regionManager));
 			this.regionManager = null;
 			
-			MwUtil.log("waiting for %d tasks to finish...", this.executor.tasksRemaining());
+			Logging.log("waiting for %d tasks to finish...", this.executor.tasksRemaining());
 			if (this.executor.close()) {
-				MwUtil.log("error: timeout waiting for tasks to finish");
+				Logging.log("error: timeout waiting for tasks to finish");
 			}
-			MwUtil.log("done");
+			Logging.log("done");
 			
 			this.playerTrail.close();
 			
@@ -512,7 +513,7 @@ public class Mw {
 			if (this.ready) {
 				this.chunkManager.addChunk(chunk);
 			} else {
-				MwUtil.logInfo("missed chunk (%d, %d)", chunk.xPosition, chunk.zPosition);
+				Logging.logInfo("missed chunk (%d, %d)", chunk.xPosition, chunk.zPosition);
 			}
 		}
 	}
@@ -538,7 +539,7 @@ public class Mw {
 				this.markerManager.delMarker(null, "playerDeaths");
 			}
 			
-			this.markerManager.addMarker(MwUtil.getCurrentDateString(), "playerDeaths", this.playerXInt, this.playerYInt, this.playerZInt, this.playerDimension, 0xffff0000);
+			this.markerManager.addMarker(Utils.getCurrentDateString(), "playerDeaths", this.playerXInt, this.playerYInt, this.playerZInt, this.playerDimension, 0xffff0000);
 			this.markerManager.setVisibleGroupName("playerDeaths");
 			this.markerManager.update();
 		}
