@@ -4,12 +4,12 @@ import java.awt.Point;
 import java.util.ArrayList;
 
 import mapwriter.Mw;
-import mapwriter.Render;
 import mapwriter.api.IMwChunkOverlay;
 import mapwriter.api.IMwDataProvider;
 import mapwriter.api.MwAPI;
 import mapwriter.map.mapmode.MapMode;
 import mapwriter.util.Config;
+import mapwriter.util.Render;
 import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;

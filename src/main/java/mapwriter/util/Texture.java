@@ -1,9 +1,6 @@
-package mapwriter;
+package mapwriter.util;
 
 import java.nio.IntBuffer;
-
-import mapwriter.util.Logging;
-import mapwriter.util.Utils;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;

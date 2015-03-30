@@ -3,6 +3,8 @@ package mapwriter;
 import mapwriter.region.BlockColours;
 import mapwriter.region.BlockColours.BlockType;
 import mapwriter.util.Logging;
+import mapwriter.util.Render;
+import mapwriter.util.Texture;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;

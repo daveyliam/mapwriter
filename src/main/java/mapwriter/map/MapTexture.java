@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mapwriter.BackgroundExecutor;
-import mapwriter.Texture;
 import mapwriter.region.Region;
 import mapwriter.region.RegionManager;
+import mapwriter.util.Texture;
 
 import org.lwjgl.opengl.GL11;
 

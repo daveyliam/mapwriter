@@ -1,6 +1,5 @@
-package mapwriter;
+package mapwriter.util;
 
-import mapwriter.util.Logging;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;

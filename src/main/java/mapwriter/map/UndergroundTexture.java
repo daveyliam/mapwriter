@@ -4,9 +4,9 @@ import java.awt.Point;
 import java.util.Arrays;
 
 import mapwriter.Mw;
-import mapwriter.Texture;
 import mapwriter.region.ChunkRender;
 import mapwriter.region.IChunk;
+import mapwriter.util.Texture;
 import net.minecraft.block.Block;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.BlockPos;

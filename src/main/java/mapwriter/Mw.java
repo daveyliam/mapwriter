@@ -23,6 +23,7 @@ import mapwriter.tasks.CloseRegionManagerTask;
 import mapwriter.util.Config;
 import mapwriter.util.Logging;
 import mapwriter.util.Reference;
+import mapwriter.util.Render;
 import mapwriter.util.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;

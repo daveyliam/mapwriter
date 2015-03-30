@@ -4,10 +4,10 @@ import java.awt.Point;
 import java.util.LinkedList;
 
 import mapwriter.Mw;
-import mapwriter.Render;
 import mapwriter.handler.ConfigurationHandler;
 import mapwriter.map.mapmode.MapMode;
 import mapwriter.util.Reference;
+import mapwriter.util.Render;
 
 public class Trail {
 	
