@@ -30,7 +30,7 @@ import org.lwjgl.input.Mouse;
 @SideOnly(Side.CLIENT)
 public class MwGui extends GuiScreen {
 	private Mw mw;
-    private MapMode mapMode;
+    public MapMode mapMode;
     private MapView mapView;
     private MapRenderer map;
     
@@ -40,8 +40,6 @@ public class MwGui extends GuiScreen {
     private static final int menuX = 5;
     
     private int mouseLeftHeld = 0;
-    //private int mouseRightHeld = 0;
-    //private int mouseMiddleHeld = 0;
     private int mouseLeftDragStartX = 0;
     private int mouseLeftDragStartY = 0;
     private double viewXStart;
@@ -60,6 +58,8 @@ public class MwGui extends GuiScreen {
     private Label dimensionLabel;
     private Label groupLabel;
     private Label overlayLabel;
+    
+	public static MwGui instance;
     
     class Label {
     	int x = 0, y = 0, w = 1, h = 12;
@@ -98,6 +98,8 @@ public class MwGui extends GuiScreen {
     	this.dimensionLabel = new Label();
     	this.groupLabel = new Label();
     	this.overlayLabel = new Label();
+    	
+    	instance = this;
     }
 
     public MwGui(Mw mw, int dim, int x, int z){
@@ -121,7 +123,6 @@ public class MwGui extends GuiScreen {
     	//MwUtil.log("closing GUI");
     	// set the mini map dimension to the GUI map dimension when closing
     	this.mw.miniMap.view.setDimension(this.mapView.getDimension());
-    	this.mapMode.close();
     	Keyboard.enableRepeatEvents(false);
     	this.mc.displayGuiScreen((GuiScreen) null);
         this.mc.setIngameFocus();

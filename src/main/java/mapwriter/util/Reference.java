@@ -11,9 +11,12 @@ public final class Reference
 	public static final String CLIENT_PROXY_CLASS = "mapwriter.forge.ClientProxy";
 	public static final String SERVER_PROXY_CLASS = "mapwriter.forge.CommonProxy";
 	
-	public final static String catOptions = "options";
+	public static final String catOptions = "options";
+	public static final String catLargeMapConfig = "largemap";
+	public static final String catSmallMapConfig = "smallmap";
+	public static final String catFullMapConfig = "fullscreenmap";
 	
-	public final static String PlayerTrailName = "player";
+	public static final String PlayerTrailName = "player";
 	
-	public final static Pattern patternInvalidChars = Pattern.compile("[^a-zA-Z0-9_]");
+	public static final Pattern patternInvalidChars = Pattern.compile("[^a-zA-Z0-9_]");
 }

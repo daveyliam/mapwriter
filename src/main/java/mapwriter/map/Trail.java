@@ -32,14 +32,14 @@ public class Trail {
 		}
 		
 		public void draw(MapMode mapMode, MapView mapView) {
-			if (mapView.isBlockWithinView(this.x, this.z, mapMode.circular)) {
+			if (mapView.isBlockWithinView(this.x, this.z, mapMode.config.circular)) {
 				Point.Double p = mapMode.blockXZtoScreenXY(mapView, this.x, this.z);
 			
 				// draw a coloured arrow centered on the calculated (x, y)
 				Render.setColourWithAlphaPercent(borderColour, this.alphaPercent);
-				Render.drawArrow(p.x, p.y, this.heading, mapMode.trailMarkerSize);
+				Render.drawArrow(p.x, p.y, this.heading, mapMode.config.trailMarkerSize);
 				Render.setColourWithAlphaPercent(colour, this.alphaPercent);
-				Render.drawArrow(p.x, p.y, this.heading, mapMode.trailMarkerSize - 1.0);
+				Render.drawArrow(p.x, p.y, this.heading, mapMode.config.trailMarkerSize - 1.0);
 			}
 		}
 	}

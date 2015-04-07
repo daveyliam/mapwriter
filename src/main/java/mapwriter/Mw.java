@@ -34,7 +34,6 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.config.Configuration;
 
 public class Mw {
-	
 	public Minecraft mc = null;
 	
 	// configuration files (global and world specific)
@@ -318,15 +317,6 @@ public class Mw {
 		if (oldTexture != null) {
 			this.undergroundMapTexture.close();
 		}
-	}
-	
-	public void setCoordsMode(int mode) {
-		Config.coordsMode = Math.min(Math.max(0, mode), 2);
-	}
-	
-	public int toggleCoords() {
-		this.setCoordsMode((Config.coordsMode + 1) % 3);
-		return Config.coordsMode;
 	}
 	
 	public void toggleUndergroundMode() {

@@ -57,8 +57,8 @@ public class Marker {
 		this.screenPos.setLocation(p.x + mapMode.xTranslation, p.y + mapMode.yTranslation);
 		
 		// draw a coloured rectangle centered on the calculated (x, y)
-		double mSize = mapMode.markerSize;
-		double halfMSize = mapMode.markerSize / 2.0;
+		double mSize = mapMode.config.markerSize;
+		double halfMSize = mapMode.config.markerSize / 2.0;
 		Render.setColour(borderColour);
 		Render.drawRect(p.x - halfMSize, p.y - halfMSize, mSize, mSize);
 		Render.setColour(this.colour);

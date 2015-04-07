@@ -13,10 +13,6 @@ import mapwriter.util.Reference;
 public class MiniMap {
 	private Mw mw;
 	
-	public static final String catSmallMap = "smallMap";
-	public static final String catLargeMap = "largeMap";
-	public static final String catUndergroundMap = "undergroundMap";
-	
 	public MapMode smallMapMode;
 	public MapMode largeMapMode;
 	public MapMode guiMapMode;
@@ -48,10 +44,10 @@ public class MiniMap {
 		
 		// add small, large and underground map modes if they
 		// are enabled.
-		if (this.smallMapMode.enabled) {
+		if (this.smallMapMode.config.enabled) {
 			this.mapList.add(this.smallMap);
 		}
-		if (this.largeMapMode.enabled) {
+		if (this.largeMapMode.config.enabled) {
 			this.mapList.add(this.largeMap);
 		}
 		// add a null entry (hides the overlay when selected)
@@ -65,9 +61,6 @@ public class MiniMap {
 	public void close() {
 		this.mapList.clear();
 		this.currentMap = null;
-		
-		this.smallMapMode.close();
-		this.largeMapMode.close();
 	}
 	
 	// toggle between small map, underground map and no map

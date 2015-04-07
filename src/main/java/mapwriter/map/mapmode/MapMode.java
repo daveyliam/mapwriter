@@ -1,15 +1,20 @@
 package mapwriter.map.mapmode;
 
 import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
 
+import mapwriter.gui.ModGuiConfig.ModBooleanEntry;
 import mapwriter.handler.ConfigurationHandler;
 import mapwriter.map.MapView;
+import mapwriter.util.MapModeConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraftforge.fml.client.config.ConfigGuiType;
+import net.minecraftforge.fml.client.config.DummyConfigElement;
+import net.minecraftforge.fml.client.config.IConfigElement;
 
 public class MapMode {
-	public final String configCategory;
-	
 	private int sw = 320;
 	private int sh = 240;
 	private double screenScalingFactor = 1.0;
@@ -25,64 +30,15 @@ public class MapMode {
 	public int hPixels = 50;
 	
 	// config settings
-	public boolean enabled = true;
-	public boolean rotate = true;
-	public boolean circular = true;
-	public boolean coordsEnabled = false;
-	public int borderMode = 1;
-	public int playerArrowSize = 5;
-	public int markerSize = 5;
-	public int trailMarkerSize = 3;
-	public int alphaPercent = 100;
-	
-	public int marginTop = 0;
-	public int marginBottom = 0;
-	public int marginLeft = 0;
-	public int marginRight = 0;
-	public int heightPercent = -1;
 	
 	public int textX = 0;
 	public int textY = 0;
 	public int textColour = 0xffffffff;
 	
-	public MapMode(String configCategory) {
-		this.configCategory = configCategory;
-	}
+	public MapModeConfig config;
 	
-	public void loadConfig() {
-		// get options from config file
-		this.enabled = ConfigurationHandler.configuration.getBoolean("enabled", this.configCategory, this.enabled, "");
-		this.playerArrowSize = ConfigurationHandler.configuration.getInt("playerArrowSize", this.configCategory, this.playerArrowSize, 1, 20, "");
-		this.markerSize = ConfigurationHandler.configuration.getInt("markerSize", this.configCategory, this.markerSize, 1, 20, "");
-		this.alphaPercent = ConfigurationHandler.configuration.getInt("alphaPercent", this.configCategory, this.alphaPercent, 0, 100, "");
-		
-		this.heightPercent = ConfigurationHandler.configuration.getInt("heightPercent",this.configCategory, this.heightPercent, 0, 100, "");
-		this.marginTop = ConfigurationHandler.configuration.getInt("marginTop", this.configCategory, this.marginTop, -1, 320, "");
-		this.marginBottom = ConfigurationHandler.configuration.getInt("marginBottom", this.configCategory, this.marginBottom, -1, 320, "");
-		this.marginLeft = ConfigurationHandler.configuration.getInt("marginLeft", this.configCategory, this.marginLeft, -1, 320, "");
-		this.marginRight = ConfigurationHandler.configuration.getInt("marginRight", this.configCategory, this.marginRight, -1, 320, "");
-		
-		this.rotate = ConfigurationHandler.configuration.getBoolean("rotate", this.configCategory, this.rotate, "");
-		this.circular = ConfigurationHandler.configuration.getBoolean("circular", this.configCategory, this.circular, "");
-		this.coordsEnabled = ConfigurationHandler.configuration.getBoolean("coordsEnabled", this.configCategory, this.coordsEnabled, "");
-		this.borderMode = ConfigurationHandler.configuration.getInt("borderMode", this.configCategory, this.borderMode, 0, 1, "");
-		
-		this.trailMarkerSize = Math.max(1, this.markerSize - 1);
-	}
-	
-	public void saveConfig() {
-		//this.config.setBoolean(this.configCategory, "enabled", this.enabled);
-		//this.config.setInt(this.configCategory, "heightPercent", this.heightPercent);
-		//this.config.setInt(this.configCategory, "marginTop", this.marginTop);
-		//this.config.setInt(this.configCategory, "marginBottom", this.marginBottom);
-		//this.config.setInt(this.configCategory, "marginLeft", this.marginLeft);
-		//this.config.setInt(this.configCategory, "marginRight", this.marginRight);
-		//this.config.setBoolean(this.configCategory, "rotate", this.rotate);
-		//this.config.setBoolean(this.configCategory, "circular", this.circular);
-	}
-	
-	public void close() {
-		this.saveConfig();
+	public MapMode(MapModeConfig config) {
+		this.config = config;
 	}
 	
 	public void setScreenRes(int dw, int dh, int sw, int sh, double scaling) {
@@ -101,20 +57,20 @@ public class MapMode {
 	}
 	
 	public void setMargins(int marginTop, int marginBottom, int marginLeft, int marginRight) {
-		this.marginTop = marginTop;
-		this.marginBottom = marginBottom;
-		this.marginLeft = marginLeft;
-		this.marginRight = marginRight;
+		this.config.marginTop = marginTop;
+		this.config.marginBottom = marginBottom;
+		this.config.marginLeft = marginLeft;
+		this.config.marginRight = marginRight;
 		this.update();
 	}
 	
 	public void setHeightPercent(int heightPercent) {
-		this.heightPercent = heightPercent;
+		this.config.heightPercent = heightPercent;
 		this.update();
 	}
 	
 	public void toggleHeightPercent() {
-		int i = (this.heightPercent / 5) + 1;
+		int i = (this.config.heightPercent / 5) + 1;
 		if (i > 12) {
 			i = 1;
 		}
@@ -122,18 +78,18 @@ public class MapMode {
 	}
 	
 	private void update() {
-		int size = (this.sh * this.heightPercent) / 100;
+		int size = (this.sh * this.config.heightPercent) / 100;
 		int x, y;
 		
 		// calculate map x position and width
-		if ((this.marginLeft >= 0) && (this.marginRight >= 0)) {
-			x = this.marginLeft;
-			this.w = this.sw - this.marginLeft - this.marginRight;
-		} else if (this.marginLeft >= 0) {
-			x = this.marginLeft;
+		if ((this.config.marginLeft >= 0) && (this.config.marginRight >= 0)) {
+			x = this.config.marginLeft;
+			this.w = this.sw - this.config.marginLeft - this.config.marginRight;
+		} else if (this.config.marginLeft >= 0) {
+			x = this.config.marginLeft;
 			this.w = size;
-		} else if (this.marginRight >= 0) {
-			x = this.sw - size - this.marginRight;
+		} else if (this.config.marginRight >= 0) {
+			x = this.sw - size - this.config.marginRight;
 			this.w = size;
 		} else {
 			x = (this.sw - size) / 2;
@@ -141,14 +97,14 @@ public class MapMode {
 		}
 		
 		// calculate map y position and height
-		if ((this.marginTop >= 0) && (this.marginBottom >= 0)) {
-			y = this.marginTop;
-			this.h = this.sh - this.marginTop - this.marginBottom;
-		} else if (this.marginTop >= 0) {
-			y = this.marginTop;
+		if ((this.config.marginTop >= 0) && (this.config.marginBottom >= 0)) {
+			y = this.config.marginTop;
+			this.h = this.sh - this.config.marginTop - this.config.marginBottom;
+		} else if (this.config.marginTop >= 0) {
+			y = this.config.marginTop;
 			this.h = size;
-		} else if (this.marginBottom >= 0) {
-			y = this.sh - size - this.marginBottom;
+		} else if (this.config.marginBottom >= 0) {
+			y = this.sh - size - this.config.marginBottom;
 			this.h = size;
 		} else {
 			y = (this.sh - size) / 2;
@@ -162,7 +118,7 @@ public class MapMode {
 		this.xTranslation = x + (this.w >> 1);
 		this.yTranslation = y + (this.h >> 1);
 		
-		if (this.circular) {
+		if (this.config.circular) {
 			this.w = this.h;
 		}
 		
@@ -182,14 +138,14 @@ public class MapMode {
 	}
 	
 	public void setRotating(boolean enabled) {
-		this.rotate = enabled;
-		this.circular = enabled;
+		this.config.rotate = enabled;
+		this.config.circular = enabled;
 		this.update();
 	}
 	
 	public boolean toggleRotating() {
-		this.setRotating(!this.rotate);
-		return this.rotate;
+		this.setRotating(!this.config.rotate);
+		return this.config.rotate;
 	}
 	
 	public Point screenXYtoBlockXZ(MapView mapView, int sx, int sy) {
@@ -211,7 +167,7 @@ public class MapMode {
 		double zRel = (bZ - mapView.getZ()) / mapView.getHeight();
 		double limit = 0.49;
 		
-		if (!this.circular) {
+		if (!this.config.circular) {
 			if (xRel < -limit) {
 				zRel = -limit * zRel / xRel;
 				xRel = -limit;

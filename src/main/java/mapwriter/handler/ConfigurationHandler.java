@@ -2,7 +2,6 @@ package mapwriter.handler;
 
 import java.io.File;
 
-import mapwriter.Mw;
 import mapwriter.util.Config;
 import mapwriter.util.Reference;
 import net.minecraftforge.common.config.Configuration;
@@ -19,18 +18,18 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 	        if (configuration == null)
 	        {
 	            configuration = new Configuration(configFile);
+	            setMapModeDefaults();
 	            loadConfig();
 	        }
 	    }
 
 		public static void loadConfig() 
 		{
-			configuration.load();
 			Config.linearTextureScalingEnabled = configuration.getBoolean("linearTextureScaling", Reference.catOptions, Config.linearTextureScalingEnabled, "");
 			Config.useSavedBlockColours = configuration.getBoolean("useSavedBlockColours", Reference.catOptions, Config.useSavedBlockColours, "");
 			Config.teleportEnabled = configuration.getBoolean("teleportEnabled", Reference.catOptions, Config.teleportEnabled, "");
 			Config.teleportCommand = configuration.getString("teleportCommand", Reference.catOptions, Config.teleportCommand, "");
-			Config.coordsMode = configuration.getInt("coordsMode", Reference.catOptions, Config.coordsMode, 0, 2, "");
+			Config.coordsMode = configuration.getString("coordsMode", Reference.catOptions, Config.coordsMode, "", Config.coordsModeStringArray);
 			Config.maxChunkSaveDistSq = configuration.getInt("maxChunkSaveDistSq", Reference.catOptions, Config.maxChunkSaveDistSq, 1, 256 * 256, "");
 			Config.mapPixelSnapEnabled = configuration.getBoolean("mapPixelSnapEnabled", Reference.catOptions, Config.mapPixelSnapEnabled, "");
 			Config.maxDeathMarkers = configuration.getInt("maxDeathMarkers", Reference.catOptions, Config.maxDeathMarkers, 0, 1000, "");
@@ -45,13 +44,17 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 			Config.maxZoom = configuration.getInt("zoomOutLevels", Reference.catOptions, Config.maxZoom, 1, 256, "");
 			Config.minZoom = -configuration.getInt("zoomInLevels", Reference.catOptions, -Config.minZoom, 1, 256, "");
 			
-			Config.configTextureSize = configuration.getInt("textureSize", Reference.catOptions, Config.configTextureSize, 1024, 8192, "");
+			Config.configTextureSize = configuration.getInt("textureSize", Reference.catOptions, Config.configTextureSize, 1024, 4096, "");
 			
-	        if (configuration.hasChanged())
+			Config.fullScreenMap.loadConfig();
+			Config.largeMap.loadConfig();
+			Config.smallMap.loadConfig();
+			
+			if (configuration.hasChanged())
 	        {
 	            configuration.save();
 	        }
-	        
+			
 			//Mw.instance.setTextureSize();
 		}
 
@@ -61,18 +64,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 			Config.modeIndex = configuration.getInt("overlayModeIndex", Reference.catOptions, Config.modeIndex, 0, 1000, "");
 			Config.zoomLevel = configuration.getInt("overlayZoomLevel", Reference.catOptions, 0, Config.minZoom, Config.maxZoom, "");
 		}
-		
-		public static void SaveConfig()
-		{
-			//this.mw.config.setInt(Reference.catOptions, "overlayModeIndex", Config.modeIndex);
-			//this.mw.config.setInt(Reference.catOptions, "overlayZoomLevel", this.view.getZoomLevel());
-			
-			//this.mw.config.setBoolean(Reference.catOptions, Reference.TrailName + "TrailEnabled", Config.PlayerTrailEnabled);
-			//this.mw.config.setInt(Reference.catOptions, Reference.TrailName + "TrailMaxLength", Config.maxLength);
-			//this.mw.config.setInt(Reference.catOptions, Reference.TrailName + "TrailMarkerIntervalMillis", (int) Config.intervalMillis);
-		}
 
-		
 	    @SubscribeEvent
 	    public void onConfigurationChangedEvent(ConfigChangedEvent.OnConfigChangedEvent event)
 	    {
@@ -80,5 +72,50 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 	        {
 	            loadConfig();
 	        }
+	    }
+
+	    public static void setMapModeDefaults()
+	    {
+	    	Config.fullScreenMap.heightPercent = -1;
+	    	Config.fullScreenMap.marginTop = 0;
+	    	Config.fullScreenMap.marginBottom = 0;
+	    	Config.fullScreenMap.marginLeft = 0;
+	    	Config.fullScreenMap.marginRight = 0;
+	    	Config.fullScreenMap.borderMode = 0;
+	    	Config.fullScreenMap.playerArrowSize = 5;
+	    	Config.fullScreenMap.markerSize = 5;
+	    	Config.fullScreenMap.alphaPercent = 100;
+	    	Config.fullScreenMap.rotate = false;
+	    	Config.fullScreenMap.circular = false;
+			Config.fullScreenMap.coordsEnabled = false;
+			
+			ConfigurationHandler.configuration.get(Reference.catFullMapConfig, "heightPercent", Config.fullScreenMap.heightPercent).setShowInGui(false);
+			ConfigurationHandler.configuration.get(Reference.catFullMapConfig, "marginTop", Config.fullScreenMap.marginTop).setShowInGui(false);
+			ConfigurationHandler.configuration.get(Reference.catFullMapConfig, "marginLeft", Config.fullScreenMap.marginLeft).setShowInGui(false);
+			ConfigurationHandler.configuration.get(Reference.catFullMapConfig, "marginRight", Config.fullScreenMap.marginRight).setShowInGui(false);
+			ConfigurationHandler.configuration.get(Reference.catFullMapConfig, "borderMode", Config.fullScreenMap.borderMode).setShowInGui(false);
+			ConfigurationHandler.configuration.get(Reference.catFullMapConfig, "rotate", Config.fullScreenMap.rotate).setShowInGui(false);
+			ConfigurationHandler.configuration.get(Reference.catFullMapConfig, "circular", Config.fullScreenMap.circular).setShowInGui(false);
+			ConfigurationHandler.configuration.get(Reference.catFullMapConfig, "coordsEnabled", Config.fullScreenMap.coordsEnabled).setShowInGui(false);
+			
+			Config.largeMap.heightPercent = -1;
+			Config.largeMap.marginTop = 10;
+			Config.largeMap.marginBottom = 40;
+			Config.largeMap.marginLeft = 40;
+			Config.largeMap.marginRight = 40;
+			Config.largeMap.playerArrowSize = 5;
+			Config.largeMap.markerSize = 5;
+			Config.largeMap.coordsEnabled = true;	
+			
+			ConfigurationHandler.configuration.get(Reference.catLargeMapConfig, "heightPercent", Config.largeMap.heightPercent).setShowInGui(false);			
+			
+			Config.smallMap.heightPercent = 30;
+			Config.smallMap.marginTop = 10;
+			Config.smallMap.marginBottom = -1;
+			Config.smallMap.marginLeft = -1;
+			Config.smallMap.marginRight = 10;
+			Config.smallMap.playerArrowSize = 4;
+			Config.smallMap.markerSize = 3;
+			Config.smallMap.coordsEnabled = true;
 	    }
 	}
