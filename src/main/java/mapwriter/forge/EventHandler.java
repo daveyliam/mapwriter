@@ -77,7 +77,7 @@ public class EventHandler {
     @SubscribeEvent
     public void renderMap(RenderGameOverlayEvent.Post event){
         if(event.type == RenderGameOverlayEvent.ElementType.ALL){
-            Mw.instance.onTick();
+            Mw.getInstance().onTick();
         }
     }
 }

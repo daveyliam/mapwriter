@@ -1,8 +1,8 @@
 package mapwriter.gui;
 
 import mapwriter.Mw;
+import mapwriter.config.Config;
 import mapwriter.map.MapView;
-import mapwriter.util.Config;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;

@@ -19,4 +19,12 @@ public final class Reference
 	public static final String PlayerTrailName = "player";
 	
 	public static final Pattern patternInvalidChars = Pattern.compile("[^a-zA-Z0-9_]");
+	
+	public static final String catWorld = "world";
+	public static final String catMarkers = "markers";
+	public static final String worldDirConfigName = "mapwriter.cfg";
+	public static final String blockColourSaveFileName = "MapWriterBlockColours.txt";
+	public static final String blockColourOverridesFileName = "MapWriterBlockColourOverrides.txt";
+	
+	
 }

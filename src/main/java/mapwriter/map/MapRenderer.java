@@ -7,8 +7,8 @@ import mapwriter.Mw;
 import mapwriter.api.IMwChunkOverlay;
 import mapwriter.api.IMwDataProvider;
 import mapwriter.api.MwAPI;
+import mapwriter.config.Config;
 import mapwriter.map.mapmode.MapMode;
-import mapwriter.util.Config;
 import mapwriter.util.Render;
 import net.minecraft.util.ResourceLocation;
 
@@ -273,7 +273,7 @@ public class MapRenderer {
 		// draw background, the map texture, and enabled overlays
 		this.drawMap();
 		
-		if (this.mapMode.config.borderMode > 0) {
+		if (this.mapMode.config.borderMode) {
 			this.drawBorder();
 		}
 		this.drawIcons();
@@ -315,6 +315,11 @@ public class MapRenderer {
 		
 		Render.setColour(overlay.getColor());
 		Render.drawRect(topCorner.x + offsetX + 1, topCorner.y + offsetY + 1, sizeX - 1, sizeY - 1);
+	}
+
+	public MapMode getMapMode()
+	{
+		return this.mapMode;	
 	}
 }
 

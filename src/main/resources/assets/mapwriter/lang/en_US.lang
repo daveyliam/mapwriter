@@ -1,3 +1,4 @@
+# Keys
 key.mw_open_gui=Open map GUI
 key.mw_new_marker=New Waypoint
 key.mw_next_map_mode=Next map mode
@@ -6,3 +7,77 @@ key.mw_teleport=Teleport to waypoint
 key.mw_zoom_in=Minimap zoom in
 key.mw_zoom_out=Minimap zoom out
 key.mw_underground_mode=Underground map mode
+
+#Config Global
+mw.config.linearTextureScaling=Linear texture scaling enabled
+mw.config.linearTextureScaling.tooltip=Enabled linear texture scaling. (nearest is used otherwise)
+mw.config.useSavedBlockColours= Use saved block colors
+mw.config.useSavedBlockColours.tooltip=
+mw.config.teleportEnabled= Teleport enabled
+mw.config.teleportEnabled.tooltip=Enables teleporting to positions on the map
+mw.config.teleportCommand=Teleport Command
+mw.config.teleportCommand.tooltip=The command used to teleport the player
+mw.config.coordsMode= Coordinates mode
+mw.config.coordsMode.tooltip=Switch between no,small or large coordinates under the minimap
+mw.config.maxChunkSaveDistSq=Max draw distance
+mw.config.maxChunkSaveDistSq.tooltip=The square of the max distance from the player to map chunks at
+mw.config.mapPixelSnapEnabled= Map pixel snap
+mw.config.mapPixelSnapEnabled.tooltip=
+mw.config.maxDeathMarkers=Max death markers
+mw.config.maxDeathMarkers.tooltip=The maximum amount of death markers
+mw.config.chunksPerTick=Chunks per tick
+mw.config.chunksPerTick.tooltip=sets the maximum number of chunks updated per tick
+mw.config.saveDirOverride=Save directory Override
+mw.config.saveDirOverride.tooltip=Override the directory MapWriter uses to store images and region
+mw.config.portNumberInWorldNameEnabled=Portnumber in world Name
+mw.config.portNumberInWorldNameEnabled.tooltip=set to false to disable appending the port number to the world name for multiplayer worlds
+mw.config.undergroundMode=Underground Mode
+mw.config.undergroundMode.tooltip=Enables the underground mode
+mw.config.regionFileOutputEnabledSP=Region file output SP
+mw.config.regionFileOutputEnabledSP.tooltip=set to false to disable saving region files (mca files) in single player. prevents map regen if disabled
+mw.config.regionFileOutputEnabledMP=Region file output MP
+mw.config.regionFileOutputEnabledMP.tooltip=set to false to disable saving region files (mca files) in multiplayer. prevents map regen if disabled
+mw.config.backgroundTextureMode=
+mw.config.backgroundTextureMode.tooltip=
+mw.config.zoomOutLevels=Zoom out levels
+mw.config.zoomOutLevels.tooltip=Max number of steps you can zoom out. Larger values decrease performance.
+mw.config.zoomInLevels=Zoom in levels
+mw.config.zoomInLevels.tooltip=Max number of steps you can zoom in. Does not affect performance.
+mw.config.textureSize=
+mw.config.textureSize.tooltip=
+
+#Config Temp
+mw.config.overlayModeIndex=
+mw.config.overlayModeIndex.tooltip=
+mw.config.overlayZoomLevel=
+mw.config.overlayZoomLevel.tooltip=
+
+#Config map
+mw.config.map.enabled=Map enabled
+mw.config.map.enabled.tooltip=Set to false to disable this map view
+mw.config.map.playerArrowSize=Player arrow Size
+mw.config.map.playerArrowSize.tooltip=The size of the player arrow on the map
+mw.config.map.markerSize=Marker size
+mw.config.map.markerSize.tooltip=The size of markers on the map
+mw.config.map.alphaPercent= Map opacity
+mw.config.map.alphaPercent.tooltip=Map opacity. 0-100 percent
+mw.config.map.heightPercent=
+mw.config.map.heightPercent.tooltip=The map size as a percentage of the screen height. Ignored if both Left and Right or Bottom and Top margins are set.
+mw.config.map.marginTop=Top margin
+mw.config.map.marginTop.tooltip=
+mw.config.map.marginBottom=Bottom margin
+mw.config.map.marginBottom.tooltip=
+mw.config.map.marginLeft=Left margin
+mw.config.map.marginLeft.tooltip=
+mw.config.map.marginRight=Right margin
+mw.config.map.marginRight.tooltip=
+mw.config.map.rotate=Rotate map
+mw.config.map.rotate.tooltip=Set to true to rotate the map, only possible in circular mode
+mw.config.map.circular=Circular map
+mw.config.map.circular.tooltip=True = Circular map, false = square map
+mw.config.map.coordsEnabled=Enable coordinates
+mw.config.map.coordsEnabled.tooltip=set to true to display coordinates under map
+mw.config.map.borderMode=Draw border
+mw.config.map.borderMode.tooltip=Set to true to draw the borders around the map
+mw.config.map.trailMarkerSize=Trail marker size
+mw.config.map.trailMarkerSize.tooltip=The size of trail markers on the map

@@ -4,10 +4,10 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import mapwriter.config.MapModeConfig;
 import mapwriter.gui.ModGuiConfig.ModBooleanEntry;
 import mapwriter.handler.ConfigurationHandler;
 import mapwriter.map.MapView;
-import mapwriter.util.MapModeConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraftforge.fml.client.config.ConfigGuiType;

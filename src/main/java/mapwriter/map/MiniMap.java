@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mapwriter.Mw;
+import mapwriter.config.Config;
 import mapwriter.map.mapmode.LargeMapMode;
 import mapwriter.map.mapmode.MapMode;
 import mapwriter.map.mapmode.SmallMapMode;
-import mapwriter.util.Config;
 import mapwriter.util.Reference;
 
 public class MiniMap {
@@ -30,7 +30,7 @@ public class MiniMap {
 		
 		// map view shared between large and small map modes
 		this.view = new MapView(mw);
-		this.view.setZoomLevel(Config.zoomLevel);
+		this.view.setZoomLevel(Config.overlayZoomLevel);
 		
 		// small map mode
 		this.smallMapMode = new SmallMapMode();
@@ -55,7 +55,7 @@ public class MiniMap {
 		
 		// sanitize overlayModeIndex loaded from config
 		this.nextOverlayMode(0);
-		this.currentMap = this.mapList.get(Config.modeIndex);
+		this.currentMap = this.mapList.get(Config.overlayModeIndex);
 	}
 	
 	public void close() {
@@ -66,8 +66,14 @@ public class MiniMap {
 	// toggle between small map, underground map and no map
 	public MapRenderer nextOverlayMode(int increment) {
 		int size = this.mapList.size();
-		Config.modeIndex = (Config.modeIndex + size + increment) % size;
-		this.currentMap = this.mapList.get(Config.modeIndex);
+		Config.overlayModeIndex = (Config.overlayModeIndex + size + increment) % size;
+		
+		MapRenderer newMap = this.mapList.get(Config.overlayModeIndex);
+		
+		//if (newMap.getMapMode().config.enabled)
+		//{		
+			this.currentMap = newMap;
+		//}
 		return this.currentMap;
 	}
 	

@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import mapwriter.config.Config;
 import mapwriter.handler.ConfigurationHandler;
 import mapwriter.map.mapmode.MapMode;
-import mapwriter.util.Config;
 import mapwriter.util.Reference;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;

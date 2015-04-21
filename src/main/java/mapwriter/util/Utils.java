@@ -9,8 +9,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import mapwriter.Mw;
+import mapwriter.config.Config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.chunk.Chunk;
 
@@ -106,5 +109,40 @@ public class Utils
 		int dx = (chunk.xPosition << 4) + 8 - x;
 		int dz = (chunk.zPosition << 4) + 8 - z;
 		return (dx * dx) + (dz * dz);
+	}
+
+	public static String getWorldName() {
+		String worldName;
+
+		if (Minecraft.getMinecraft().isIntegratedServerRunning()) 
+		{
+			// cannot use this.mc.theWorld.getWorldInfo().getWorldName() as it
+			// is set statically to "MpServer".
+			IntegratedServer server = Minecraft.getMinecraft().getIntegratedServer();
+			worldName = (server != null) ? server.getFolderName() : "sp_world";			
+		} 
+		else 
+		{		
+			worldName = Minecraft.getMinecraft().getCurrentServerData().serverIP;
+			if (!Config.portNumberInWorldNameEnabled)
+			{
+				worldName = worldName.substring(0, worldName.indexOf(":"));
+			}
+			else
+			{
+				worldName = worldName.replace(":", "_");
+			}
+		}
+		
+		// strip invalid characters from the server name so that it
+		// can't be something malicious like '..\..\..\windows\'
+		worldName = mungeString(worldName);
+		
+		// if something went wrong make sure the name is not blank
+		// (causes crash on start up due to empty configuration section)
+		if (worldName == "") {
+			worldName = "default";
+		}
+		return worldName;
 	}
 }

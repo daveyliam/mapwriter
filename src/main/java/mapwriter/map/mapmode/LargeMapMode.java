@@ -1,6 +1,6 @@
 package mapwriter.map.mapmode;
 
-import mapwriter.util.Config;
+import mapwriter.config.Config;
 import mapwriter.util.Reference;
 
 

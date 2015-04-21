@@ -1,6 +1,7 @@
 package mapwriter.gui;
 
 import mapwriter.Mw;
+import mapwriter.config.WorldConfig;
 import mapwriter.map.MapView;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.relauncher.Side;
@@ -27,7 +28,7 @@ public class MwGuiDimensionDialog extends MwGuiTextDialog {
 		if (this.inputValid) {
     		this.mapView.setDimensionAndAdjustZoom(dimension);
     		this.mw.miniMap.view.setDimension(dimension);
-    		this.mw.addDimension(dimension);
+    		WorldConfig.getInstance().addDimension(dimension);
     		done = true;
 		}
 		return done;

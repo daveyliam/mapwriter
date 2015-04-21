@@ -4,11 +4,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import mapwriter.config.Config;
 import mapwriter.region.MwChunk;
 import mapwriter.tasks.SaveChunkTask;
 import mapwriter.tasks.UpdateSurfaceChunksTask;
-import mapwriter.util.Config;
 import mapwriter.util.Utils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 
@@ -141,8 +142,8 @@ public class ChunkManager {
 	}
 	
 	private void addSaveChunkTask(Chunk chunk) {
-		if ((this.mw.multiplayer && Config.regionFileOutputEnabledMP) || 
-			(!this.mw.multiplayer && Config.regionFileOutputEnabledSP)) {
+		if ((Minecraft.getMinecraft().isSingleplayer() && Config.regionFileOutputEnabledMP) || 
+			(!Minecraft.getMinecraft().isSingleplayer() && Config.regionFileOutputEnabledSP)) {
 			if (!chunk.isEmpty()) {
 				this.mw.executor.addTask2(new SaveChunkTask(copyToMwChunk(chunk), this.mw.regionManager));
 			}

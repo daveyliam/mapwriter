@@ -4,8 +4,8 @@ import java.util.List;
 
 import mapwriter.Mw;
 import mapwriter.api.MwAPI;
+import mapwriter.config.Config;
 import mapwriter.map.mapmode.MapMode;
-import mapwriter.util.Config;
 
 public class MapView {
 	
@@ -37,8 +37,8 @@ public class MapView {
 	private boolean undergroundMode;
 	
 	public MapView(Mw mw) {
-		this.minZoom = Config.minZoom;
-		this.maxZoom = Config.maxZoom;
+		this.minZoom = Config.zoomInLevels;
+		this.maxZoom = Config.zoomOutLevels;
 		this.undergroundMode = Config.undergroundMode;
 		this.setZoomLevel(0);
 		this.setViewCentre(mw.playerX, mw.playerZ);

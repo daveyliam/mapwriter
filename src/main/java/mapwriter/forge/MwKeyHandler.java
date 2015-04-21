@@ -71,7 +71,7 @@ public class MwKeyHandler {
 	@SubscribeEvent
 	public void keyEventSpecial(KeyBindingPressedEvent event) 
 	{
-		Mw.instance.onKeyDown(event.keyBinding);
+		Mw.getInstance().onKeyDown(event.keyBinding);
 	}
 	
 	private void checkKeys() 
@@ -80,7 +80,7 @@ public class MwKeyHandler {
 		{
 			if (key != null && key.isPressed()) 
 			{
-				Mw.instance.onKeyDown(key);
+				Mw.getInstance().onKeyDown(key);
 			}
 		}
 	}

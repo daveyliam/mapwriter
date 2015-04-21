@@ -6,6 +6,8 @@ import java.io.IOException;
 import mapwriter.Mw;
 import mapwriter.api.IMwDataProvider;
 import mapwriter.api.MwAPI;
+import mapwriter.config.Config;
+import mapwriter.config.WorldConfig;
 import mapwriter.forge.MwKeyHandler;
 import mapwriter.map.MapRenderer;
 import mapwriter.map.MapView;
@@ -14,7 +16,6 @@ import mapwriter.map.mapmode.FullScreenMapMode;
 import mapwriter.map.mapmode.MapMode;
 import mapwriter.tasks.MergeTask;
 import mapwriter.tasks.RebuildRegionsTask;
-import mapwriter.util.Config;
 import mapwriter.util.Logging;
 import mapwriter.util.Reference;
 import mapwriter.util.Utils;
@@ -452,7 +453,7 @@ public class MwGui extends GuiScreen {
     		
     	} else if (this.dimensionLabel.posWithin(x, y)) {
     		int n = (direction > 0) ? 1 : -1;
-	    	this.mapView.nextDimension(this.mw.dimensionList, n);
+	    	this.mapView.nextDimension(WorldConfig.getInstance().dimensionList, n);
 	    	
     	} else if (this.groupLabel.posWithin(x, y)) {
     		int n = (direction > 0) ? 1 : -1;
