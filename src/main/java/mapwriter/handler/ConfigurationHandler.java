@@ -60,7 +60,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 			if (configuration.hasChanged())
 	        {
 	            configuration.save();
-	            //Mw.getInstance().setTextureSize();
 	        }
 		}
 

@@ -37,7 +37,7 @@ public class MapRenderer {
 	private void drawMap() {
 		
 		int regionZoomLevel = Math.max(0, this.mapView.getZoomLevel());
-		double tSize = (double) Config.textureSize;
+		double tSize = (double) this.mw.textureSize;
 		double zoomScale = (double) (1 << regionZoomLevel);
 		
 		// if the texture UV coordinates do not line up with the texture pixels then the texture
@@ -260,7 +260,7 @@ public class MapRenderer {
 		
 		this.mapMode.setScreenRes();
 		this.mapView.setMapWH(this.mapMode);
-		this.mapView.setTextureSize(Config.textureSize);
+		this.mapView.setTextureSize(this.mw.textureSize);
 		
 		GL11.glPushMatrix();
 		GL11.glLoadIdentity();

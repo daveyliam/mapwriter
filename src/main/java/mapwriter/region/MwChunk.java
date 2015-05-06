@@ -27,13 +27,13 @@ public class MwChunk implements IChunk {
 	
 	char[][] dataArray = new char[16][]; 
 	public final byte[][] lightingArray;
-	public final Map tileentityMap;
+	public final Map<BlockPos, TileEntity> tileentityMap;
 	
 	public final byte[] biomeArray;
 	
 	public final int maxY;
 	
-	public MwChunk(int x, int z, int dimension, char[][] data, byte[][] lightingArray, byte[] biomeArray, Map TileEntityMap) {
+	public MwChunk(int x, int z, int dimension, char[][] data, byte[][] lightingArray, byte[] biomeArray, Map<BlockPos, TileEntity> TileEntityMap) {
 		this.x = x;
 		this.z = z;
 		this.dimension = dimension;
@@ -61,7 +61,7 @@ public class MwChunk implements IChunk {
 		byte[][] lsbArray = new byte[16][];
 		char[][] data = new char[16][];
 		byte[][] lightingArray = new byte[16][];
-		Map TileEntityMap = new HashMap();
+		Map<BlockPos, TileEntity> TileEntityMap = new HashMap<BlockPos, TileEntity>();
 		
         DataInputStream dis = null;
         RegionFile regionFile = regionFileCache.getRegionFile(x << 4, z << 4, dimension);

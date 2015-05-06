@@ -1,8 +1,6 @@
 package mapwriter;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import mapwriter.config.Config;
 import mapwriter.config.WorldConfig;
@@ -29,10 +27,8 @@ import mapwriter.util.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.common.config.Configuration;
 
 public class Mw {
 	public Minecraft mc = null;
@@ -47,6 +43,8 @@ public class Mw {
 	public boolean ready = false;
 	//public boolean multiplayer = false;
 	public int tickCounter = 0;
+	
+	public int textureSize = 2048;
 	
 	// player position and heading
 	public double playerX = 0.0;
@@ -100,7 +98,7 @@ public class Mw {
 	}
 	
 	public void setTextureSize() {
-		if (Config.configTextureSize != Config.textureSize) {
+		if (Config.configTextureSize != this.textureSize) {
 			int maxTextureSize = Render.getMaxTextureSize();
 			int textureSize = 1024;
 			while ((textureSize <= maxTextureSize) && (textureSize <= Config.configTextureSize)) {
@@ -112,7 +110,7 @@ public class Mw {
 			Logging.log("texture size from config = %d", Config.configTextureSize);
 			Logging.log("setting map texture size to = %d", textureSize);
 			
-			Config.textureSize = textureSize;
+			this.textureSize = textureSize;
 			if (this.ready) {
 				// if we are already up and running need to close and reinitialize the map texture and
 				// region manager.
@@ -236,7 +234,7 @@ public class Mw {
 		this.executor.addTask(new CloseRegionManagerTask(this.regionManager));
 		this.executor.close();
 		MapTexture oldMapTexture = this.mapTexture;
-		MapTexture newMapTexture = new MapTexture(Config.textureSize, Config.linearTextureScaling);
+		MapTexture newMapTexture = new MapTexture(this.textureSize, Config.linearTextureScaling);
 		this.mapTexture = newMapTexture;
 		if (oldMapTexture != null) {
 			oldMapTexture.close();
@@ -245,7 +243,7 @@ public class Mw {
 		this.regionManager = new RegionManager(this.worldDir, this.imageDir, this.blockColours, Config.zoomInLevels, Config.zoomOutLevels);
 		
 		UndergroundTexture oldTexture = this.undergroundMapTexture;
-		UndergroundTexture newTexture = new UndergroundTexture(this, Config.textureSize, Config.linearTextureScaling);
+		UndergroundTexture newTexture = new UndergroundTexture(this, this.textureSize, Config.linearTextureScaling);
 		this.undergroundMapTexture = newTexture;
 		if (oldTexture != null) {
 			this.undergroundMapTexture.close();
@@ -314,8 +312,8 @@ public class Mw {
 		this.executor = new BackgroundExecutor();
 		
 		// mapTexture depends on config being loaded
-		this.mapTexture = new MapTexture(Config.textureSize, Config.linearTextureScaling);
-		this.undergroundMapTexture = new UndergroundTexture(this, Config.textureSize, Config.linearTextureScaling);
+		this.mapTexture = new MapTexture(this.textureSize, Config.linearTextureScaling);
+		this.undergroundMapTexture = new UndergroundTexture(this, this.textureSize, Config.linearTextureScaling);
 		this.reloadBlockColours();
 		// region manager depends on config, mapTexture, and block colours
 		this.regionManager = new RegionManager(this.worldDir, this.imageDir, this.blockColours, Config.zoomInLevels, Config.zoomOutLevels);
@@ -382,6 +380,8 @@ public class Mw {
 	public void onTick() {
 		this.load();
 		if (this.ready && (this.mc.thePlayer != null)) {
+			
+			setTextureSize();
 			
 			this.updatePlayer();
 			

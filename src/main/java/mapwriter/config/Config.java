@@ -41,7 +41,6 @@ public class Config {
 	public static boolean useSavedBlockColours = false;
 	public static int maxChunkSaveDistSq = 128 * 128;
 	public static boolean mapPixelSnapEnabled = true;
-	public static int textureSize = 2048;
 	public static int configTextureSize = 2048;
 	public static int maxDeathMarkers = 3;
 	public static int chunksPerTick = 5;

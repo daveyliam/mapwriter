@@ -9,7 +9,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import mapwriter.Mw;
 import mapwriter.config.Config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -59,6 +58,7 @@ public class Utils
 		return (i < 1000) ? outputFile : null;
 	}
 	
+	//send an ingame chat message and console log
 	public static void printBoth(String msg) {
 		EntityPlayerSP thePlayer = Minecraft.getMinecraft().thePlayer;
 		if (thePlayer != null) {
