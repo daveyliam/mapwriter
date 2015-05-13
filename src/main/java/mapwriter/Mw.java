@@ -283,7 +283,7 @@ public class Mw {
 			}
 		}
 		
-		if (this.mc.isSingleplayer()) {
+		if (!this.mc.isSingleplayer()) {
 			this.worldDir = new File(new File(saveDir, "mapwriter_mp_worlds"), Utils.getWorldName());
 		} else {
 			this.worldDir = new File(new File(saveDir, "mapwriter_sp_worlds"), Utils.getWorldName());
