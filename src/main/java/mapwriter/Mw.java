@@ -500,8 +500,6 @@ public class Mw {
 		this.tickCounter = 0;
 		this.onPlayerDeathAlreadyFired = false;
 		
-		//this.multiplayer = !this.mc.isIntegratedServerRunning();
-		
 		// marker manager only depends on the config being loaded
 		this.markerManager = new MarkerManager();
 		this.markerManager.load(this.worldConfig, catMarkers);
@@ -514,7 +512,7 @@ public class Mw {
 		// mapTexture depends on config being loaded
 		this.mapTexture = new MapTexture(this.textureSize, this.linearTextureScalingEnabled);
 		this.undergroundMapTexture = new UndergroundTexture(this, this.textureSize, this.linearTextureScalingEnabled);
-		//this.reloadBlockColours();
+		this.reloadBlockColours();
 		// region manager depends on config, mapTexture, and block colours
 		this.regionManager = new RegionManager(this.worldDir, this.imageDir, this.blockColours, this.minZoom, this.maxZoom);
 		// overlay manager depends on mapTexture
