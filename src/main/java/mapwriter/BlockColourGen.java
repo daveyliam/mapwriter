@@ -66,6 +66,8 @@ public class BlockColourGen {
 			// they also look too dark if the render colour is applied.
 			blockColour |= 0xff000000;
 			break;
+		case GRASS:
+			blockColour = 0xff9b9b9b;
 		default:
 			break;
 		}
