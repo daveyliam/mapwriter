@@ -70,8 +70,10 @@ processResources
     }
 }
 
+version = "${project.minecraft.version}-${project.version}"
+
 jar {
-classifier = 'universal'
+// = 'universal'
 }
 
 task sourceJar(type: Jar) {
