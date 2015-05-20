@@ -266,7 +266,7 @@ public class Render {
 		//mc.renderEngine.resetBoundTexture();
 		FontRenderer fr = mc.fontRenderer;
 		String s = String.format(formatString, args);
-		fr.drawStringWithShadow(s, x, y, colour);
+		//fr.drawStringWithShadow(s, x, y, colour);
 	}
 	
 	public static void drawCentredString(int x, int y, int colour, String formatString, Object...args) {
@@ -275,7 +275,7 @@ public class Render {
 		FontRenderer fr = mc.fontRenderer;
 		String s = String.format(formatString, args);
 		int w = fr.getStringWidth(s);
-		fr.drawStringWithShadow(s, x - (w / 2), y, colour);
+		//fr.drawStringWithShadow(s, x - (w / 2), y, colour);
 	}
 	
 	public static void setCircularStencil(double x, double y, double r) {
