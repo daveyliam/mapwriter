@@ -5,14 +5,14 @@ import mapwriter.overlay.OverlaySlime;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.DamageSource;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.world.ChunkEvent;
-import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 
 public class EventHandler {
 
@@ -74,10 +74,24 @@ public class EventHandler {
 		}
 	}
 	
+    //@SubscribeEvent
+    //public void renderMap(RenderGameOverlayEvent.Post event){
+    //   if(event.type == RenderGameOverlayEvent.ElementType.ALL){
+    //        Mw.getInstance().onTick();
+    //    }
+    //}
+    
+	//using the FML render tick event because RenderGameOverlayEvent.Post creates flickering 
     @SubscribeEvent
-    public void renderMap(RenderGameOverlayEvent.Post event){
-        if(event.type == RenderGameOverlayEvent.ElementType.ALL){
-            Mw.getInstance().onTick();
+    public void onTick(RenderTickEvent event)
+    {
+        if (event.phase.equals(Phase.START))
+        {
+        	return;
+        }
+        if (Mw.getInstance().ready)
+        {
+        	Mw.getInstance().onTick();
         }
     }
 }
