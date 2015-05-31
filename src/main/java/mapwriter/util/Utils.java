@@ -122,7 +122,7 @@ public class Utils
 			worldName = (server != null) ? server.getFolderName() : "sp_world";			
 		} 
 		else 
-		{		
+		{	
 			worldName = Minecraft.getMinecraft().getCurrentServerData().serverIP;
 			if (!Config.portNumberInWorldNameEnabled)
 			{
@@ -130,7 +130,11 @@ public class Utils
 			}
 			else
 			{
-				worldName = worldName.replace(":", "_");
+                            if(worldName.indexOf(":")==-1){//standard port is missing. Adding it
+                                worldName += "_25565";
+                            } else {
+                                worldName = worldName.replace(":", "_");
+                            }
 			}
 		}
 		
