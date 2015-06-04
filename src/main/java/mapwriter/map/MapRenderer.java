@@ -8,6 +8,7 @@ import mapwriter.api.IMwChunkOverlay;
 import mapwriter.api.IMwDataProvider;
 import mapwriter.api.MwAPI;
 import mapwriter.config.Config;
+import mapwriter.config.MapModeConfig;
 import mapwriter.map.mapmode.MapMode;
 import mapwriter.util.Render;
 import net.minecraft.util.ResourceLocation;
@@ -211,14 +212,15 @@ public class MapRenderer {
 	
 	private void drawCoords() {
 		// draw coordinates
-		if (this.mapMode.config.coordsEnabled) {
+		if (!this.mapMode.config.coordsMode.equals(MapModeConfig.coordsModeStringArray[0])) 
+		{
 			GL11.glPushMatrix();
 			GL11.glTranslatef(this.mapMode.textX, this.mapMode.textY, 0);
-			if (Config.coordsMode != Config.coordsModeStringArray[2]) {
+			if (this.mapMode.config.coordsMode.equals(MapModeConfig.coordsModeStringArray[1]))
+			{
 				GL11.glScalef(0.5f, 0.5f, 1.0f);
 			}
 			int offset = 0;
-			if (Config.coordsMode != Config.coordsModeStringArray[0]) {
 				Render.drawCentredString(0, 0, this.mapMode.textColour,
 						"%d, %d, %d", 
 						this.mw.playerXInt,
@@ -226,7 +228,6 @@ public class MapRenderer {
 						this.mw.playerZInt
 				);
 				offset += 12;
-			}
 			if (Config.undergroundMode) {
 				Render.drawCentredString(
 					0, offset, this.mapMode.textColour,"underground mode"
