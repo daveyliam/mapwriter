@@ -257,7 +257,7 @@ public class MapRenderer {
 	}
 	
 	public void draw() {
-		
+		this.mapMode.checkChanges();
 		this.mapMode.setScreenRes();
 		this.mapView.setMapWH(this.mapMode);
 		this.mapView.setTextureSize(this.mw.textureSize);

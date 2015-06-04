@@ -4,7 +4,7 @@ import java.io.File;
 
 import mapwriter.Mw;
 import mapwriter.api.MwAPI;
-import mapwriter.handler.ConfigurationHandler;
+import mapwriter.config.ConfigurationHandler;
 import mapwriter.overlay.OverlayGrid;
 import mapwriter.overlay.OverlaySlime;
 import net.minecraftforge.common.MinecraftForge;

@@ -1,23 +1,8 @@
 package mapwriter.config;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import mapwriter.gui.ModGuiConfig.ModBooleanEntry;
-import mapwriter.handler.ConfigurationHandler;
 import mapwriter.util.Reference;
-import net.minecraftforge.fml.client.config.ConfigGuiType;
-import net.minecraftforge.fml.client.config.DummyConfigElement;
-import net.minecraftforge.fml.client.config.IConfigElement;
 
 public class Config {
-	public static final String[] miniMapPositionStringArray = {
-		"unchanged",
-		"top right",
-		"top left",
-		"bottom right",
-		"bottom left"
-	};
 	public static final String[] coordsModeStringArray = {
 		"disabled",
 		"small",

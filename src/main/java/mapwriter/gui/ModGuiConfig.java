@@ -2,32 +2,21 @@ package mapwriter.gui;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import mapwriter.config.Config;
-import mapwriter.handler.ConfigurationHandler;
-import mapwriter.map.mapmode.MapMode;
+import mapwriter.config.ConfigurationHandler;
 import mapwriter.util.Reference;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
-import net.minecraftforge.client.gui.ForgeGuiFactory.ForgeConfigGui.AddModOverrideEntry;
-import net.minecraftforge.client.gui.ForgeGuiFactory.ForgeConfigGui.ModOverridesEntry;
-import net.minecraftforge.common.ForgeChunkManager;
-import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.ConfigElement;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fml.client.config.ConfigGuiType;
-import net.minecraftforge.fml.client.config.DummyConfigElement;
+import net.minecraftforge.fml.client.config.DummyConfigElement.DummyCategoryElement;
 import net.minecraftforge.fml.client.config.GuiConfig;
 import net.minecraftforge.fml.client.config.GuiConfigEntries;
-import net.minecraftforge.fml.client.config.GuiUtils;
-import net.minecraftforge.fml.client.config.GuiConfigEntries.ButtonEntry;
-import net.minecraftforge.fml.client.config.IConfigElement;
-import net.minecraftforge.fml.client.config.DummyConfigElement.DummyCategoryElement;
 import net.minecraftforge.fml.client.config.GuiConfigEntries.BooleanEntry;
-import net.minecraftforge.fml.client.config.GuiConfigEntries.CategoryEntry;
+import net.minecraftforge.fml.client.config.GuiConfigEntries.ButtonEntry;
 import net.minecraftforge.fml.client.config.GuiConfigEntries.IConfigEntry;
-import net.minecraftforge.fml.client.config.GuiConfigEntries.NumberSliderEntry;
+import net.minecraftforge.fml.client.config.GuiUtils;
+import net.minecraftforge.fml.client.config.IConfigElement;
 
 public class ModGuiConfig extends GuiConfig
 {

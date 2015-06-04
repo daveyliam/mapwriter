@@ -1,12 +1,8 @@
-package mapwriter.handler;
+package mapwriter.config;
 
 import java.io.File;
 
-import mapwriter.Mw;
-import mapwriter.config.Config;
-import mapwriter.config.WorldConfig;
 import mapwriter.util.Reference;
-import mapwriter.util.Utils;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -76,10 +72,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 	    public static void setMapModeDefaults()
 	    {
 	    	Config.fullScreenMap.heightPercent = -1;
-	    	Config.fullScreenMap.marginTop = 0;
-	    	Config.fullScreenMap.marginBottom = 0;
-	    	Config.fullScreenMap.marginLeft = 0;
-	    	Config.fullScreenMap.marginRight = 0;
+	    	Config.fullScreenMap.Position = "FullScreen";
 	    	Config.fullScreenMap.borderMode = false;
 	    	Config.fullScreenMap.playerArrowSize = 5;
 	    	Config.fullScreenMap.markerSize = 5;
@@ -90,31 +83,27 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 			
 			ConfigurationHandler.configuration.get(Reference.catFullMapConfig, "enabled", Config.fullScreenMap.enabled).setShowInGui(false);
 			ConfigurationHandler.configuration.get(Reference.catFullMapConfig, "heightPercent", Config.fullScreenMap.heightPercent).setShowInGui(false);
-			ConfigurationHandler.configuration.get(Reference.catFullMapConfig, "marginTop", Config.fullScreenMap.marginTop).setShowInGui(false);
-			ConfigurationHandler.configuration.get(Reference.catFullMapConfig, "marginLeft", Config.fullScreenMap.marginLeft).setShowInGui(false);
-			ConfigurationHandler.configuration.get(Reference.catFullMapConfig, "marginRight", Config.fullScreenMap.marginRight).setShowInGui(false);
 			ConfigurationHandler.configuration.get(Reference.catFullMapConfig, "borderMode", Config.fullScreenMap.borderMode).setShowInGui(false);
 			ConfigurationHandler.configuration.get(Reference.catFullMapConfig, "rotate", Config.fullScreenMap.rotate).setShowInGui(false);
 			ConfigurationHandler.configuration.get(Reference.catFullMapConfig, "circular", Config.fullScreenMap.circular).setShowInGui(false);
 			ConfigurationHandler.configuration.get(Reference.catFullMapConfig, "coordsEnabled", Config.fullScreenMap.coordsEnabled).setShowInGui(false);
 			
+			ConfigurationHandler.configuration.get(Reference.catFullMapConfig, "Position", Config.fullScreenMap.Position).setShowInGui(false);
+			ConfigurationHandler.configuration.get(Reference.catFullMapConfig, "Position", Config.fullScreenMap.Position).setDefaultValue("FullScreen");
+			
 			Config.largeMap.heightPercent = -1;
-			Config.largeMap.marginTop = 10;
-			Config.largeMap.marginBottom = 40;
-			Config.largeMap.marginLeft = 40;
-			Config.largeMap.marginRight = 40;
+			Config.largeMap.Position = "Large";
 			Config.largeMap.playerArrowSize = 5;
 			Config.largeMap.markerSize = 5;
 			Config.largeMap.coordsEnabled = true;	
 			
 			ConfigurationHandler.configuration.get(Reference.catLargeMapConfig, "enabled", Config.largeMap.enabled).setRequiresWorldRestart(true);
-			ConfigurationHandler.configuration.get(Reference.catLargeMapConfig, "heightPercent", Config.largeMap.heightPercent).setShowInGui(false);			
+			ConfigurationHandler.configuration.get(Reference.catLargeMapConfig, "heightPercent", Config.largeMap.heightPercent).setShowInGui(false);
+			ConfigurationHandler.configuration.get(Reference.catLargeMapConfig, "Position", Config.largeMap.Position).setShowInGui(false);
+			ConfigurationHandler.configuration.get(Reference.catLargeMapConfig, "Position", Config.largeMap.Position).setDefaultValue("Large");
 			
 			Config.smallMap.heightPercent = 30;
-			Config.smallMap.marginTop = 10;
-			Config.smallMap.marginBottom = -1;
-			Config.smallMap.marginLeft = -1;
-			Config.smallMap.marginRight = 10;
+			Config.smallMap.Position = Config.smallMap.miniMapPositionStringArray[0];
 			Config.smallMap.playerArrowSize = 4;
 			Config.smallMap.markerSize = 3;
 			Config.smallMap.coordsEnabled = true;

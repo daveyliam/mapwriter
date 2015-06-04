@@ -8,7 +8,6 @@ import mapwriter.config.Config;
 import mapwriter.map.mapmode.LargeMapMode;
 import mapwriter.map.mapmode.MapMode;
 import mapwriter.map.mapmode.SmallMapMode;
-import mapwriter.util.Reference;
 
 public class MiniMap {
 	private Mw mw;
@@ -75,11 +74,6 @@ public class MiniMap {
 			this.currentMap = newMap;
 		//}
 		return this.currentMap;
-	}
-	
-	public void toggleRotating() {
-		boolean rotate = this.smallMapMode.toggleRotating();
-		this.largeMapMode.setRotating(rotate);
 	}
 	
 	// draw the map overlay, player arrow, and markers

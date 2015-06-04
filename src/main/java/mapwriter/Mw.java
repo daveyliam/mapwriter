@@ -3,12 +3,12 @@ package mapwriter;
 import java.io.File;
 
 import mapwriter.config.Config;
+import mapwriter.config.ConfigurationHandler;
 import mapwriter.config.WorldConfig;
 import mapwriter.forge.MwForge;
 import mapwriter.forge.MwKeyHandler;
 import mapwriter.gui.MwGui;
 import mapwriter.gui.MwGuiMarkerDialog;
-import mapwriter.handler.ConfigurationHandler;
 import mapwriter.map.MapTexture;
 import mapwriter.map.MapView;
 import mapwriter.map.Marker;

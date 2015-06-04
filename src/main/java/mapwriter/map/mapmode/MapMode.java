@@ -1,18 +1,11 @@
 package mapwriter.map.mapmode;
 
 import java.awt.Point;
-import java.util.ArrayList;
-import java.util.List;
 
 import mapwriter.config.MapModeConfig;
-import mapwriter.gui.ModGuiConfig.ModBooleanEntry;
-import mapwriter.handler.ConfigurationHandler;
 import mapwriter.map.MapView;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraftforge.fml.client.config.ConfigGuiType;
-import net.minecraftforge.fml.client.config.DummyConfigElement;
-import net.minecraftforge.fml.client.config.IConfigElement;
 
 public class MapMode {
 	private int sw = 320;
@@ -29,6 +22,11 @@ public class MapMode {
 	public int wPixels = 50;
 	public int hPixels = 50;
 	
+	public int marginLeft = 10;
+	public int marginRight = -1;
+	public int marginTop = -1;
+	public int marginBottom = 10;
+
 	// config settings
 	
 	public int textX = 0;
@@ -39,6 +37,7 @@ public class MapMode {
 	
 	public MapMode(MapModeConfig config) {
 		this.config = config;
+		updateMargin();
 	}
 	
 	public void setScreenRes(int dw, int dh, int sw, int sh, double scaling) {
@@ -56,25 +55,64 @@ public class MapMode {
 		this.setScreenRes(mc.displayWidth, mc.displayHeight, sRes.getScaledWidth(), sRes.getScaledHeight(), sRes.getScaleFactor());
 	}
 	
-	public void setMargins(int marginTop, int marginBottom, int marginLeft, int marginRight) {
-		this.config.marginTop = marginTop;
-		this.config.marginBottom = marginBottom;
-		this.config.marginLeft = marginLeft;
-		this.config.marginRight = marginRight;
-		this.update();
-	}
-	
-	public void setHeightPercent(int heightPercent) {
-		this.config.heightPercent = heightPercent;
-		this.update();
-	}
-	
-	public void toggleHeightPercent() {
-		int i = (this.config.heightPercent / 5) + 1;
-		if (i > 12) {
-			i = 1;
+	public void checkChanges()
+	{
+		if (this.config.Changed)
+		{
+			this.updateMargin();
+			this.update();
+			this.config.Changed = false;
 		}
-		this.setHeightPercent(i * 5);
+	}
+	
+	private void updateMargin()
+	{
+		//top right
+		if (this.config.Position.equals(MapModeConfig.miniMapPositionStringArray[0]))
+		{
+			marginTop = 10;
+			marginBottom = -1;
+			marginLeft = -1;
+			marginRight = 10;
+		}
+		//top left
+		else if (this.config.Position.equals(MapModeConfig.miniMapPositionStringArray[1]))
+		{
+			marginTop = 10;
+			marginBottom = -1;
+			marginLeft = 10;
+			marginRight = -1;
+		}
+		//botom right
+		else if (this.config.Position.equals(MapModeConfig.miniMapPositionStringArray[2]))
+		{
+			marginTop = -1;
+			marginBottom = 40;
+			marginLeft = -1;
+			marginRight = 10;
+		}
+		//botom left
+		else if (this.config.Position.equals(MapModeConfig.miniMapPositionStringArray[3]))
+		{
+			marginTop = -1;
+			marginBottom = 40;
+			marginLeft = 10;
+			marginRight = -1;
+		}
+		else if (this.config.Position.equals("FullScreen"))
+		{
+			marginTop = 0;
+			marginBottom = 0;
+			marginLeft = 0;
+			marginRight = 0;
+		}
+		else if (this.config.Position.equals("Large"))
+		{
+			marginTop = 10;
+			marginBottom = 40;
+			marginLeft = 40;
+			marginRight = 40;
+		}
 	}
 	
 	private void update() {
@@ -82,14 +120,14 @@ public class MapMode {
 		int x, y;
 		
 		// calculate map x position and width
-		if ((this.config.marginLeft >= 0) && (this.config.marginRight >= 0)) {
-			x = this.config.marginLeft;
-			this.w = this.sw - this.config.marginLeft - this.config.marginRight;
-		} else if (this.config.marginLeft >= 0) {
-			x = this.config.marginLeft;
+		if ((marginLeft >= 0) && (marginRight >= 0)) {
+			x = marginLeft;
+			this.w = this.sw - marginLeft - marginRight;
+		} else if (marginLeft >= 0) {
+			x = marginLeft;
 			this.w = size;
-		} else if (this.config.marginRight >= 0) {
-			x = this.sw - size - this.config.marginRight;
+		} else if (marginRight >= 0) {
+			x = this.sw - size - marginRight;
 			this.w = size;
 		} else {
 			x = (this.sw - size) / 2;
@@ -97,14 +135,14 @@ public class MapMode {
 		}
 		
 		// calculate map y position and height
-		if ((this.config.marginTop >= 0) && (this.config.marginBottom >= 0)) {
-			y = this.config.marginTop;
-			this.h = this.sh - this.config.marginTop - this.config.marginBottom;
-		} else if (this.config.marginTop >= 0) {
-			y = this.config.marginTop;
+		if ((marginTop >= 0) && (marginBottom >= 0)) {
+			y = marginTop;
+			this.h = this.sh - marginTop - marginBottom;
+		} else if (marginTop >= 0) {
+			y = marginTop;
 			this.h = size;
-		} else if (this.config.marginBottom >= 0) {
-			y = this.sh - size - this.config.marginBottom;
+		} else if (marginBottom >= 0) {
+			y = this.sh - size - marginBottom;
 			this.h = size;
 		} else {
 			y = (this.sh - size) / 2;
@@ -135,17 +173,6 @@ public class MapMode {
 		//MwUtil.log("MapMode: map = %d %d %d %d, screen = %d %d", this.x, this.y, this.w, this.h, this.sw, this.sh);
 		//MwUtil.log("MapMode: margins = left %d, right %d, top %d, bottom %d, size = %d",
 		//		this.marginLeft, this.marginRight, this.marginTop, this.marginBottom, size);
-	}
-	
-	public void setRotating(boolean enabled) {
-		this.config.rotate = enabled;
-		this.config.circular = enabled;
-		this.update();
-	}
-	
-	public boolean toggleRotating() {
-		this.setRotating(!this.config.rotate);
-		return this.config.rotate;
 	}
 	
 	public Point screenXYtoBlockXZ(MapView mapView, int sx, int sy) {

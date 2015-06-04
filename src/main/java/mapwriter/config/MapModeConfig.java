@@ -1,18 +1,21 @@
 package mapwriter.config;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import mapwriter.gui.ModGuiConfig.ModBooleanEntry;
-import mapwriter.handler.ConfigurationHandler;
 import net.minecraftforge.common.config.ConfigElement;
-import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.client.config.DummyConfigElement.DummyCategoryElement;
 import net.minecraftforge.fml.client.config.IConfigElement;
 
-public class MapModeConfig {
-	
+public class MapModeConfig {	
 		public final String configCategory;
+		
+		public static final String[] miniMapPositionStringArray = {
+			"top right",
+			"top left",
+			"bottom right",
+			"bottom left"
+		};
+		
+		public boolean Changed = false;
 		
 		public boolean enabled = true;
 		public boolean rotate = true;
@@ -23,12 +26,10 @@ public class MapModeConfig {
 		public int markerSize = 5;
 		public int trailMarkerSize = 3;
 		public int alphaPercent = 100;
-		
-		public int marginTop = 0;
-		public int marginBottom = 0;
-		public int marginLeft = 0;
-		public int marginRight = 0;
 		public int heightPercent = -1;
+		public String Position = miniMapPositionStringArray[0];
+
+		
 		
 		public MapModeConfig(String configCategory) {
 			this.configCategory = configCategory;
@@ -42,17 +43,17 @@ public class MapModeConfig {
 			this.alphaPercent = ConfigurationHandler.configuration.getInt("alphaPercent", this.configCategory, this.alphaPercent, 0, 100, "mw.config.map.alphaPercent");
 			
 			this.heightPercent = ConfigurationHandler.configuration.getInt("heightPercent",this.configCategory, this.heightPercent, 0, 100, "mw.config.map.heightPercent");
-			this.marginTop = ConfigurationHandler.configuration.getInt("marginTop", this.configCategory, this.marginTop, -1, 320, "mw.config.map.marginTop");
-			this.marginBottom = ConfigurationHandler.configuration.getInt("marginBottom", this.configCategory, this.marginBottom, -1, 320, "mw.config.map.marginBottom");
-			this.marginLeft = ConfigurationHandler.configuration.getInt("marginLeft", this.configCategory, this.marginLeft, -1, 320, "mw.config.map.marginLeft");
-			this.marginRight = ConfigurationHandler.configuration.getInt("marginRight", this.configCategory, this.marginRight, -1, 320, "mw.config.map.marginRight");
-			
+
 			this.rotate = ConfigurationHandler.configuration.getBoolean("rotate", this.configCategory, this.rotate, "mw.config.map.rotate");
 			this.circular = ConfigurationHandler.configuration.getBoolean("circular", this.configCategory, this.circular, "mw.config.map.circular");
 			this.coordsEnabled = ConfigurationHandler.configuration.getBoolean("coordsEnabled", this.configCategory, this.coordsEnabled, "mw.config.map.coordsEnabled");
 			this.borderMode = ConfigurationHandler.configuration.getBoolean("borderMode", this.configCategory, this.borderMode, "mw.config.map.borderMode");
 			
+			this.Position = ConfigurationHandler.configuration.getString("Position", this.configCategory, miniMapPositionStringArray[0], "mw.config.map.Position", miniMapPositionStringArray);
+			
 			this.trailMarkerSize = Math.max(1, this.markerSize - 1);
+			
+			this.Changed = true;
 		}	
 		
 	    public IConfigElement categoryElement(String name, String tooltip_key) 
