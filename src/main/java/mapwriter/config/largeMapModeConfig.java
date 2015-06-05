@@ -32,6 +32,7 @@ public class largeMapModeConfig extends MapModeConfig
 		this.borderModeDef = true;
 		this.heightPercentDef = -1;
 		this.PositionDef = "Large";
+		this.Position = this.PositionDef;
 	
 		ConfigurationHandler.configuration.get(Reference.catLargeMapConfig, "enabled", this.enabled).setRequiresWorldRestart(true);
 	}

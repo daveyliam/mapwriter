@@ -65,7 +65,7 @@ public class MapRenderer {
 		}
 		GlStateManager.pushMatrix();
 		
-		if (this.mapMode.config.rotate) {
+		if (this.mapMode.config.rotate  && this.mapMode.config.circular == true) {
 			GlStateManager.rotate(this.mw.mapRotationDegrees, 0.0f, 0.0f, 1.0f);
 		}
 		if (this.mapMode.config.circular) {
@@ -161,7 +161,7 @@ public class MapRenderer {
 		
 		// the arrow only needs to be rotated if the map is NOT rotated
 		GlStateManager.translate(p.x, p.y, 0.0);
-		if (!this.mapMode.config.rotate) {
+		if (!this.mapMode.config.rotate || this.mapMode.config.circular == false) {
 			GlStateManager.rotate(-this.mw.mapRotationDegrees, 0.0f, 0.0f, 1.0f);
 		}
 		
@@ -178,7 +178,7 @@ public class MapRenderer {
 	private void drawIcons() {
 		GlStateManager.pushMatrix();
 		
-		if (this.mapMode.config.rotate) {
+		if (this.mapMode.config.rotate && this.mapMode.config.circular == true) {
 			GlStateManager.rotate(this.mw.mapRotationDegrees, 0.0f, 0.0f, 1.0f);
 		}
 		
@@ -256,7 +256,7 @@ public class MapRenderer {
 	}
 	
 	public void draw() {
-		this.mapMode.checkChanges();
+		this.mapMode.updateMargin();
 		this.mapMode.setScreenRes();
 		this.mapView.setMapWH(this.mapMode);
 		this.mapView.setTextureSize(this.mw.textureSize);

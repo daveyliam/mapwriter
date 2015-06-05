@@ -19,8 +19,6 @@ public class MapModeConfig {
 			"bottom right",
 			"bottom left"
 		};
-		
-		public boolean Changed = false;
 
 		public boolean enabledDef = true;
 		public boolean enabled = enabledDef;
@@ -56,8 +54,6 @@ public class MapModeConfig {
 			this.alphaPercent = ConfigurationHandler.configuration.getInt("alphaPercent", this.configCategory, this.alphaPercentDef, 0, 100, "mw.config.map.alphaPercent");
 
 			this.trailMarkerSize = Math.max(1, this.markerSize - 1);
-			
-			this.Changed = true;
 		}	
 		
 		public void setDefaults()

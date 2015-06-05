@@ -22,10 +22,12 @@ public class MapMode {
 	public int wPixels = 50;
 	public int hPixels = 50;
 	
-	public int marginLeft = 10;
-	public int marginRight = -1;
-	public int marginTop = -1;
-	public int marginBottom = 10;
+	public int marginTop = 10;
+	public int marginBottom = -1;
+	public int marginLeft = -1;
+	public int marginRight = 10;
+
+	public String lastPos = MapModeConfig.miniMapPositionStringArray[0];
 
 	// config settings
 	
@@ -55,18 +57,13 @@ public class MapMode {
 		this.setScreenRes(mc.displayWidth, mc.displayHeight, sRes.getScaledWidth(), sRes.getScaledHeight(), sRes.getScaleFactor());
 	}
 	
-	public void checkChanges()
+	public void updateMargin()
 	{
-		if (this.config.Changed)
+		if (this.lastPos.equals(this.config.Position))
 		{
-			this.updateMargin();
-			this.update();
-			this.config.Changed = false;
+			return;	
 		}
-	}
-	
-	private void updateMargin()
-	{
+		
 		//top right
 		if (this.config.Position.equals(MapModeConfig.miniMapPositionStringArray[0]))
 		{
@@ -113,6 +110,7 @@ public class MapMode {
 			marginLeft = 40;
 			marginRight = 40;
 		}
+		this.update();
 	}
 	
 	private void update() {
