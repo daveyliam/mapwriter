@@ -90,10 +90,12 @@ public class MapRenderer {
 			this.mw.mapTexture.requestView(req, this.mw.executor, this.mw.regionManager);
 			
 			// draw the background texture
-			if (Config.backgroundTextureMode > 0) {
+			if (!Config.backgroundTextureMode.equals(Config.backgroundModeStringArray[0]))
+				{
 				double bu1 = 0.0; double bu2 = 1.0;
 				double bv1 = 0.0; double bv2 = 1.0;
-				if (Config.backgroundTextureMode == 2) {
+				if (Config.backgroundTextureMode.equals(Config.backgroundModeStringArray[2]))
+				{
 					// background moves with map if mode is 2
 					double bSize = tSize / 256.0;
 					bu1 = u * bSize; bu2 = (u + w) * bSize;

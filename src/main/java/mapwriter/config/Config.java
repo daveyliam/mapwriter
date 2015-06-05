@@ -44,8 +44,8 @@ public class Config {
 	public static boolean regionFileOutputEnabledSP = regionFileOutputEnabledSPDef;
 	public static boolean regionFileOutputEnabledMPDef = true;
 	public static boolean regionFileOutputEnabledMP = regionFileOutputEnabledMPDef;
-	public static int backgroundTextureModeDef = 0;
-	public static int backgroundTextureMode = backgroundTextureModeDef;
+	public static String backgroundTextureModeDef = backgroundModeStringArray[0];
+	public static String backgroundTextureMode = backgroundTextureModeDef;
 	
 	//World configuration Options
 	public static int overlayModeIndex = 0;
