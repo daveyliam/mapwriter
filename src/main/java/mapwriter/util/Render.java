@@ -2,6 +2,7 @@ package mapwriter.util;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 
@@ -27,18 +28,19 @@ public class Render {
 	}
 	
 	public static void setColour(int colour) {
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA,GL11.GL_ONE_MINUS_SRC_ALPHA);     
-		GL11.glColor4f(
+		
+		GlStateManager.enableBlend();
+		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GlStateManager.color(
 				(float) ((colour >> 16) & 0xff) / 255.0f,
 				(float) ((colour >> 8)  & 0xff) / 255.0f,
 				(float) ((colour)       & 0xff) / 255.0f,
 				(float) ((colour >> 24) & 0xff) / 255.0f);
-        GL11.glDisable(GL11.GL_BLEND);
+		GlStateManager.disableBlend();
 	}
 
 	public static void resetColour() {
-		GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f); 
+		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f); 
 	}
 	
 	public static int multiplyColours(int c1, int c2) {
@@ -155,9 +157,9 @@ public class Render {
 	// draw rectangle with texture UV coordinates specified (so only part of the texture fills the rectangle).
 	public static void drawTexturedRect(double x, double y, double w, double h, double u1, double v1, double u2, double v2) {
 		try {
-			GL11.glEnable(GL11.GL_TEXTURE_2D);
-			GL11.glEnable(GL11.GL_BLEND);
-			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+			GlStateManager.enableTexture2D();
+			GlStateManager.enableBlend();
+			GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 	        Tessellator tessellator = Tessellator.getInstance();
 	        WorldRenderer renderer  = tessellator.getWorldRenderer();
 	        renderer.startDrawingQuads();
@@ -167,7 +169,7 @@ public class Render {
 	        renderer.addVertexWithUV(x + w, y + h, zDepth, u2, v2);
 	        //renderer.finishDrawing();
 	        tessellator.draw();
-			GL11.glDisable(GL11.GL_BLEND);
+	        GlStateManager.disableBlend();
 		} catch (NullPointerException e) {
 			Logging.log("MwRender.drawTexturedRect: null pointer exception");
 		}
@@ -176,9 +178,9 @@ public class Render {
 	public static void drawArrow(double x, double y, double angle, double length) {
 		// angle the back corners will be drawn at relative to the pointing angle
 		double arrowBackAngle = 0.75D * Math.PI;
-		GL11.glEnable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GlStateManager.enableBlend();
+		GlStateManager.disableTexture2D();
+		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer renderer  = tessellator.getWorldRenderer();
         renderer.startDrawing(GL11.GL_TRIANGLE_FAN);
@@ -188,14 +190,14 @@ public class Render {
         renderer.addVertex(x + (length * 0.5D * Math.cos(angle + arrowBackAngle)), y + (length * 0.5D * Math.sin(angle + arrowBackAngle)), zDepth);
         //renderer.finishDrawing();
         tessellator.draw();
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glDisable(GL11.GL_BLEND);
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
 	}
 	
 	public static void drawTriangle(double x1, double y1, double x2, double y2, double x3, double y3) {
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GlStateManager.enableBlend();
+		GlStateManager.disableTexture2D();
+		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer renderer  = tessellator.getWorldRenderer();
         renderer.startDrawing(GL11.GL_TRIANGLES);
@@ -204,14 +206,14 @@ public class Render {
         renderer.addVertex(x3, y3, zDepth);
         //renderer.finishDrawing();
         tessellator.draw();
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glDisable(GL11.GL_BLEND);
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
 	}
 	
 	public static void drawRect(double x, double y, double w, double h) {
-		GL11.glEnable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GlStateManager.enableBlend();
+		GlStateManager.disableTexture2D();
+		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer renderer  = tessellator.getWorldRenderer();
         renderer.startDrawingQuads();
@@ -221,14 +223,14 @@ public class Render {
         renderer.addVertex(x + w, y + h, zDepth);
         //renderer.finishDrawing();
         tessellator.draw();
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glDisable(GL11.GL_BLEND);
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
 	}
 	
 	public static void drawCircle(double x, double y, double r) {
-		GL11.glEnable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GlStateManager.enableBlend();
+		GlStateManager.disableTexture2D();
+		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer renderer  = tessellator.getWorldRenderer();
         renderer.startDrawing(GL11.GL_TRIANGLE_FAN);
@@ -241,14 +243,14 @@ public class Render {
         }
        //renderer.finishDrawing();
         tessellator.draw();
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glDisable(GL11.GL_BLEND);
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
 	}
 	
 	public static void drawCircleBorder(double x, double y, double r, double width) {
-		GL11.glEnable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GlStateManager.enableBlend();
+		GlStateManager.disableTexture2D();
+		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer renderer  = tessellator.getWorldRenderer();
         renderer.startDrawing(GL11.GL_TRIANGLE_STRIP);
@@ -262,8 +264,8 @@ public class Render {
         }
         //renderer.finishDrawing();
         tessellator.draw();
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glDisable(GL11.GL_BLEND);
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
 	}
 	
 	public static void drawRectBorder(double x, double y, double w, double h, double bw) {
@@ -295,12 +297,12 @@ public class Render {
 	}
 	
 	public static void setCircularStencil(double x, double y, double r) {
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GlStateManager.depthFunc(GL11.GL_DEPTH_TEST);
 		// disable drawing to the color buffer.
 		// circle will only be drawn to depth buffer.
 		GL11.glColorMask(false, false, false, false);
 		// enable writing to depth buffer
-		GL11.glDepthMask(true);
+		GlStateManager.depthMask(true);
 		
 		// Clearing the depth buffer causes problems with shader mods.
 		// I guess we just have to hope that the rest of the depth buffer
@@ -316,7 +318,7 @@ public class Render {
 		//GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
 		
 		// always write to depth buffer
-		GL11.glDepthFunc(GL11.GL_ALWAYS);
+		GlStateManager.depthFunc(GL11.GL_ALWAYS);
 		
 		// draw stencil pattern (filled circle at z = 1000.0)
 		Render.setColour(0xffffffff);
@@ -327,17 +329,18 @@ public class Render {
 		// re-enable drawing to colour buffer
 		GL11.glColorMask(true, true, true, true);
 		// disable drawing to depth buffer
-		GL11.glDepthMask(false);
+		GlStateManager.depthMask(false);
 		// only draw pixels with z values that are greater
 		// than the value in the depth buffer.
 		// The overlay is drawn at 2000 so this will pass inside
 		// the circle (2000 > 1000) but not outside (2000 <= 3000).
-		GL11.glDepthFunc(GL11.GL_GREATER);
+		GlStateManager.depthFunc(GL11.GL_GREATER);
 	}
 	
 	public static void disableStencil() {
-		GL11.glDepthMask(true);
-		GL11.glDepthFunc(GL11.GL_LEQUAL);
+		GlStateManager.depthMask(true);
+		GlStateManager.depthFunc(GL11.GL_LEQUAL);
+		GlStateManager.disableDepth();
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
 	}
 	

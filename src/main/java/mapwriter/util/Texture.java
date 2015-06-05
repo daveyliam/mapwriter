@@ -2,6 +2,8 @@ package mapwriter.util;
 
 import java.nio.IntBuffer;
 
+import net.minecraft.client.renderer.GlStateManager;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
@@ -14,7 +16,7 @@ public class Texture {
 	
 	// allocate new texture and fill from IntBuffer
 	public Texture(int w, int h, int fillColour, int minFilter, int maxFilter, int textureWrap) {
-		this.id = GL11.glGenTextures();
+		this.id = GlStateManager.generateTexture();
 		this.w = w;
 		this.h = h;
 		this.pixelBuf = Utils.allocateDirectIntBuffer(w * h);
@@ -44,7 +46,7 @@ public class Texture {
 	public synchronized void close() {
 		if (this.id != 0) {
 			try {
-				GL11.glDeleteTextures(this.id);
+				GlStateManager.deleteTexture(this.id);
 			} catch (NullPointerException e) {
 				Logging.log("MwTexture.close: null pointer exception (texture %d)", this.id);
 			}
@@ -97,7 +99,7 @@ public class Texture {
 	}
 	
 	public void bind() {
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, this.id);
+		GlStateManager.bindTexture(this.id);
 	}
 	
 	// set texture scaling and wrapping parameters

@@ -74,24 +74,10 @@ public class EventHandler {
 		}
 	}
 	
-    //@SubscribeEvent
-    //public void renderMap(RenderGameOverlayEvent.Post event){
-    //   if(event.type == RenderGameOverlayEvent.ElementType.ALL){
-    //        Mw.getInstance().onTick();
-    //    }
-    //}
-    
-	//using the FML render tick event because RenderGameOverlayEvent.Post creates flickering 
     @SubscribeEvent
-    public void onTick(RenderTickEvent event)
-    {
-        if (event.phase.equals(Phase.START))
-        {
-        	return;
-        }
-        if (Mw.getInstance().ready)
-        {
-        	Mw.getInstance().onTick();
+    public void renderMap(RenderGameOverlayEvent.Post event){
+       if(event.type == RenderGameOverlayEvent.ElementType.ALL){
+            Mw.getInstance().onTick();
         }
     }
 }

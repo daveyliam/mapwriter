@@ -11,6 +11,7 @@ import mapwriter.config.Config;
 import mapwriter.config.MapModeConfig;
 import mapwriter.map.mapmode.MapMode;
 import mapwriter.util.Render;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
@@ -62,11 +63,10 @@ public class MapRenderer {
 			w = (this.mapView.getWidth() / tSizeInBlocks);
 			h = (this.mapView.getHeight() / tSizeInBlocks);
 		}
-		
-		GL11.glPushMatrix();
+		GlStateManager.pushMatrix();
 		
 		if (this.mapMode.config.rotate) {
-			GL11.glRotated(this.mw.mapRotationDegrees, 0.0f, 0.0f, 1.0f);
+			GlStateManager.rotate(this.mw.mapRotationDegrees, 0.0f, 0.0f, 1.0f);
 		}
 		if (this.mapMode.config.circular) {
 			Render.setCircularStencil(0, 0, this.mapMode.h / 2.0);
@@ -128,16 +128,15 @@ public class MapRenderer {
 		
 		// overlay onDraw event
 		if (provider != null) {
-			GL11.glPushMatrix();			
+			GlStateManager.pushMatrix();			
 			provider.onDraw(this.mapView, this.mapMode);
-			GL11.glPopMatrix();			
+			GlStateManager.popMatrix();
 		}
 		
 		if (this.mapMode.config.circular) {
 			Render.disableStencil();
 		}
-		
-		GL11.glPopMatrix();
+		GlStateManager.popMatrix();
 	}
 	
 	private void drawBorder() {
@@ -155,15 +154,15 @@ public class MapRenderer {
 	}
 	
 	private void drawPlayerArrow() {
-		GL11.glPushMatrix();
+		GlStateManager.pushMatrix();
 		double scale = this.mapView.getDimensionScaling(this.mw.playerDimension);
 		Point.Double p = this.mapMode.getClampedScreenXY(this.mapView, this.mw.playerX * scale, this.mw.playerZ * scale);
 		this.playerArrowScreenPos.setLocation(p.x + this.mapMode.xTranslation, p.y + this.mapMode.yTranslation);
 		
 		// the arrow only needs to be rotated if the map is NOT rotated
-		GL11.glTranslated(p.x, p.y, 0.0);
+		GlStateManager.translate(p.x, p.y, 0.0);
 		if (!this.mapMode.config.rotate) {
-			GL11.glRotated(-this.mw.mapRotationDegrees, 0.0f, 0.0f, 1.0f);
+			GlStateManager.rotate(-this.mw.mapRotationDegrees, 0.0f, 0.0f, 1.0f);
 		}
 		
 		double arrowSize = this.mapMode.config.playerArrowSize;
@@ -173,14 +172,14 @@ public class MapRenderer {
 			-arrowSize, -arrowSize, arrowSize * 2, arrowSize * 2,
 			0.0, 0.0, 1.0, 1.0
 		);
-		GL11.glPopMatrix();
+		GlStateManager.popMatrix();
 	}
 	
 	private void drawIcons() {
-		GL11.glPushMatrix();
+		GlStateManager.pushMatrix();
 		
 		if (this.mapMode.config.rotate) {
-			GL11.glRotated(this.mw.mapRotationDegrees, 0.0f, 0.0f, 1.0f);
+			GlStateManager.rotate(this.mw.mapRotationDegrees, 0.0f, 0.0f, 1.0f);
 		}
 		
 		// draw markers
@@ -202,8 +201,7 @@ public class MapRenderer {
 				0.0, 0.0, 1.0, 1.0
 			);
 		}
-		
-		GL11.glPopMatrix();
+		GlStateManager.popMatrix();
 		
 		// outside of the matrix pop as theplayer arrow
 		// needs to be drawn without rotation
@@ -214,11 +212,11 @@ public class MapRenderer {
 		// draw coordinates
 		if (!this.mapMode.config.coordsMode.equals(MapModeConfig.coordsModeStringArray[0])) 
 		{
-			GL11.glPushMatrix();
-			GL11.glTranslatef(this.mapMode.textX, this.mapMode.textY, 0);
+			GlStateManager.pushMatrix();
+			GlStateManager.translate(this.mapMode.textX, this.mapMode.textY, 0);
 			if (this.mapMode.config.coordsMode.equals(MapModeConfig.coordsModeStringArray[1]))
 			{
-				GL11.glScalef(0.5f, 0.5f, 1.0f);
+				GlStateManager.scale(0.5f, 0.5f, 1.0f);
 			}
 			int offset = 0;
 				Render.drawCentredString(0, 0, this.mapMode.textColour,
@@ -233,7 +231,7 @@ public class MapRenderer {
 					0, offset, this.mapMode.textColour,"underground mode"
 				);
 			}
-			GL11.glPopMatrix();
+			GlStateManager.popMatrix();
 		}
 	}
 	
@@ -263,13 +261,13 @@ public class MapRenderer {
 		this.mapView.setMapWH(this.mapMode);
 		this.mapView.setTextureSize(this.mw.textureSize);
 		
-		GL11.glPushMatrix();
-		GL11.glLoadIdentity();
+		GlStateManager.pushMatrix();
+		GlStateManager.loadIdentity();
 		
 		// translate to center of minimap
 		// z is -2000 so that it is drawn above the 3D world, but below GUI
 		// elements which are typically at -3000
-		GL11.glTranslated(this.mapMode.xTranslation, this.mapMode.yTranslation, -2000.0);
+		GlStateManager.translate(this.mapMode.xTranslation, this.mapMode.yTranslation, -2000.0);
 		
 		// draw background, the map texture, and enabled overlays
 		this.drawMap();
@@ -283,7 +281,7 @@ public class MapRenderer {
 		
 		// some shader mods seem to need depth testing re-enabled
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glPopMatrix();
+		GlStateManager.popMatrix();
 	}
 	
 	private static void paintChunk(MapMode mapMode, MapView mapView, IMwChunkOverlay overlay){

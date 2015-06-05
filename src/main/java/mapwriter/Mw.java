@@ -55,7 +55,7 @@ public class Mw {
 	public int playerZInt = 0;
 	public double playerHeading = 0.0;
 	public int playerDimension = 0;
-	public double mapRotationDegrees = 0.0;
+	public float mapRotationDegrees = 0.0f;
 	
 	// instances of components
 	public MapTexture mapTexture = null;
