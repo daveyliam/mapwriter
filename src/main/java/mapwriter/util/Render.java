@@ -297,7 +297,7 @@ public class Render {
 	}
 	
 	public static void setCircularStencil(double x, double y, double r) {
-		GlStateManager.depthFunc(GL11.GL_DEPTH_TEST);
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		// disable drawing to the color buffer.
 		// circle will only be drawn to depth buffer.
 		GL11.glColorMask(false, false, false, false);
