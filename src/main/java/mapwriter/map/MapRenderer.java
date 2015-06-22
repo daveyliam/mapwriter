@@ -10,9 +10,9 @@ import mapwriter.api.MwAPI;
 import mapwriter.config.Config;
 import mapwriter.config.MapModeConfig;
 import mapwriter.map.mapmode.MapMode;
+import mapwriter.util.Reference;
 import mapwriter.util.Render;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
 
@@ -23,12 +23,6 @@ public class MapRenderer {
 	// accessed by the MwGui to check whether the mouse cursor is near the
 	// player arrow on the rendered map
 	public Point.Double playerArrowScreenPos = new Point.Double(0, 0);
-	 
-	private ResourceLocation backgroundTexture = new ResourceLocation("mapwriter", "textures/map/background.png");
-	private ResourceLocation roundMapTexture = new ResourceLocation("mapwriter", "textures/map/border_round.png");
-	private ResourceLocation squareMapTexture = new ResourceLocation("mapwriter", "textures/map/border_square.png");
-	private ResourceLocation playerArrowTexture = new ResourceLocation("mapwriter", "textures/map/arrow_player.png");
-	private ResourceLocation northArrowTexture = new ResourceLocation("mapwriter", "textures/map/arrow_north.png");
 	
 	public MapRenderer(Mw mw, MapMode mapMode, MapView mapView) {
 		this.mw = mw;
@@ -101,7 +95,7 @@ public class MapRenderer {
 					bu1 = u * bSize; bu2 = (u + w) * bSize;
 					bv1 = v * bSize; bv2 = (v + h) * bSize;
 				}
-				this.mw.mc.renderEngine.bindTexture(this.backgroundTexture);
+				this.mw.mc.renderEngine.bindTexture(Reference.backgroundTexture);
 				Render.setColourWithAlphaPercent(0xffffff, this.mapMode.config.alphaPercent);
 				Render.drawTexturedRect(
 						this.mapMode.x, this.mapMode.y, this.mapMode.w, this.mapMode.h,
@@ -143,9 +137,9 @@ public class MapRenderer {
 	
 	private void drawBorder() {
 		if (this.mapMode.config.circular) {
-			this.mw.mc.renderEngine.bindTexture(this.roundMapTexture);
+			this.mw.mc.renderEngine.bindTexture(Reference.roundMapTexture);
 		} else {
-			this.mw.mc.renderEngine.bindTexture(this.squareMapTexture);
+			this.mw.mc.renderEngine.bindTexture(Reference.squareMapTexture);
 		}
 		Render.setColour(0xffffffff);
 		Render.drawTexturedRect(
@@ -169,7 +163,7 @@ public class MapRenderer {
 		
 		double arrowSize = this.mapMode.config.playerArrowSize;
 		Render.setColour(0xffffffff);
-		this.mw.mc.renderEngine.bindTexture(this.playerArrowTexture);
+		this.mw.mc.renderEngine.bindTexture(Reference.playerArrowTexture);
 		Render.drawTexturedRect(
 			-arrowSize, -arrowSize, arrowSize * 2, arrowSize * 2,
 			0.0, 0.0, 1.0, 1.0
@@ -197,7 +191,7 @@ public class MapRenderer {
 			double y = this.mapMode.h / 2.0;
 			double arrowSize = this.mapMode.config.playerArrowSize;
 			Render.setColour(0xffffffff);
-			this.mw.mc.renderEngine.bindTexture(this.northArrowTexture);
+			this.mw.mc.renderEngine.bindTexture(Reference.northArrowTexture);
 			Render.drawTexturedRect(
 				-arrowSize, -y - (arrowSize * 2), arrowSize * 2, arrowSize * 2,
 				0.0, 0.0, 1.0, 1.0

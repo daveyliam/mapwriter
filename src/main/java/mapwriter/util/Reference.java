@@ -2,6 +2,8 @@ package mapwriter.util;
 
 import java.util.regex.Pattern;
 
+import net.minecraft.util.ResourceLocation;
+
 public final class Reference 
 {
 	public static final String MOD_ID = "MapWriter";
@@ -25,6 +27,12 @@ public final class Reference
 	public static final String worldDirConfigName = "mapwriter.cfg";
 	public static final String blockColourSaveFileName = "MapWriterBlockColours.txt";
 	public static final String blockColourOverridesFileName = "MapWriterBlockColourOverrides.txt";
+	
+	public static final ResourceLocation backgroundTexture = new ResourceLocation("mapwriter", "textures/map/background.png");
+	public static final ResourceLocation roundMapTexture = new ResourceLocation("mapwriter", "textures/map/border_round.png");
+	public static final ResourceLocation squareMapTexture = new ResourceLocation("mapwriter", "textures/map/border_square.png");
+	public static final ResourceLocation playerArrowTexture = new ResourceLocation("mapwriter", "textures/map/arrow_player.png");
+	public static final ResourceLocation northArrowTexture = new ResourceLocation("mapwriter", "textures/map/arrow_north.png");
 	
 	
 }
