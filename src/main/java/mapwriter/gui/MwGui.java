@@ -438,7 +438,7 @@ public class MwGui extends GuiScreen {
 
     // mouse button released. 0 = LMB, 1 = RMB, 2 = MMB
     // not called on mouse movement.
-    protected void mouseMovedOrUp(int x, int y, int button) {
+    protected void mouseReleased(int x, int y, int button) {
     	//MwUtil.log("MwGui.mouseMovedOrUp(%d, %d, %d)", x, y, button);
     	if (button == 0) {
     		this.mouseLeftHeld = 0;
