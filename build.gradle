@@ -25,27 +25,30 @@ repositories {
 ext.configFile = file "build.properties"
 
 configFile.withReader {
-    // Load config. It shall from now be referenced as simply config or project.config
-    def prop = new Properties()
-    prop.load(it)
-    project.ext.config = new ConfigSlurper().parse prop
+// Load config. It shall from now be referenced as simply config or project.config
+def prop = new Properties()
+prop.load(it)
+project.ext.config = new ConfigSlurper().parse prop
+}
+
+dependencies {
+	if (config.isSet('dependicies'))	{
+		def dep = config.dependicies.split(", ")
+		dep.each { compile it }
+	}
 }
 
 group= config.mod_group
+version = config.mod_version
 archivesBaseName = config.mod_name
 
-dependencies {
-}
 
-version = config.mod_version
 minecraft {
 version = config.mc_version + "-" + config.forge_version
 runDir = "eclipse"
-//mappings = config.mcp_version
+mappings = config.mcp_version
+replace '@MOD_VERSION@', config.mod_version
 }
-
-
-def root = project.projectDir.parentFile
 
 processResources
 {
@@ -73,11 +76,9 @@ jar {
 //classifier = 'universal'
 }
 
-
 task sourceJar(type: Jar) {
-    from sourceSets.main.java
-    from new File(root, "dev")
-    classifier = 'sources'
+    from sourceSets.main.allSource
+    classifier = 'src'
 }
 
 task devJar(type: Jar) {
@@ -86,5 +87,32 @@ classifier = 'dev'
 }
 
 artifacts {
-    		archives sourceJar, devJar
+    		archives sourceJar
+			archives devJar
+}
+
+eclipse {
+    // replace absolute paths with classpath variable GRADLE_CACHE
+    pathVariables 'GRADLE_CACHE': gradle.gradleUserHomeDir
+}
+
+eclipse.classpath.file.whenMerged { classpath ->
+  classpath.entries.each { entry ->
+    if (entry.kind == 'lib') {
+      // for jar files referenced in project folder, use relative path
+      def prefix = projectDir.absolutePath.replace('\\', '/')
+      entry.path = entry.path.replace(prefix, "/$eclipse.project.name")
+    }
+  }
+}
+
+gradle.taskGraph.whenReady { taskGraph ->
+  if (!taskGraph.allTasks.findAll{ it.name == 'eclipseClasspath' }.empty) {
+    gradle.buildFinished {
+      println '----------------------------------------------------------------------'
+      print   "Please set the Eclipse classpath variable 'GRADLE_USER_HOME' in Preferences "
+      println "-> Java -> Build path -> Classpath Variable to $gradle.gradleUserHomeDir"
+      println '----------------------------------------------------------------------'
+    }
+  }
 }

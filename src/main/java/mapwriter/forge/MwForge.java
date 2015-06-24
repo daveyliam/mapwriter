@@ -59,7 +59,7 @@ public class MwForge {
     @SubscribeEvent
     public void onConnected(FMLNetworkEvent.ClientConnectedToServerEvent event){
     	if (!event.isLocal) {
-    		InetSocketAddress address = (InetSocketAddress) event.manager.getSocketAddress();
+    		InetSocketAddress address = (InetSocketAddress) event.manager.getRemoteAddress();
     		Mw.instance.setServerDetails(address.getHostName(), address.getPort());
     	}
     }
