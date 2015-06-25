@@ -110,7 +110,7 @@ gradle.taskGraph.whenReady { taskGraph ->
   if (!taskGraph.allTasks.findAll{ it.name == 'eclipseClasspath' }.empty) {
     gradle.buildFinished {
       println '----------------------------------------------------------------------'
-      print   "Please set the Eclipse classpath variable 'GRADLE_USER_HOME' in Preferences "
+      print   "Please set the Eclipse classpath variable 'GRADLE_CACHE' in Preferences "
       println "-> Java -> Build path -> Classpath Variable to $gradle.gradleUserHomeDir"
       println '----------------------------------------------------------------------'
     }
