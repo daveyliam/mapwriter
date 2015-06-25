@@ -1,7 +1,6 @@
 package mapwriter;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 import mapwriter.config.Config;
@@ -10,8 +9,12 @@ import mapwriter.tasks.SaveChunkTask;
 import mapwriter.tasks.UpdateSurfaceChunksTask;
 import mapwriter.util.Utils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
+
+import com.google.common.collect.Maps;
 
 public class ChunkManager {
 	public Mw mw;
@@ -36,8 +39,8 @@ public class ChunkManager {
 	// make this a full copy of chunk data to prevent possible race conditions <-- done
 	public static MwChunk copyToMwChunk(Chunk chunk) {
 		byte[][] lightingArray = new byte[16][];
-		Map TileEntityMap = new HashMap();
-		TileEntityMap.putAll(chunk.getTileEntityMap());
+		Map<BlockPos, TileEntity> TileEntityMap = Maps.newHashMap();
+		TileEntityMap = Utils.checkedMapByCopy(chunk.getTileEntityMap(), BlockPos.class, TileEntity.class, false);
 		char[][] dataArray = new char[16][]; 
 		
 		ExtendedBlockStorage[] storageArrays = chunk.getBlockStorageArray();

@@ -279,7 +279,6 @@ public class MwChunk implements IChunk {
         
         NBTTagList nbttaglist = new NBTTagList();
         
-        int i = 16;
         NBTTagCompound nbttagcompound2;
 
         for (int y = 0; y < this.dataArray.length; y++)
@@ -328,13 +327,10 @@ public class MwChunk implements IChunk {
         nbttagcompound1.setTag("Sections", nbttaglist);
         }
         nbttagcompound1.setByteArray("Biomes", this.biomeArray);
-
-        NBTTagList nbttaglist2 = new NBTTagList();
-        Iterator iterator1;
-
+        
         NBTTagList nbttaglist3 = new NBTTagList();
         
-        iterator1 = this.tileentityMap.values().iterator();
+        Iterator<TileEntity> iterator1 = this.tileentityMap.values().iterator();
 
         while (iterator1.hasNext())
         {

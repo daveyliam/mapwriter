@@ -77,8 +77,6 @@ public class ChunkRender {
 		double b = 0.0;
 		for (; y > 0; y--) {
 			int blockAndMeta = chunk.getBlockAndMetadata(x, y, z);
-			int block = blockAndMeta >> 4;
-			int meta = (blockAndMeta | 0xfff0) ^ 0xfff0;
 			int c1 = bc.getColour(blockAndMeta);
 			int alpha = (c1 >> 24) & 0xff;
 			

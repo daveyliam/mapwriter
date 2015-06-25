@@ -1,6 +1,5 @@
 package mapwriter.config;
 
-import mapwriter.gui.ModGuiConfig.ModBooleanEntry;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.fml.client.config.DummyConfigElement.DummyCategoryElement;
 import net.minecraftforge.fml.client.config.IConfigElement;

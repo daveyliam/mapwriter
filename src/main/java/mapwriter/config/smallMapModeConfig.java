@@ -1,10 +1,6 @@
 package mapwriter.config;
 
-import mapwriter.gui.ModGuiConfig.ModBooleanEntry;
 import mapwriter.util.Reference;
-import net.minecraftforge.common.config.ConfigElement;
-import net.minecraftforge.fml.client.config.IConfigElement;
-import net.minecraftforge.fml.client.config.DummyConfigElement.DummyCategoryElement;
 
 public class smallMapModeConfig extends largeMapModeConfig
 {

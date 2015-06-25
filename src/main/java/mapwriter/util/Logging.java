@@ -1,7 +1,5 @@
 package mapwriter.util;
 
-import java.util.regex.Pattern;
-
 import mapwriter.forge.MwForge;
 
 public class Logging 

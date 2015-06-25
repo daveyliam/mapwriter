@@ -9,9 +9,7 @@ import mapwriter.map.mapmode.LargeMapMode;
 import mapwriter.map.mapmode.MapMode;
 import mapwriter.map.mapmode.SmallMapMode;
 
-public class MiniMap {
-	private Mw mw;
-	
+public class MiniMap {	
 	public MapMode smallMapMode;
 	public MapMode largeMapMode;
 	public MapMode guiMapMode;
@@ -25,8 +23,6 @@ public class MiniMap {
 	private MapRenderer currentMap = null;
 	
 	public MiniMap(Mw mw) {
-		this.mw = mw;
-		
 		// map view shared between large and small map modes
 		this.view = new MapView(mw);
 		this.view.setZoomLevel(Config.overlayZoomLevel);
