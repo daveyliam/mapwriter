@@ -20,7 +20,7 @@ This includes:
 */
 
 public class Render {
-	public static double zDepth = 200.0D;
+	public static double zDepth = 0.0D;
 	public static final double circleSteps = 30.0;
 	
 	public static void setColourWithAlphaPercent(int colour, int alphaPercent) {
@@ -342,6 +342,9 @@ public class Render {
 		GlStateManager.depthFunc(GL11.GL_LEQUAL);
 		GlStateManager.disableDepth();
 		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		
+		//set the zDepth to 0 to make sure there arent any problems drawing other things when circular map isnt drawn
+		Render.zDepth = 0.0;
 	}
 	
 	// A better implementation of a circular stencil using the stencil buffer

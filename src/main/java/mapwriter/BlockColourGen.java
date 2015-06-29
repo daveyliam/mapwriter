@@ -10,6 +10,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.MathHelper;
+import net.minecraft.world.ColorizerFoliage;
+import net.minecraft.world.ColorizerGrass;
 import net.minecraft.world.biome.BiomeGenBase;
 
 // Static class to generate BlockColours.
@@ -81,8 +84,14 @@ public class BlockColourGen {
 		for (int i = 0; i < BiomeGenBase.getBiomeGenArray().length; i++) {
 			if (BiomeGenBase.getBiomeGenArray()[i] != null) {
 				bc.setBiomeWaterShading(i, BiomeGenBase.getBiomeGenArray()[i].getWaterColorMultiplier() & 0xffffff);
-				bc.setBiomeGrassShading(i, BiomeGenBase.getBiomeGenArray()[i].getGrassColorAtPos(new BlockPos(0, 0, 0)) & 0xffffff); //FIXME 0,0,0?
-				bc.setBiomeFoliageShading(i, BiomeGenBase.getBiomeGenArray()[i].getFoliageColorAtPos(new BlockPos(0, 0, 0)) & 0xffffff); //FIXME 0,0,0?
+				
+				double temp = MathHelper.clamp_float(BiomeGenBase.getBiomeGenArray()[i].temperature, 0.0F, 1.0F);
+				double rain = MathHelper.clamp_float(BiomeGenBase.getBiomeGenArray()[i].rainfall, 0.0F, 1.0F);
+				int grasscolor = ColorizerGrass.getGrassColor(temp, rain);
+				int foliagecolor = ColorizerFoliage.getFoliageColor(temp, rain);
+				
+				bc.setBiomeGrassShading(i, grasscolor & 0xffffff);
+				bc.setBiomeFoliageShading(i, foliagecolor & 0xffffff);
 			} else {
 				bc.setBiomeWaterShading(i, 0xffffff);
 				bc.setBiomeGrassShading(i, 0xffffff);
@@ -120,7 +129,6 @@ public class BlockColourGen {
 		int b_count = 0;
 		int s_count = 0;
 
-		//for (int blockID = 0; blockID < 4096; blockID++) { //TODO: replace hardcoded 4096 with actual registry size
 		for (Object oblock : Block.blockRegistry){
 			Block block = (Block)oblock;
 			int blockID = Block.getIdFromBlock(block);
