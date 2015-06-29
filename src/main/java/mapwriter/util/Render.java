@@ -20,7 +20,7 @@ This includes:
 */
 
 public class Render {
-	public static double zDepth = 0.0D;
+	public static double zDepth = 200.0D;
 	public static final double circleSteps = 30.0;
 	
 	public static void setColourWithAlphaPercent(int colour, int alphaPercent) {
@@ -300,7 +300,7 @@ public class Render {
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		// disable drawing to the color buffer.
 		// circle will only be drawn to depth buffer.
-		GL11.glColorMask(false, false, false, false);
+		GlStateManager.colorMask(false, false, false, false);
 		// enable writing to depth buffer
 		GlStateManager.depthMask(true);
 		
@@ -314,8 +314,8 @@ public class Render {
 		// set it up by default.
 		
 		// clear depth buffer to z = 3000.0
-		//GL11.glClearDepth(3000.0);
-		//GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
+		//GlStateManager.clearDepth(3000.0);
+		//GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT);
 		
 		// always write to depth buffer
 		GlStateManager.depthFunc(GL11.GL_ALWAYS);
@@ -324,10 +324,10 @@ public class Render {
 		Render.setColour(0xffffffff);
 		Render.zDepth = 1000.0;
 		Render.drawCircle(x, y, r);
-		Render.zDepth = 0.0;
+		Render.zDepth = 200.0;
 		
 		// re-enable drawing to colour buffer
-		GL11.glColorMask(true, true, true, true);
+		GlStateManager.colorMask(true, true, true, true);
 		// disable drawing to depth buffer
 		GlStateManager.depthMask(false);
 		// only draw pixels with z values that are greater
