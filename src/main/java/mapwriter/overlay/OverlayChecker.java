@@ -78,37 +78,31 @@ public class OverlayChecker implements IMwDataProvider {
 
 	@Override
 	public void onMapCenterChanged(double vX, double vZ, MapView mapview) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void onZoomChanged(int level, MapView mapview) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void onOverlayActivated(MapView mapview) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void onOverlayDeactivated(MapView mapview) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void onDraw(MapView mapview, MapMode mapmode) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public boolean onMouseInput(MapView mapview, MapMode mapmode) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 

@@ -114,7 +114,6 @@ public class BlockColourGen {
 		int b_count = 0;
 		int s_count = 0;
 
-		//for (int blockID = 0; blockID < 4096; blockID++) { //TODO: replace hardcoded 4096 with actual registry size
 		for (Object oblock : Block.blockRegistry){
 			Block block = (Block)oblock;
 			int blockID = block.getIdFromBlock(block);

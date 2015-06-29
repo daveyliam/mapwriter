@@ -119,38 +119,27 @@ public class OverlaySlime implements IMwDataProvider {
 	public void onDimensionChanged(int dimension, MapView mapview) {	}
 
 	@Override
-	public void onMapCenterChanged(double vX, double vZ, MapView mapview) {
-		// TODO Auto-generated method stub
-		
+	public void onMapCenterChanged(double vX, double vZ, MapView mapview) {		
 	}
 
 	@Override
-	public void onZoomChanged(int level, MapView mapview) {
-		// TODO Auto-generated method stub
-		
+	public void onZoomChanged(int level, MapView mapview) {		
 	}
 
 	@Override
-	public void onOverlayActivated(MapView mapview) {
-		// TODO Auto-generated method stub
-		
+	public void onOverlayActivated(MapView mapview) {		
 	}
 
 	@Override
-	public void onOverlayDeactivated(MapView mapview) {
-		// TODO Auto-generated method stub
-		
+	public void onOverlayDeactivated(MapView mapview) {		
 	}
 
 	@Override
-	public void onDraw(MapView mapview, MapMode mapmode) {
-		// TODO Auto-generated method stub
-		
+	public void onDraw(MapView mapview, MapMode mapmode) {		
 	}
 
 	@Override
 	public boolean onMouseInput(MapView mapview, MapMode mapmode) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
