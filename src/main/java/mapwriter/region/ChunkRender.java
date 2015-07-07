@@ -36,16 +36,17 @@ public class ChunkRender {
 		
 		double heightDiffFactor = 0.0;
 		if (samples > 0) {
-			heightDiffFactor = (double) heightDiff / ((double) samples * 255.0);
+			heightDiffFactor = (double) heightDiff / ((double) samples);
 		}
 		
 		// emphasize small differences in height, but as the difference in height increases,
 		// don't increase so much
 		// TODO: probably more accurate to use atan here rather than a fractional
 		// exponent.
-		return (heightDiffFactor >= 0.0) ?
-				Math.pow(heightDiffFactor, brightenExponent) * brightenAmplitude :
-				-Math.pow(-heightDiffFactor, darkenExponent) * darkenAmplitude;
+		return Math.atan(heightDiffFactor) *0.5;
+		//return Math.atan(heightDiffFactor) *0.4;
+		//return Math.atan(heightDiffFactor);
+		//return (heightDiffFactor >= 0.0) ? Math.pow(heightDiffFactor, brightenExponent) * brightenAmplitude : -Math.pow(-heightDiffFactor, darkenExponent) * darkenAmplitude;
 	}
 	
 	// calculate the colour of a pixel by alpha blending the colour of each block
