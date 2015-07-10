@@ -16,7 +16,7 @@ import net.minecraft.world.biome.BiomeGenBase;
 
 public class BlockColourGen {
 	
-	private static int getIconMapColour(IIcon icon, Texture terrainTexture, String Blockname) {
+	private static int getIconMapColour(IIcon icon, Texture terrainTexture) {
 		// flipped icons have the U and V coords reversed (minU > maxU, minV > maxV).
 		// thanks go to taelnia for fixing this. 
 		int iconX = (int) Math.round(((float) terrainTexture.w) * Math.min(icon.getMinU(), icon.getMaxU()));
@@ -28,7 +28,7 @@ public class BlockColourGen {
 		
 		//MwUtil.log("(%d, %d) %dx%d", iconX, iconY, iconWidth, iconHeight);
 		
-		terrainTexture.getRGB(iconX, iconY, iconWidth, iconHeight, pixels, 0, iconWidth, Blockname);
+		terrainTexture.getRGB(iconX, iconY, iconWidth, iconHeight, pixels, 0, iconWidth);
 		
 		// need to use custom averaging routine rather than scaling down to one pixel to
 		// stop transparent pixel colours being included in the average.
@@ -144,14 +144,14 @@ public class BlockColourGen {
 							blockColour = blockColourLast;
 							s_count++;
 						} else {
-							blockColour = getIconMapColour(icon, terrainTexture,block.getUnlocalizedName());
+							blockColour = getIconMapColour(icon, terrainTexture);
 							
 							//request icon with meta 16, carpenterblocks uses this method to get the real texture
 							//this makes the carpenterblocks render as brown blocks on the map
 							if (blockColour == 0)
 							{
 								icon = block.getIcon(1, 16);	
-								blockColour = getIconMapColour(icon, terrainTexture, block.getUnlocalizedName());
+								blockColour = getIconMapColour(icon, terrainTexture);
 							}
 							u1Last = u1;
 							u2Last = u2;
