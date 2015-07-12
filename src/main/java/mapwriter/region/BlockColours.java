@@ -27,12 +27,10 @@ public class BlockColours {
 	public static final String biomeSectionString = "[biomes]";
 	public static final String blockSectionString = "[blocks]";
 
-	// private int[] bcArray = new int[MAX_BLOCKS * MAX_META];
 	private int[] waterMultiplierArray = new int[MAX_BIOMES];
 	private int[] grassMultiplierArray = new int[MAX_BIOMES];
 	private int[] foliageMultiplierArray = new int[MAX_BIOMES];
 	private LinkedHashMap<String, BlockData> bcMap = new LinkedHashMap<String, BlockData>();
-	private LinkedHashMap<String, BlockData> bcOverrideMap = new LinkedHashMap<String, BlockData>();
 
 	public enum BlockType {
 		NORMAL, GRASS, LEAVES, FOLIAGE, WATER, OPAQUE
