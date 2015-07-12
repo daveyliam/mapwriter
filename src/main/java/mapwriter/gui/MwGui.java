@@ -87,12 +87,12 @@ public class MwGui extends GuiScreen {
     public MwGui(Mw mw) {
     	this.mw = mw;
     	this.mapMode = new FullScreenMapMode();
-    	this.mapView = new MapView(this.mw);
+    	this.mapView = new MapView(this.mw, true);
     	this.map = new MapRenderer(this.mw, this.mapMode, this.mapView);
     	
     	this.mapView.setDimension(this.mw.miniMap.view.getDimension());
     	this.mapView.setViewCentreScaled(this.mw.playerX, this.mw.playerZ, this.mw.playerDimension);
-    	this.mapView.setZoomLevel(0);
+    	this.mapView.setZoomLevel(Config.fullScreenZoomLevel);
     	
     	this.helpLabel = new Label();
     	this.optionsLabel = new Label();
@@ -107,7 +107,7 @@ public class MwGui extends GuiScreen {
     	this(mw);
     	this.mapView.setDimension(dim);
     	this.mapView.setViewCentreScaled(x, z, dim);
-    	this.mapView.setZoomLevel(0);    	
+    	this.mapView.setZoomLevel(Config.fullScreenZoomLevel);    	
     }
     
     // called when gui is displayed and every time the screen
@@ -475,6 +475,7 @@ public class MwGui extends GuiScreen {
     	} else {
     		int zF = (direction > 0) ? -1 : 1;
     		this.mapView.zoomToPoint(this.mapView.getZoomLevel() + zF, this.mouseBlockX, this.mouseBlockZ);
+    		Config.fullScreenZoomLevel = this.mapView.getZoomLevel();
     	}
     }
 

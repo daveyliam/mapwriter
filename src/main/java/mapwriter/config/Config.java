@@ -51,10 +51,12 @@ public class Config {
 	
 	
 	//World configuration Options
-	public static int overlayModeIndex = 0;
 	public static int overlayModeIndexDef = 0;
-	public static int overlayZoomLevel = 0;
+	public static int overlayModeIndex = overlayModeIndexDef;
 	public static int overlayZoomLevelDef = 0;
+	public static int overlayZoomLevel = overlayZoomLevelDef;
+	public static int fullScreenZoomLevelDef = 0;
+	public static int fullScreenZoomLevel = fullScreenZoomLevelDef;
 	
 	public static largeMapModeConfig largeMap = new largeMapModeConfig(Reference.catLargeMapConfig);
 	public static smallMapModeConfig smallMap = new smallMapModeConfig(Reference.catSmallMapConfig);	

@@ -24,7 +24,7 @@ public class MiniMap {
 	
 	public MiniMap(Mw mw) {
 		// map view shared between large and small map modes
-		this.view = new MapView(mw);
+		this.view = new MapView(mw, false);
 		this.view.setZoomLevel(Config.overlayZoomLevel);
 		
 		// small map mode

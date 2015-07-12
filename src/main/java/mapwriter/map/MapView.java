@@ -35,12 +35,18 @@ public class MapView {
 	private int maxZoom;
 	
 	private boolean undergroundMode;
+	private boolean fullscreenMap;
 	
-	public MapView(Mw mw) {
+	public MapView(Mw mw, boolean FullscreenMap) {
 		this.minZoom = Config.zoomInLevels;
 		this.maxZoom = Config.zoomOutLevels;
 		this.undergroundMode = Config.undergroundMode;
-		this.setZoomLevel(0);
+		this.fullscreenMap = FullscreenMap;
+		if (this.fullscreenMap)
+		{
+			this.setZoomLevel(Config.fullScreenZoomLevel);
+		}
+		this.setZoomLevel(Config.overlayZoomLevel);
 		this.setViewCentre(mw.playerX, mw.playerZ);
 	}
 	
@@ -88,7 +94,14 @@ public class MapView {
 		if (prevZoomLevel != this.zoomLevel) {
 			this.updateZoom();
 		}
-		return this.zoomLevel;
+		
+		if (this.fullscreenMap)
+		{
+			Config.fullScreenZoomLevel = this.zoomLevel;
+		}
+		Config.overlayZoomLevel = this.zoomLevel;
+		
+		return this.zoomLevel;		
 	}
 	
 	private void updateZoom() {
