@@ -45,6 +45,8 @@ mw.config.zoomInLevels=Zoom in levels
 mw.config.zoomInLevels.tooltip=Max number of steps you can zoom in. Does not affect performance.
 mw.config.textureSize=
 mw.config.textureSize.tooltip=
+mw.config.moreRealisticMap=Enables realistic map
+mw.config.moreRealisticMap.tooltip=Enable the use of a different height algorithm that makes the map look more realistic
 
 #Config Temp
 mw.config.overlayModeIndex=

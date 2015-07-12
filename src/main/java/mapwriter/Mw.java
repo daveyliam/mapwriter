@@ -220,8 +220,6 @@ public class Mw {
 		} else {
 			// generate block colours from current texture pack
 			Logging.logInfo("generating block colours");
-			// block type overrides need to be loaded before the block colours are generated
-			this.loadBlockColourOverrides(bc);
 			BlockColourGen.genBlockColours(bc);
 			// load overrides again to override block and biome colours
 			this.loadBlockColourOverrides(bc);

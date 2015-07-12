@@ -47,6 +47,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 			Config.overlayModeIndex = configuration.getInt("overlayModeIndex", Reference.catOptions, Config.overlayModeIndexDef, 0, 1000, "mw.config.overlayModeIndex");
 			Config.overlayZoomLevel = configuration.getInt("overlayZoomLevel", Reference.catOptions, 0, Config.zoomInLevels, Config.zoomOutLevels, "mw.config.overlayZoomLevel");
 			
+			Config.moreRealisticMap = configuration.getBoolean("moreRealisticMap", Reference.catOptions, Config.moreRealisticMapDef, "mw.config.moreRealisticMap");
+			
 			Config.fullScreenMap.loadConfig();
 			Config.largeMap.loadConfig();
 			Config.smallMap.loadConfig();
