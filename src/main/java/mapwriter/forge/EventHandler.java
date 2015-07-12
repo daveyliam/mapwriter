@@ -7,6 +7,7 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -77,5 +78,9 @@ public class EventHandler {
        if(event.type == RenderGameOverlayEvent.ElementType.ALL){
             Mw.getInstance().onTick();
         }
+    }
+    @SubscribeEvent
+    public void onTextureStitchEventPost(TextureStitchEvent.Post event){ 
+    		mw.reloadBlockColours();
     }
 }

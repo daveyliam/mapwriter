@@ -312,7 +312,7 @@ public class Mw {
 		// mapTexture depends on config being loaded
 		this.mapTexture = new MapTexture(this.textureSize, Config.linearTextureScaling);
 		this.undergroundMapTexture = new UndergroundTexture(this, this.textureSize, Config.linearTextureScaling);
-		this.reloadBlockColours();
+		//this.reloadBlockColours();
 		// region manager depends on config, mapTexture, and block colours
 		this.regionManager = new RegionManager(this.worldDir, this.imageDir, this.blockColours, Config.zoomInLevels, Config.zoomOutLevels);
 		// overlay manager depends on mapTexture
