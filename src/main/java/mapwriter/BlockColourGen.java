@@ -28,7 +28,7 @@ public class BlockColourGen {
 		
 		//MwUtil.log("(%d, %d) %dx%d", iconX, iconY, iconWidth, iconHeight);
 		
-		terrainTexture.getRGB(iconX, iconY, iconWidth, iconHeight, pixels, 0, iconWidth);
+		terrainTexture.getRGB(iconX, iconY, iconWidth, iconHeight, pixels, 0, iconWidth, icon);
 		
 		// need to use custom averaging routine rather than scaling down to one pixel to
 		// stop transparent pixel colours being included in the average.

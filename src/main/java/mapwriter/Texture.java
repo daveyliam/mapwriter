@@ -2,6 +2,8 @@ package mapwriter;
 
 import java.nio.IntBuffer;
 
+import net.minecraft.util.IIcon;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
@@ -71,11 +73,20 @@ public class Texture {
 	}
 	
 	// Copy a rectangular sub-region of dimensions 'w' x 'h' from the pixel buffer to the array 'pixels'.
-	public synchronized void getRGB(int x, int y, int w, int h, int[] pixels, int offset, int scanSize) {
+	public synchronized void getRGB(int x, int y, int w, int h, int[] pixels, int offset, int scanSize, IIcon icon) {
 		int bufOffset = (y * this.w) + x;
 		for (int i = 0; i < h; i++) {
+			try 
+			{
 			this.pixelBuf.position(bufOffset + (i * this.w));
 			this.pixelBuf.get(pixels, offset + (i * scanSize), w);
+			}
+			catch (IllegalArgumentException e)
+			{
+				MwUtil.log("MwTexture.getRGB: IllegalArgumentException (icon name: %s; height: %d; width: %d; MaxU: %f; MinU: %f; MaxV: %f; MinV: %f)", icon.getIconName(), icon.getIconHeight(), icon.getIconWidth(), icon.getMaxU(),icon.getMinU(), icon.getMaxV(),icon.getMinV());
+				MwUtil.log("MwTexture.getRGB: IllegalArgumentException (pos: %d)", bufOffset + (i * this.w));
+				MwUtil.log("MwTexture.getRGB: IllegalArgumentException (buffersize: %d)", this.pixelBuf.limit());
+			}
 		}
 	}
 	

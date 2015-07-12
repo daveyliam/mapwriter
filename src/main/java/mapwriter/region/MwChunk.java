@@ -252,9 +252,9 @@ public class MwChunk implements IChunk {
 			 }
 		 }
 
-		//return ((offset & 1) == 1) ?
-		//		((msb & 0xf0) << 8)  | ((lsb & 0xff) << 4) | ((meta & 0xf0) >> 4) :
-		return		((msb & 0x0f) << 12) | ((lsb & 0xff) << 4) | (meta & 0x0f);
+		return ((offset & 1) == 1) ?
+				((msb & 0xf0) << 8)  | ((lsb & 0xff) << 4) | ((meta & 0xf0) >> 4) :
+				((msb & 0x0f) << 12) | ((lsb & 0xff) << 4) | (meta & 0x0f);
 	}
 	
 	//changed to use the NBTTagCompound that minecraft uses. this makes the local way of saving anvill data the same as Minecraft world data
