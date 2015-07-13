@@ -6,9 +6,9 @@
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "http://www.minecraftforum.net/topic/1570989-/",
-  "updateUrl": "",
+  "updateUrl": "http://www.curse.com/mc-mods/Minecraft/231387-mapwriter-2",
   "authorList": ["mapwriter"],
-  "credits": "chrixian, ProfMobius, taelnia, jk-5",
+  "credits": "chrixian, ProfMobius, taelnia, jk-5, Vectron",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []
