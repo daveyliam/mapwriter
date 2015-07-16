@@ -1,12 +1,10 @@
 package mapwriter;
 
 import mapwriter.region.BlockColours;
-import mapwriter.region.BlockColours.BlockType;
 import mapwriter.util.Logging;
 import mapwriter.util.Render;
 import mapwriter.util.Texture;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -117,7 +115,7 @@ public class BlockColourGen {
 			}
 			for (int dv = 0; dv < 16; dv++) {
 
-				int blockAndMeta = ((blockID & 0xfff) << 4) | (dv & 0xf);
+				//int blockAndMeta = ((blockID & 0xfff) << 4) | (dv & 0xf);
 				int blockColour = 0;
 
 				if (block != null) {

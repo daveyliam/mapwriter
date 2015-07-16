@@ -471,7 +471,6 @@ public class BlockColours {
 		for (Map.Entry<String, BlockData> entry : bcMap.entrySet()) {
 			String[] BlockAndMeta = entry.getKey().split(" ");
 			String block = BlockAndMeta[0];
-			String meta = BlockAndMeta[1];
 
 			String color = String.format("%08x", entry.getValue().color);
 
@@ -496,7 +495,6 @@ public class BlockColours {
 		for (Map.Entry<String, BlockData> entry : bcMap.entrySet()) {
 			String[] BlockAndMeta = entry.getKey().split(" ");
 			String block = BlockAndMeta[0];
-			String meta = BlockAndMeta[1];
 
 			String Type = getBlockTypeAsString(entry.getValue().type);
 
