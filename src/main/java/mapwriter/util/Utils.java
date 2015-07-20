@@ -2,7 +2,6 @@ package mapwriter.util;
 
 import java.io.File;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
@@ -17,8 +16,6 @@ import java.util.Map;
 import mapwriter.config.Config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.GuiConfirmOpenLink;
-import net.minecraft.event.ClickEvent;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.chunk.Chunk;
@@ -161,7 +158,7 @@ public class Utils
     {
         try
         {
-            Class oclass = Class.forName("java.awt.Desktop");
+            Class<?> oclass = Class.forName("java.awt.Desktop");
             Object object = oclass.getMethod("getDesktop", new Class[0]).invoke((Object)null, new Object[0]);
             oclass.getMethod("browse", new Class[] {URI.class}).invoke(object, new Object[] {p_175282_1_});
         }

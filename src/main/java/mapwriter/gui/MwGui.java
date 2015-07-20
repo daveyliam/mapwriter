@@ -4,7 +4,7 @@ import java.awt.Point;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Set;
+import java.util.HashSet;
 
 import mapwriter.Mw;
 import mapwriter.api.IMwDataProvider;
@@ -69,7 +69,7 @@ public class MwGui extends GuiScreen {
 	private Label updateLabel;
 	public static MwGui instance;
 
-	private static final Set PROTOCOLS = Sets.newHashSet(new String[] { "http",
+	private static final HashSet<String> PROTOCOLS = Sets.newHashSet(new String[] { "http",
 			"https" });
 	private URI clickedLinkURI;
 

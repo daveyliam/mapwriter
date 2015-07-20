@@ -53,11 +53,9 @@ public class VersionCheck implements Runnable {
 			updateURL = updateURL.replace("\"updateURL\":\"", "");
 			updateURL = updateURL.replace("\",", "");
 			updateURL = updateURL.replace(" ", "");
-			this.updateURL = updateURL;
+			VersionCheck.updateURL = updateURL;
 
 			isLatestVersion = Reference.VERSION.equals(version);
-
-			int test = 0;
 		} catch (IOException e) {
 		}
 

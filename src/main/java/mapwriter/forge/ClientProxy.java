@@ -7,9 +7,12 @@ import mapwriter.api.MwAPI;
 import mapwriter.config.ConfigurationHandler;
 import mapwriter.overlay.OverlayGrid;
 import mapwriter.overlay.OverlaySlime;
+import mapwriter.util.Reference;
 import mapwriter.util.VersionCheck;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
 
 public class ClientProxy extends CommonProxy {
 	
@@ -30,10 +33,16 @@ public class ClientProxy extends CommonProxy {
 	}
 	
 	public void postInit() {
-		VersionCheck versionCheck = new VersionCheck();
-		Thread versionCheckThread = new Thread(versionCheck, "Version Check");
-		versionCheckThread.start();
-		
+		if (Loader.isModLoaded("VersionChecker"))
+		{
+			FMLInterModComms.sendRuntimeMessage(Reference.MOD_ID, "VersionChecker", "addVersionCheck", Reference.VersionURL);
+		}
+		else
+		{
+			VersionCheck versionCheck = new VersionCheck();
+			Thread versionCheckThread = new Thread(versionCheck, "Version Check");
+			versionCheckThread.start();
+		}
 		MwAPI.registerDataProvider("Slime", new OverlaySlime());
 		MwAPI.registerDataProvider("Grid", new OverlayGrid());
 	}
