@@ -3,11 +3,15 @@ package mapwriter.region;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import net.minecraft.block.Block;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -202,6 +206,53 @@ public class MwChunk implements IChunk {
 		return this.maxY;
 	}
 
+	private static java.lang.reflect.Method CarpenterMethod = null;
+
+	public static void carpenterdata() {
+		try {
+			Class<?> act = Class
+					.forName("com.carpentersblocks.tileentity.TEBase");
+			CarpenterMethod = act.getMethod("getAttribute", byte.class);
+		} catch (SecurityException e) {
+			// ...
+		} catch (NoSuchMethodException e) {
+			// ...
+		} catch (ClassNotFoundException e) {
+			//
+		}
+	}
+
+	private static java.lang.reflect.Method FMPMethodParts = null;
+	private static java.lang.reflect.Method FMPMethodMaterial = null;
+
+	private static java.lang.reflect.Field FMPFieldBlock = null;
+	private static java.lang.reflect.Field FMPFieldMeta = null;
+
+	public static void FMPdata() {
+		try {
+			Class<?> act = Class.forName("codechicken.multipart.TileMultipart");
+			FMPMethodParts = act.getMethod("jPartList");
+			act = Class.forName("codechicken.microblock.Microblock");
+			FMPMethodMaterial = act.getMethod("getIMaterial");
+
+			act = Class.forName("codechicken.microblock.BlockMicroMaterial");
+			FMPFieldBlock = act.getDeclaredField("block");
+			FMPFieldBlock.setAccessible(true);
+
+			FMPFieldMeta = act.getDeclaredField("meta");
+			FMPFieldMeta.setAccessible(true);
+
+		} catch (SecurityException e) {
+			// ...
+		} catch (NoSuchMethodException e) {
+			// ...
+		} catch (ClassNotFoundException e) {
+			//
+		} catch (NoSuchFieldException e) {
+			//
+		}
+	}
+
 	public int getBlockAndMetadata(int x, int y, int z) {
 		int yi = (y >> 4) & 0xf;
 		int offset = ((y & 0xf) << 8) | ((z & 0xf) << 4) | (x & 0xf);
@@ -225,56 +276,41 @@ public class MwChunk implements IChunk {
 			value.writeToNBT(tag);
 			int id = 0;
 
-			if (tag.getString("id") == "savedMultipart") {
-				String material = tag.getTagList("parts", 10)
-						.getCompoundTagAt(0).getString("material");
-				int end = material.indexOf("_");
-
-				if (end != -1) {
-					id = Block.getIdFromBlock(Block.getBlockFromName(material
-							.substring(5, end)));
-
-					lsb = (id & 255);
-					if (id > 255) {
-						msb = (id & 3840) >> 8;
-					} else {
-						msb = 0;
+			// Get the Block from the carpenter TileEntity
+			if (CarpenterMethod != null) {
+				try {
+					ItemStack itemStack = (ItemStack) CarpenterMethod.invoke(
+							value, (byte) 6);
+					if (itemStack != null) {
+						ItemBlock itemBlock = (ItemBlock) itemStack.getItem();
+						id = Block.getIdFromBlock(itemBlock.blockInstance);
+						meta = itemStack.getMetadata();
 					}
-
-					meta = Integer.parseInt(material.substring(end + 1));
-				} else {
-					if (material.length() > 5) {
-						id = Block.getIdFromBlock(Block
-								.getBlockFromName(material.substring(5)));
-
-						lsb = (id & 255);
-						if (id > 255) {
-							msb = (id & 3840) >> 8;
-						} else {
-							msb = 0;
-						}
-
-						meta = 0;
-					}
+				} catch (IllegalArgumentException e) {
+				} catch (IllegalAccessException e) {
+				} catch (InvocationTargetException e) {
 				}
-			} else if (tag.getString("id") == "TileEntityCarpentersBlock") {
-				NBTTagList TagList = tag.getTagList("cbAttrList", 10);
-				String sid = TagList.getCompoundTagAt(0).getString("id");
-				String smeta = TagList.getCompoundTagAt(0).getString("Damage");
-				if (sid != "") {
-					id = Integer.parseInt(sid.substring(0, sid.length() - 1));
-
-					lsb = (id & 255);
-					if (id > 255) {
-						msb = (id & 3840) >> 8;
-					} else {
-						msb = 0;
+			}
+			if (FMPMethodParts != null) {
+				try {
+					for (Object temp : (List) FMPMethodParts.invoke(value)) {
+						Object material = FMPMethodMaterial.invoke(temp);
+						Block block = (Block) FMPFieldBlock.get(material);
+						id = Block.getIdFromBlock(block);
+						meta = (Integer) FMPFieldMeta.get(material);
 					}
 
-					if (smeta != "") {
-						meta = Integer.parseInt(smeta.substring(0,
-								smeta.length() - 1));
-					}
+				} catch (IllegalArgumentException e) {
+				} catch (IllegalAccessException e) {
+				} catch (InvocationTargetException e) {
+				}
+			}
+			if (id != 0) {
+				lsb = (id & 255);
+				if (id > 255) {
+					msb = (id & 3840) >> 8;
+				} else {
+					msb = 0;
 				}
 			}
 		}
