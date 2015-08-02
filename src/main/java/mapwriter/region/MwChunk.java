@@ -272,8 +272,6 @@ public class MwChunk implements IChunk {
 		if (this.tileentityMap.containsKey(chunkposition)) {
 			TileEntity value = (TileEntity) this.tileentityMap
 					.get(chunkposition);
-			NBTTagCompound tag = new NBTTagCompound();
-			value.writeToNBT(tag);
 			int id = 0;
 
 			// Get the Block from the carpenter TileEntity
