@@ -130,17 +130,17 @@ public class OverlaySlime implements IMwDataProvider {
 
 	@Override
 	public void onOverlayActivated(MapView mapview) {
-		
+
 	}
 
 	@Override
 	public void onOverlayDeactivated(MapView mapview) {
-		
+
 	}
 
 	@Override
-	public void onDraw(MapView mapview, MapMode mapmode) {
-		
+	public void onDraw(MapView mapview, MapMode mapmode) {		
+
 	}
 
 	@Override

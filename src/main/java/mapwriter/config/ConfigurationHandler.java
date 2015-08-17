@@ -49,6 +49,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 			
 			Config.moreRealisticMap = configuration.getBoolean("moreRealisticMap", Reference.catOptions, Config.moreRealisticMapDef, "mw.config.moreRealisticMap");
 			
+			Config.newMarkerDialog = configuration.getBoolean("newMarkerDialog", Reference.catOptions, Config.newMarkerDialogDef, "mw.config.newMarkerDialog");
+			
 			Config.fullScreenMap.loadConfig();
 			Config.largeMap.loadConfig();
 			Config.smallMap.loadConfig();

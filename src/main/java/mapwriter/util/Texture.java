@@ -77,8 +77,6 @@ public class Texture {
 	public synchronized void getRGB(int x, int y, int w, int h, int[] pixels, int offset, int scanSize, TextureAtlasSprite icon) {
 		int bufOffset = (y * this.w) + x;
 		for (int i = 0; i < h; i++) {
-			this.pixelBuf.position(bufOffset + (i * this.w));
-			this.pixelBuf.get(pixels, offset + (i * scanSize), w);
 		try
 		{
 			this.pixelBuf.position(bufOffset + (i * this.w));

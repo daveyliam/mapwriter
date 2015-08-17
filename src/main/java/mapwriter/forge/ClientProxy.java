@@ -7,6 +7,7 @@ import mapwriter.api.MwAPI;
 import mapwriter.config.ConfigurationHandler;
 import mapwriter.overlay.OverlayGrid;
 import mapwriter.overlay.OverlaySlime;
+import mapwriter.region.MwChunk;
 import mapwriter.util.Reference;
 import mapwriter.util.VersionCheck;
 import net.minecraftforge.common.MinecraftForge;
@@ -14,14 +15,15 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 
+
 public class ClientProxy extends CommonProxy {
-	
+
 	public void preInit(File configFile) 
 	{
 		ConfigurationHandler.init(configFile);
 		FMLCommonHandler.instance().bus().register(new ConfigurationHandler());
 	}
-	
+
 	public void load() {
 		EventHandler eventHandler = new EventHandler(Mw.getInstance());
 		MinecraftForge.EVENT_BUS.register(eventHandler);
@@ -31,7 +33,7 @@ public class ClientProxy extends CommonProxy {
 		FMLCommonHandler.instance().bus().register(keyEventHandler);
 		MinecraftForge.EVENT_BUS.register(keyEventHandler);
 	}
-	
+
 	public void postInit() {
 		if (Loader.isModLoaded("VersionChecker"))
 		{
@@ -42,8 +44,16 @@ public class ClientProxy extends CommonProxy {
 			VersionCheck versionCheck = new VersionCheck();
 			Thread versionCheckThread = new Thread(versionCheck, "Version Check");
 			versionCheckThread.start();
+
+		if (Loader.isModLoaded("CarpentersBlocks")) {
+			MwChunk.carpenterdata();
+		}
+		if (Loader.isModLoaded("ForgeMultipart")) {
+			MwChunk.FMPdata();
+
 		}
 		MwAPI.registerDataProvider("Slime", new OverlaySlime());
 		MwAPI.registerDataProvider("Grid", new OverlayGrid());
 	}
+}
 }

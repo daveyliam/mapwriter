@@ -80,6 +80,7 @@ public class EventHandler {
         }
     }
     @SubscribeEvent
+    
     public void onTextureStitchEventPost(TextureStitchEvent.Post event){ 
     		mw.reloadBlockColours();
     }

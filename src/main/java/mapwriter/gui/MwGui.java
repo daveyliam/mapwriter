@@ -428,11 +428,27 @@ public class MwGui extends GuiScreen {
 							: Config.defaultTeleportHeight;
 					mz = this.mouseBlockZ;
 				}
+			if (Config.newMarkerDialog)
+        		{
+            		this.mc.displayGuiScreen(
+                			new MwGuiMarkerDialogNew(
+                				this,
+                				this.mw.markerManager,
+                				"",
+                				group,
+                				mx, my, mz,
+                				this.mapView.getDimension()
+                			)
+                		);	
+        		}
+        		else
+        		{
 				this.mc.displayGuiScreen(new MwGuiMarkerDialog(this,
 						this.mw.markerManager, "", group, mx, my, mz,
 						this.mapView.getDimension()));
 			}
 		}
+	}
 
 		else if (button == 2) {
 			Point blockPoint = this.mapMode.screenXYtoBlockXZ(this.mapView, x,

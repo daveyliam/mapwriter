@@ -36,14 +36,12 @@ public class BlockColourGen {
 				* Math.abs(icon.getMaxV() - icon.getMinV()));
 
 		int[] pixels = new int[iconWidth * iconHeight];
-
-		// MwUtil.log("(%d, %d) %dx%d", iconX, iconY, iconWidth, iconHeight);
-
-		terrainTexture.getRGB(iconX, iconY, iconWidth, iconHeight, pixels, 0,
-				iconWidth, icon);
-
-		// need to use custom averaging routine rather than scaling down to one
-		// pixel to
+		
+		//MwUtil.log("(%d, %d) %dx%d", iconX, iconY, iconWidth, iconHeight);
+		
+		terrainTexture.getRGB(iconX, iconY, iconWidth, iconHeight, pixels, 0, iconWidth, icon);
+		
+		// need to use custom averaging routine rather than scaling down to one pixel to
 		// stop transparent pixel colours being included in the average.
 		return Render.getAverageColourOfArray(pixels);
 	}
@@ -145,17 +143,13 @@ public class BlockColourGen {
 							s_count++;
 						} else {
 							blockColour = getIconMapColour(icon, terrainTexture);
-							// request icon with meta 16, carpenterblocks uses
-							// this method to get the real texture
-							// this makes the carpenterblocks render as brown
-							// blocks on the map
-							// FIXME:check how carpenterblocks fixes this
-							// if (blockColour == 0)
-							// {
-							// icon = block.getIcon(1, 16);
-							// blockColour = getIconMapColour(icon,
-							// terrainTexture);
-							// }
+							//request icon with meta 16, carpenterblocks uses this method to get the real texture
+							//this makes the carpenterblocks render as brown blocks on the map
+							if (block.delegate != null && block.delegate.name().contains("CarpentersBlocks"))
+							{
+								//icon = block.getIcon(1, 16);	
+								//blockColour = getIconMapColour(icon, terrainTexture);
+							}
 							
 							u1Last = u1;
 							u2Last = u2;

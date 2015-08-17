@@ -9,6 +9,7 @@ import mapwriter.forge.MwForge;
 import mapwriter.forge.MwKeyHandler;
 import mapwriter.gui.MwGui;
 import mapwriter.gui.MwGuiMarkerDialog;
+import mapwriter.gui.MwGuiMarkerDialogNew;
 import mapwriter.map.MapTexture;
 import mapwriter.map.MapView;
 import mapwriter.map.Marker;
@@ -474,19 +475,36 @@ public class Mw {
 				if (group.equals("none")) {
 					group = "group";
 				}
-				this.mc.displayGuiScreen(
-					new MwGuiMarkerDialog(
-						null,
-						this.markerManager,
-						"",
-						group,
-						this.playerXInt,
-						this.playerYInt,
-						this.playerZInt,
-						this.playerDimension
-					)
-				);
-			
+        		if (Config.newMarkerDialog)
+        		{				
+        			this.mc.displayGuiScreen(
+    					new MwGuiMarkerDialogNew(
+    							null,
+    							this.markerManager,
+    							"",
+    							group,
+    							this.playerXInt,
+    							this.playerYInt,
+    							this.playerZInt,
+    							this.playerDimension
+    						)
+    					);
+        		}
+        		else
+        		{
+    				this.mc.displayGuiScreen(
+    						new MwGuiMarkerDialog(
+    							null,
+    							this.markerManager,
+    							"",
+    							group,
+    							this.playerXInt,
+    							this.playerYInt,
+    							this.playerZInt,
+    							this.playerDimension
+    						)
+    					);
+        		}
 			} else if (kb == MwKeyHandler.keyNextGroup) {
 				// toggle marker mode
 				this.markerManager.nextGroup();
