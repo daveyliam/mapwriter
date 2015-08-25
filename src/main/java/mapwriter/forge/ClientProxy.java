@@ -38,7 +38,7 @@ public class ClientProxy extends CommonProxy {
 		if (Loader.isModLoaded("CarpentersBlocks")) {
 			MwChunk.carpenterdata();
 		}
-		if (Loader.isModLoaded("CarpentersBlocks")) {
+		if (Loader.isModLoaded("ForgeMultipart")) {
 			MwChunk.FMPdata();
 		}
 		MwAPI.registerDataProvider("Slime", new OverlaySlime());
