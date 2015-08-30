@@ -43,195 +43,8 @@ public class MwGuiMarkerDialogNew extends GuiScreen {
 	private int markerY = 80;
 	private int markerZ = 0;
 	private int dimension = 0;
-	private ResourceLocation leftArrowTexture = new ResourceLocation(
-			"mapwriter", "textures/map/arrow_text_left.png");
-	private ResourceLocation rightArrowTexture = new ResourceLocation(
-			"mapwriter", "textures/map/arrow_text_right.png");
 
-	class ScrollableTextBox {
-		public int x;
-		public int y;
-		public int width;
-		// private int height;
-		public int labelX;
-		public int labelY;
-		public int labelWidth;
-		public int labelHeight;
-		public String label;
-		public boolean drawArrows = false;
-		public int leftArrowX;
-		public int rightArrowX;
-		public int arrowsY;
-		public int arrowsWidth = 7;
-		public int arrowsHeight = 12;
-		public int textFieldX;
-		public int textFieldY;
-		public int textFieldWidth;
-		public int textFieldHeight = 12;
-		public List<String> scrollableElements;
-		public GuiTextField textField = null;
-
-		ScrollableTextBox(int x, int y, int width, String label) {
-			this.x = x;
-			this.y = y;
-			this.width = width;
-			this.label = label;
-		}
-
-		ScrollableTextBox(int x, int y, int width, String label,
-				List<String> scrollableElements) {
-			this.x = x;
-			this.y = y;
-			this.width = width;
-			this.label = label;
-			this.scrollableElements = scrollableElements;
-		}
-
-		public void init() {
-			this.textFieldX = this.x + this.arrowsWidth;
-			this.textFieldY = this.y;
-			this.textFieldWidth = this.width - this.arrowsWidth * 2 - 25;
-			this.labelWidth = MwGuiMarkerDialogNew.this.fontRendererObj
-					.getStringWidth(this.label);
-			this.labelHeight = MwGuiMarkerDialogNew.this.fontRendererObj.FONT_HEIGHT;
-			this.labelX = this.x - this.labelWidth - 4;
-			this.labelY = this.y + this.labelHeight / 2 - 2;
-			this.leftArrowX = this.x - 1;
-			this.rightArrowX = this.textFieldX + this.textFieldWidth + 1;
-			this.arrowsY = this.y;
-			this.textField = new GuiTextField(0,
-					MwGuiMarkerDialogNew.this.fontRendererObj, this.textFieldX,
-					this.textFieldY, this.textFieldWidth, this.textFieldHeight);
-			this.textField.setMaxStringLength(32);
-		}
-
-		public void draw() {
-			MwGuiMarkerDialogNew screen = MwGuiMarkerDialogNew.this;
-			screen.drawString(screen.fontRendererObj, this.label, this.labelX,
-					this.labelY, 0xffffff);
-			if (this.drawArrows) {
-				screen.mc.renderEngine.bindTexture(screen.leftArrowTexture);
-				Render.drawTexturedRect(this.leftArrowX, this.arrowsY,
-						this.arrowsWidth, this.arrowsHeight, 0.0, 0.0, 1.0, 1.0);
-				MwGuiMarkerDialogNew.this.mc.renderEngine
-						.bindTexture(screen.rightArrowTexture);
-				Render.drawTexturedRect(this.rightArrowX, this.arrowsY,
-						this.arrowsWidth, this.arrowsHeight, 0.0, 0.0, 1.0, 1.0);
-			}
-			this.textField.drawTextBox();
-			if (!this.validateTextFieldData()) {
-				drawRect(this.textFieldX - 1, this.textFieldY - 1,
-						this.textFieldX + this.textFieldWidth + 1,
-						this.textFieldY, 
-						0xff900000);
-				drawRect(this.textFieldX - 1, this.textFieldY - 1,
-						this.textFieldX, this.textFieldY + this.textFieldHeight	+ 1,
-						0xff900000);
-				drawRect(this.textFieldX + this.textFieldWidth + 1,
-						this.textFieldY + this.textFieldHeight + 1,
-						this.textFieldX,
-						this.textFieldY + this.textFieldHeight, 
-						0xff900000);
-				drawRect(this.textFieldX + this.textFieldWidth + 1,
-						this.textFieldY + this.textFieldHeight + 1,
-						this.textFieldX + this.textFieldWidth, this.textFieldY,
-						0xff900000);
-			}
-		}
-
-		public void mouseClicked(int x, int y, int button) {
-			int direction = this.posWithinArrows(x, y);
-			if (direction != 0)
-				this.textFieldScroll(direction);
-			this.textField.mouseClicked(x, y, button);
-		}
-
-		public void setDrawArrows(boolean value) {
-			this.drawArrows = value;
-		}
-
-		public void mouseDWheelScrolled(int x, int y, int direction) {
-			if (posWithinTextField(x, y))
-				textFieldScroll(-direction);
-		}
-
-		public boolean validateTextFieldData() {
-			return this.textField.getText().length() > 0;
-		}
-
-		/**
-		 * 
-		 * @return Returns clicked arrow: 1 for right and -1 for left
-		 */
-		public int posWithinArrows(int x, int y) {
-			if ((x >= this.leftArrowX) && (y >= this.arrowsY)
-					&& (x <= this.arrowsWidth + this.leftArrowX)
-					&& (y <= this.arrowsHeight + this.arrowsY))
-				return -1;
-			else if ((x >= this.rightArrowX) && (y >= this.arrowsY)
-					&& (x <= this.arrowsWidth + this.rightArrowX)
-					&& (y <= this.arrowsHeight + this.arrowsY))
-				return 1;
-			else
-				return 0;
-		}
-
-		public boolean posWithinTextField(int x, int y) {
-			return (x >= this.textFieldX) && (y >= this.textFieldY)
-					&& (x <= this.textFieldWidth + this.textFieldX)
-					&& (y <= this.textFieldHeight + this.textFieldY);
-		}
-
-		public void textFieldScroll(int direction) {
-			if (this.scrollableElements != null) {
-				int index = this.scrollableElements.indexOf(this.textField
-						.getText().trim());
-				if (direction > 0) {
-					if (index == -1
-							|| index == this.scrollableElements.size() - 1)
-						index = 0;
-					else
-						index++;
-				} else if (direction < 0) {
-					if (index == -1 || index == 0)
-						index = this.scrollableElements.size() - 1;
-					else
-						index--;
-				}
-				this.textField.setText(this.scrollableElements.get(index));
-			}
-		}
-	}
-
-	class ScrollableNumericTextBox extends ScrollableTextBox {
-
-		public ScrollableNumericTextBox(int x, int y, int width, String label) {
-			super(x, y, width, label);
-		}
-
-		@Override
-		public void textFieldScroll(int direction) {
-			if (this.validateTextFieldData()) {
-				int value = this.getTextFieldIntValue();
-				if (direction > 0)
-					this.textField.setText("" + (value + 1));
-				else if (direction < 0)
-					this.textField.setText("" + (value - 1));
-			}
-		}
-
-		public int getTextFieldIntValue() {
-			return Integer.parseInt(this.textField.getText());
-		}
-
-		public void validateTextboxKeyTyped(char c, int key) {
-			if ((c >= '0' && c <= '9') || key == Keyboard.KEY_BACK
-					|| key == Keyboard.KEY_LEFT || key == Keyboard.KEY_RIGHT
-					|| (c == '-' && (this.textField.getCursorPosition() == 0)))
-				this.textField.textboxKeyTyped(c, key);
-		}
-	}
-
+	
 	public MwGuiMarkerDialogNew(GuiScreen parentScreen,
 			MarkerManager markerManager, String markerName, String markerGroup,
 			int x, int y, int z, int dimension) {
@@ -264,11 +77,11 @@ public class MwGuiMarkerDialogNew extends GuiScreen {
 	public boolean submit() {
 		boolean inputCorrect = true;
 		if (scrollableTextBoxName.validateTextFieldData())
-			this.markerName = scrollableTextBoxName.textField.getText();
+			this.markerName = scrollableTextBoxName.getText();
 		else
 			inputCorrect = false;
 		if (scrollableTextBoxGroup.validateTextFieldData())
-			this.markerGroup = scrollableTextBoxGroup.textField.getText();
+			this.markerGroup = scrollableTextBoxGroup.getText();
 		else
 			inputCorrect = false;
 		if (scrollableNumericTextBoxX.validateTextFieldData())
@@ -304,31 +117,30 @@ public class MwGuiMarkerDialogNew extends GuiScreen {
 		int width = this.width * dialogWidthPercent / 100 - labelsWidth;
 		int x = (this.width - width) / 2 + labelsWidth;
 		int y = (this.height - elementVSpacing * 5) / 2;
-		this.scrollableTextBoxName = new ScrollableTextBox(x, y, width,
-				I18n.format(this.editMarkerName, new Object[0]));
-		this.scrollableTextBoxName.init();
-		this.scrollableTextBoxName.textField.setFocused(true);
-		this.scrollableTextBoxName.textField.setText(this.markerName);
+		
+		this.scrollableTextBoxName = new ScrollableTextBox(x, y, width,	I18n.format(this.editMarkerName, new Object[0]), this.fontRendererObj);
+		this.scrollableTextBoxName.setFocused(true);
+		this.scrollableTextBoxName.setText(this.markerName);
+		
 		this.scrollableTextBoxGroup = new ScrollableTextBox(x, y
 				+ this.elementVSpacing, width, I18n.format(this.editMarkerGroup, new Object[0]),
-				this.markerManager.groupList);
-		this.scrollableTextBoxGroup.init();
-		this.scrollableTextBoxGroup.textField.setText(this.markerGroup);
+				this.markerManager.groupList, this.fontRendererObj);
+		this.scrollableTextBoxGroup.setText(this.markerGroup);
 		this.scrollableTextBoxGroup.setDrawArrows(true);
+		
 		this.scrollableNumericTextBoxX = new ScrollableNumericTextBox(x, y
-				+ this.elementVSpacing * 2, width, I18n.format(this.editMarkerX, new Object[0]));
-		this.scrollableNumericTextBoxX.init();
-		this.scrollableNumericTextBoxX.textField.setText("" + this.markerX);
+				+ this.elementVSpacing * 2, width, I18n.format(this.editMarkerX, new Object[0]), this.fontRendererObj);
+		this.scrollableNumericTextBoxX.setText("" + this.markerX);
 		this.scrollableNumericTextBoxX.setDrawArrows(true);
+		
 		this.scrollableNumericTextBoxY = new ScrollableNumericTextBox(x, y
-				+ this.elementVSpacing * 3, width, I18n.format(this.editMarkerY, new Object[0]));
-		this.scrollableNumericTextBoxY.init();
-		this.scrollableNumericTextBoxY.textField.setText("" + this.markerY);
+				+ this.elementVSpacing * 3, width, I18n.format(this.editMarkerY, new Object[0]), this.fontRendererObj);
+		this.scrollableNumericTextBoxY.setText("" + this.markerY);
 		this.scrollableNumericTextBoxY.setDrawArrows(true);
+		
 		this.scrollableNumericTextBoxZ = new ScrollableNumericTextBox(x, y
-				+ this.elementVSpacing * 4, width, I18n.format(this.editMarkerZ, new Object[0]));
-		this.scrollableNumericTextBoxZ.init();
-		this.scrollableNumericTextBoxZ.textField.setText("" + this.markerZ);
+				+ this.elementVSpacing * 4, width, I18n.format(this.editMarkerZ, new Object[0]), this.fontRendererObj);
+		this.scrollableNumericTextBoxZ.setText("" + this.markerZ);
 		this.scrollableNumericTextBoxZ.setDrawArrows(true);
 	}
 
@@ -364,7 +176,6 @@ public class MwGuiMarkerDialogNew extends GuiScreen {
 
 	// override GuiScreen's handleMouseInput to process
 	// the scroll wheel.
-
 	@Override
 	public void handleMouseInput() throws IOException {
 		if (MwAPI.getCurrentDataProvider() != null)
@@ -416,35 +227,35 @@ public class MwGuiMarkerDialogNew extends GuiScreen {
 			GuiTextField prevtextField = null;
 			GuiTextField nexttextField = null;
 			
-			if (this.scrollableTextBoxName.textField.isFocused())
+			if (this.scrollableTextBoxName.isFocused())
 			{
-				thistextField = scrollableTextBoxName.textField;
-				prevtextField = scrollableNumericTextBoxZ.textField;
-				nexttextField = scrollableTextBoxGroup.textField;
+				thistextField = scrollableTextBoxName;
+				prevtextField = scrollableNumericTextBoxZ;
+				nexttextField = scrollableTextBoxGroup;
 			}
-			else if (this.scrollableTextBoxGroup.textField.isFocused())
+			else if (this.scrollableTextBoxGroup.isFocused())
 			{
-				thistextField = scrollableTextBoxGroup.textField;
-				prevtextField = scrollableTextBoxName.textField;
-				nexttextField = scrollableNumericTextBoxX.textField;
+				thistextField = scrollableTextBoxGroup;
+				prevtextField = scrollableTextBoxName;
+				nexttextField = scrollableNumericTextBoxX;
 			}
-			else if (this.scrollableNumericTextBoxX.textField.isFocused())
+			else if (this.scrollableNumericTextBoxX.isFocused())
 			{
-				thistextField = scrollableNumericTextBoxX.textField;
-				prevtextField = scrollableTextBoxGroup.textField;
-				nexttextField = scrollableNumericTextBoxY.textField;
+				thistextField = scrollableNumericTextBoxX;
+				prevtextField = scrollableTextBoxGroup;
+				nexttextField = scrollableNumericTextBoxY;
 			}
-			else if (this.scrollableNumericTextBoxY.textField.isFocused())
+			else if (this.scrollableNumericTextBoxY.isFocused())
 			{
-				thistextField = scrollableNumericTextBoxY.textField;
-				prevtextField = scrollableNumericTextBoxX.textField;
-				nexttextField = scrollableNumericTextBoxZ.textField;
+				thistextField = scrollableNumericTextBoxY;
+				prevtextField = scrollableNumericTextBoxX;
+				nexttextField = scrollableNumericTextBoxZ;
 			}
-			else if (this.scrollableNumericTextBoxZ.textField.isFocused())
+			else if (this.scrollableNumericTextBoxZ.isFocused())
 			{
-				thistextField = scrollableNumericTextBoxZ.textField;
-				prevtextField = scrollableNumericTextBoxY.textField;
-				nexttextField = scrollableTextBoxName.textField;
+				thistextField = scrollableNumericTextBoxZ;
+				prevtextField = scrollableNumericTextBoxY;
+				nexttextField = scrollableTextBoxName;
 			}
 			
 			thistextField.setFocused(false);
@@ -462,15 +273,15 @@ public class MwGuiMarkerDialogNew extends GuiScreen {
 			
 			break;
 		default:
-			if (this.scrollableTextBoxName.textField.isFocused())
-				this.scrollableTextBoxName.textField.textboxKeyTyped(c, key);
-			else if (this.scrollableTextBoxGroup.textField.isFocused())
-				this.scrollableTextBoxGroup.textField.textboxKeyTyped(c, key);
-			else if (this.scrollableNumericTextBoxX.textField.isFocused())
+			if (this.scrollableTextBoxName.isFocused())
+				this.scrollableTextBoxName.textboxKeyTyped(c, key);
+			else if (this.scrollableTextBoxGroup.isFocused())
+				this.scrollableTextBoxGroup.textboxKeyTyped(c, key);
+			else if (this.scrollableNumericTextBoxX.isFocused())
 				this.scrollableNumericTextBoxX.validateTextboxKeyTyped(c, key);
-			else if (this.scrollableNumericTextBoxY.textField.isFocused())
+			else if (this.scrollableNumericTextBoxY.isFocused())
 				this.scrollableNumericTextBoxY.validateTextboxKeyTyped(c, key);
-			else if (this.scrollableNumericTextBoxZ.textField.isFocused())
+			else if (this.scrollableNumericTextBoxZ.isFocused())
 				this.scrollableNumericTextBoxZ.validateTextboxKeyTyped(c, key);
 			break;
 		}

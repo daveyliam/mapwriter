@@ -16,6 +16,8 @@ import java.util.Map;
 import mapwriter.config.Config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.chunk.Chunk;
@@ -168,6 +170,38 @@ public class Utils
         }
     }
 	
+	public static String stringArrayToString(String[] arr)
+	{
+		StringBuilder builder = new StringBuilder();
+		for(String s : arr) {
+		    builder.append(I18n.format(s, new Object[0]));
+		    builder.append("\n");
+		}
+		return builder.toString();
+	}
+	public static int getMaxWidth(String[] arr, String[] arr2)
+	{
+		FontRenderer fontRendererObj = Minecraft.getMinecraft().fontRendererObj;
+		int maxWidth = 1;
+        for(int i=0; i<arr.length; i++)
+        {
+        	int w1 = 0;
+        	int w2 = 0;
+        	
+        	if (i<arr.length)
+        	{
+        		w1 = fontRendererObj.getStringWidth(I18n.format(arr[i], new Object[0]));
+        	}
+        	if (arr2 != null && i < arr2.length)
+        	{
+        		w2 = fontRendererObj.getStringWidth(I18n.format(arr2[i], new Object[0])) + 65;
+        	}
+        	int wTot = w1 > w2 ? w1 : w2;
+        	maxWidth = maxWidth > wTot ? maxWidth : wTot;
+        }
+        return maxWidth;
+	}
+    
 	/*
 	 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 	 *

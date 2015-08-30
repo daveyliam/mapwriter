@@ -35,6 +35,7 @@ public final class Reference
 	public static final ResourceLocation squareMapTexture = new ResourceLocation("mapwriter", "textures/map/border_square.png");
 	public static final ResourceLocation playerArrowTexture = new ResourceLocation("mapwriter", "textures/map/arrow_player.png");
 	public static final ResourceLocation northArrowTexture = new ResourceLocation("mapwriter", "textures/map/arrow_north.png");
-	
+	public static final ResourceLocation leftArrowTexture = new ResourceLocation("mapwriter", "textures/map/arrow_text_left.png");
+	public static final ResourceLocation rightArrowTexture = new ResourceLocation("mapwriter", "textures/map/arrow_text_right.png");
 	
 }
