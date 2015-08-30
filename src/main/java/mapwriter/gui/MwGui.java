@@ -43,6 +43,42 @@ public class MwGui extends GuiScreen {
 	private MapView mapView;
 	private MapRenderer map;
 
+	private String[] HelpText1 = new String[]{				
+			"Keys:",
+			"",
+		    "  Space",
+			"  Delete",
+			"  C",
+			"  Home",
+			"  End",
+			"  N",
+			"  T",
+			"  P",
+			"  R",
+			"  U",
+			"",
+			"mw.gui.mwgui.helptext.1",
+			"mw.gui.mwgui.helptext.2", 
+			"mw.gui.mwgui.helptext.3", 
+			"mw.gui.mwgui.helptext.4", 
+			"mw.gui.mwgui.helptext.5", 
+			"mw.gui.mwgui.helptext.6"
+			};
+	private String[] HelpText2 = new String[]{
+			"",
+			"",
+			"mw.gui.mwgui.helptext.nextmarkergroup", 
+			"mw.gui.mwgui.helptext.deletemarker",
+			"mw.gui.mwgui.helptext.cyclecolour", 
+			"mw.gui.mwgui.helptext.centermap",
+			"mw.gui.mwgui.helptext.centermapplayer", 
+			"mw.gui.mwgui.helptext.selectnextmarker",
+			"mw.gui.mwgui.helptext.teleport",
+			"mw.gui.mwgui.helptext.savepng",
+			"mw.gui.mwgui.helptext.regenerate",
+			"mw.gui.mwgui.helptext.undergroundmap"
+			};
+	
 	private final static double PAN_FACTOR = 0.3D;
 
 	private static final int menuY = 5;
@@ -93,7 +129,7 @@ public class MwGui extends GuiScreen {
 		public void drawToRightOf(Label label, String s) {
 			this.draw(label.x + label.w + 5, label.y, s);
 		}
-
+		
 		public boolean posWithin(int x, int y) {
 			return (x >= this.x) && (y >= this.y) && (x <= (this.x + this.w))
 					&& (y <= (this.y + this.h));
@@ -137,17 +173,7 @@ public class MwGui extends GuiScreen {
 	protected void actionPerformed(GuiButton button) {
 
 	}
-
-	public void exitGui() {
-		// MwUtil.log("closing GUI");
-		// set the mini map dimension to the GUI map dimension when closing
-		this.mw.miniMap.view.setDimension(this.mapView.getDimension());
-		Keyboard.enableRepeatEvents(false);
-		this.mc.displayGuiScreen((GuiScreen) null);
-		this.mc.setIngameFocus();
-		this.mc.getSoundHandler().resumeSounds();
-	}
-
+	
 	// get a marker near the specified block pos if it exists.
 	// the maxDistance is based on the view width so that you need to click
 	// closer
@@ -297,15 +323,9 @@ public class MwGui extends GuiScreen {
 			this.exitGui();
 			break;
 
-		// case Keyboard.KEY_9:
-		// MwUtil.log("refreshing maptexture");
-		// this.mw.mapTexture.updateTexture();
-		// break;
-
 		default:
 			if (key == MwKeyHandler.keyMapGui.getKeyCode()) {
-				// exit on the next tick
-				this.exit = 1;
+				this.exitGui();
 			} else if (key == MwKeyHandler.keyZoomIn.getKeyCode()) {
 				this.mapView.adjustZoomLevel(-1);
 			} else if (key == MwKeyHandler.keyZoomOut.getKeyCode()) {
@@ -534,110 +554,79 @@ public class MwGui extends GuiScreen {
 		}
 	}
 
+	//closes this gui
+	public void exitGui()
+	{
+		this.mc.displayGuiScreen((GuiScreen)null);
+	}
+	
+    /**
+     * Called when the screen is unloaded. Used to disable keyboard repeat events
+     */
+    public void onGuiClosed()
+    {
+        Keyboard.enableRepeatEvents(false);
+		this.mw.miniMap.view.setDimension(this.mapView.getDimension());
+		Keyboard.enableRepeatEvents(false);
+    }
+	
 	// called every frame
 	public void updateScreen() {
-		// TODO:MwUtil.log("MwGui.updateScreen() " +
-		// Thread.currentThread().getName());
-		// need to wait one tick before exiting so that the game doesn't
-		// handle the 'm' key and re-open the gui.
-		// there should be a better way.
-		if (this.exit > 0) {
-			this.exit++;
-		}
-		if (this.exit > 2) {
-			this.exitGui();
-		}
 		super.updateScreen();
 	}
 
-	public void drawStatus(int bX, int bY, int bZ) {
-		String s;
+	public void drawStatus(int bX, int bY, int bZ) 
+	{
+		StringBuilder builder = new StringBuilder();
 		if (bY != 0) {
-			s = String.format(I18n.format("mw.gui.mwgui.status.cursor", new Object[0]) + ": (%d, %d, %d)", bX, bY, bZ);
+			builder.append(String.format(I18n.format("mw.gui.mwgui.status.cursor", new Object[0]) + ": (%d, %d, %d)", bX, bY, bZ));
 		} else {
-			s = String.format(I18n.format("mw.gui.mwgui.status.cursor", new Object[0]) + ": (%d, ?, %d)", bX, bZ);
+			builder.append(String.format(I18n.format("mw.gui.mwgui.status.cursor", new Object[0]) + ": (%d, ?, %d)", bX, bZ));
 		}
+		
 		if (this.mc.theWorld != null) {
-			if (!this.mc.theWorld.getChunkFromBlockCoords(
-					new BlockPos(bX, 0, bZ)).isEmpty()) {
-				s += String.format(", " + I18n.format("mw.gui.mwgui.status.biome", new Object[0]) + ": %s",
-						this.mc.theWorld.getBiomeGenForCoords(new BlockPos(bX,
-								0, bZ)).biomeName);
+			if (!this.mc.theWorld.getChunkFromBlockCoords(new BlockPos(bX, 0, bZ)).isEmpty()) 
+			{
+				builder.append(", " );
+				builder.append(I18n.format("mw.gui.mwgui.status.biome", new Object[0]));
+				builder.append(String.format(": %s", this.mc.theWorld.getBiomeGenForCoords(new BlockPos(bX, 0, bZ)).biomeName));
 			}
 		}
 
-		/*
-		 * if (this.mw.markerManager.selectedMarker != null) { s +=
-		 * ", current marker: " + this.mw.markerManager.selectedMarker.name; }
-		 */
-
 		IMwDataProvider provider = MwAPI.getCurrentDataProvider();
 		if (provider != null)
-			s += provider.getStatusString(this.mapView.getDimension(), bX, bY,
-					bZ);
-
-		drawRect(10, this.height - 21, this.width - 20, this.height - 6,
-				0x80000000);
-		this.drawCenteredString(this.fontRendererObj, s, this.width / 2,
-				this.height - 18, 0xffffff);
+		{
+			builder.append(provider.getStatusString(this.mapView.getDimension(), bX, bY, bZ));
+		}
+		String s = builder.toString();
+		int x = this.width / 2 - 10 - (this.fontRendererObj.getStringWidth(s)/ 2);
+		
+		drawTooltip(new String[]{builder.toString()}, null, x, this.height - 21);
 	}
-
-	//TODO: Make this more generic in the label class
-	//TODO: Make the rectangle not fill whole screen, look at player info hover.
-	public void drawHelp() {
-		drawRect(10, 20, this.width - 20, this.height - 30, 0x80000000);
-		this.fontRendererObj.drawSplitString(
-				"Keys:\n\n" + 
-			    "  Space\n" + 
-				"  Delete\n" + 
-				"  C\n" + 
-				"  Home\n" + 
-				"  End\n" + 
-				"  N\n" + 
-				"  T\n" + 
-				"  P\n" + 
-				"  R\n" + 
-				"  U\n\n" + 
-				
-				I18n.format("mw.gui.mwgui.helptext.1", new Object[0]) + "\n" + 
-				I18n.format("mw.gui.mwgui.helptext.2", new Object[0]) + "\n" + 
-				I18n.format("mw.gui.mwgui.helptext.3", new Object[0]) + "\n" + 
-				I18n.format("mw.gui.mwgui.helptext.4", new Object[0]) + "\n" + 
-				I18n.format("mw.gui.mwgui.helptext.5", new Object[0]) + "\n" + 
-				I18n.format("mw.gui.mwgui.helptext.6", new Object[0]) + "\n",
-				15, 24, this.width - 30, 0xffffff);
-		this.fontRendererObj.drawSplitString(
-						"| " + I18n.format("mw.gui.mwgui.helptext.nextmarkergroup", new Object[0]) + "\n" + 
-						"| " + I18n.format("mw.gui.mwgui.helptext.deletemarker", new Object[0]) + "\n" + 
-						"| " + I18n.format("mw.gui.mwgui.helptext.cyclecolour", new Object[0]) + "\n" + 
-						"| " + I18n.format("mw.gui.mwgui.helptext.centermap", new Object[0]) + "\n" + 
-						"| " + I18n.format("mw.gui.mwgui.helptext.centermapplayer", new Object[0]) + "\n" + 
-						"| " + I18n.format("mw.gui.mwgui.helptext.selectnextmarker", new Object[0]) + "\n" + 
-						"| " + I18n.format("mw.gui.mwgui.helptext.teleport", new Object[0]) + "\n" + 
-						"| " + I18n.format("mw.gui.mwgui.helptext.savepng", new Object[0]) + "\n" + 
-						"| " + I18n.format("mw.gui.mwgui.helptext.regenerate", new Object[0]) + "\n" + 
-						"| " + I18n.format("mw.gui.mwgui.helptext.undergroundmap", new Object[0]) + "\n", 
-				75, 42, this.width - 90, 0xffffff);
-	}
-
-	public void drawUpdate() {
-		drawRect(10, 20, this.width - 20, this.height - 30, 0x80000000);
-		this.fontRendererObj.drawSplitString(VersionCheck.getUpdateURL(), 15,
-				24, this.width - 30, 0xffffff);
-	}
-
-	public void drawMouseOverHint(int x, int y, String title, int mX, int mY,
-			int mZ) {
-		String desc = String.format("(%d, %d, %d)", mX, mY, mZ);
-		int stringW = Math.max(this.fontRendererObj.getStringWidth(title),
-				this.fontRendererObj.getStringWidth(desc));
-
-		x = Math.min(x, this.width - (stringW + 16));
-		y = Math.min(Math.max(10, y), this.height - 14);
-
-		drawRect(x + 8, y - 10, x + stringW + 16, y + 14, 0x80000000);
-		this.drawString(this.fontRendererObj, title, x + 10, y - 8, 0xffffff);
-		this.drawString(this.fontRendererObj, desc, x + 10, y + 4, 0xcccccc);
+	
+	//draw a tooltip at x,y containing the strings in the arrays.
+	//array 2 may be null
+	public void drawTooltip(String[] s1, String[] s2, int x, int y)
+	{
+		int stringwidth = Utils.getMaxWidth(s1, s2);
+		int w = stringwidth < this.width - 20 ?  stringwidth : this.width - 20;
+		int h = (s1.length) * this.fontRendererObj.FONT_HEIGHT;
+		
+		if (x + w + 10 > this.width)
+		{
+			x = x - w - 10 - 5;
+		}
+		if (y + h + 8 > this.height)
+		{
+			y = y - h - 8;
+		}
+		
+		drawRect(x, y, x + w + 10, h + y + 8, 0x80000000);
+		this.fontRendererObj.drawSplitString(Utils.stringArrayToString(s1), x + 5 , y + 4, w, 0xffffff);
+		if (s2 != null)
+		{
+			this.fontRendererObj.drawSplitString(Utils.stringArrayToString(s2), x + 65, y + 4, w, 0xffffff);
+		}
 	}
 
 	// also called every frame
@@ -687,15 +676,41 @@ public class MwGui extends GuiScreen {
 		// draw name of marker under mouse cursor
 		Marker marker = this.getMarkerNearScreenPos(mouseX, mouseY);
 		if (marker != null) {
-			this.drawMouseOverHint(mouseX, mouseY, marker.name, marker.x,
-					marker.y, marker.z);
+			drawTooltip(new String[]{
+					marker.name, 
+					String.format("(%d, %d, %d)",
+							marker.x, 
+							marker.y, 
+							marker.z)},
+							null,
+							mouseX + 5, 
+							mouseY);
+		}
+		
+		// draw name of selected marker
+		if (this.mw.markerManager.selectedMarker != null) {
+			drawTooltip(new String[]{
+					this.mw.markerManager.selectedMarker.name, 
+					String.format("(%d, %d, %d)",
+							this.mw.markerManager.selectedMarker.x, 
+							this.mw.markerManager.selectedMarker.y, 
+							this.mw.markerManager.selectedMarker.z)},
+							null,
+							(int)this.mw.markerManager.selectedMarker.screenPos.x + 5, 
+							(int)this.mw.markerManager.selectedMarker.screenPos.y);
 		}
 
 		// draw name of player under mouse cursor
 		if (this.isPlayerNearScreenPos(mouseX, mouseY)) {
-			this.drawMouseOverHint(mouseX, mouseY,
-					this.mc.thePlayer.getDisplayNameString(),
-					this.mw.playerXInt, this.mw.playerYInt, this.mw.playerZInt);
+			drawTooltip(new String[]{
+					this.mc.thePlayer.getDisplayNameString(), 
+					String.format("(%d, %d, %d)", 
+					this.mw.playerXInt, 
+					this.mw.playerYInt, 
+					this.mw.playerZInt)},
+					null,
+					mouseX + 5, 
+					mouseY);
 		}
 
 		// draw status message
@@ -722,10 +737,10 @@ public class MwGui extends GuiScreen {
 
 		// help message on mouse over
 		if (this.helpLabel.posWithin(mouseX, mouseY)) {
-			this.drawHelp();
+			drawTooltip(HelpText1,HelpText2, 10 , 20);
 		}
 		if (this.updateLabel.posWithin(mouseX, mouseY)) {
-			this.drawUpdate();
+			drawTooltip(new String[]{VersionCheck.getUpdateURL()},null, 10 , 20);
 		}
 
 		super.drawScreen(mouseX, mouseY, f);
