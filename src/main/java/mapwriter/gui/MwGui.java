@@ -106,8 +106,6 @@ public class MwGui extends GuiScreen {
 	private Label updateLabel;
 	public static MwGui instance;
 
-	private static final HashSet<String> PROTOCOLS = Sets.newHashSet(new String[] { "http",
-			"https" });
 	private URI clickedLinkURI;
 
 	class Label {
@@ -391,7 +389,7 @@ public class MwGui extends GuiScreen {
 				try {
 					uri = new URI(VersionCheck.getUpdateURL());
 
-					if (!PROTOCOLS.contains(uri.getScheme().toLowerCase())) {
+					if (!Reference.PROTOCOLS.contains(uri.getScheme().toLowerCase())) {
 						throw new URISyntaxException(uri.toString(),
 								"Unsupported protocol: "
 										+ uri.getScheme().toLowerCase());
