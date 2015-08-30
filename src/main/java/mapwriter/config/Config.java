@@ -48,7 +48,7 @@ public class Config {
 	public static String backgroundTextureMode = backgroundTextureModeDef;
 	public static boolean moreRealisticMapDef = false;
 	public static boolean moreRealisticMap = moreRealisticMapDef;
-	public static boolean newMarkerDialogDef = false;
+	public static boolean newMarkerDialogDef = true;
 	public static boolean newMarkerDialog = newMarkerDialogDef;
 
 	

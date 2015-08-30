@@ -4,6 +4,7 @@ import mapwriter.Mw;
 import mapwriter.config.WorldConfig;
 import mapwriter.map.MapView;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -15,7 +16,10 @@ public class MwGuiDimensionDialog extends MwGuiTextDialog {
 	final int dimension;
     
     public MwGuiDimensionDialog(GuiScreen parentScreen, Mw mw, MapView mapView, int dimension) {
-        super(parentScreen, "Set dimension to:", "" + dimension, "invalid dimension");
+        super(parentScreen, 
+        		I18n.format("mw.gui.mwguidimensiondialog.title", new Object[0]) + ":", 
+        		Integer.toString(dimension), 
+        		I18n.format("mw.gui.mwguidimensiondialog.error", new Object[0]));
         this.mw = mw;
         this.mapView = mapView;
         this.dimension = dimension;
