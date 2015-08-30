@@ -11,7 +11,6 @@ import net.minecraftforge.fml.common.Loader;
 import org.apache.commons.io.IOUtils;
 
 public class VersionCheck implements Runnable {
-//TODO: add https://github.com/Dynious/VersionChecker suport
 	private static boolean isLatestVersion = true;
 	private static String latestVersion = "";
 	private static String updateURL = "";
