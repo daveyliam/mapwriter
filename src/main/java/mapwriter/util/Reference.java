@@ -1,6 +1,9 @@
 package mapwriter.util;
 
+import java.util.HashSet;
 import java.util.regex.Pattern;
+
+import com.google.common.collect.Sets;
 
 import net.minecraft.util.ResourceLocation;
 
@@ -38,4 +41,5 @@ public final class Reference
 	public static final ResourceLocation leftArrowTexture = new ResourceLocation("mapwriter", "textures/map/arrow_text_left.png");
 	public static final ResourceLocation rightArrowTexture = new ResourceLocation("mapwriter", "textures/map/arrow_text_right.png");
 	
+	public static final HashSet<String> PROTOCOLS = Sets.newHashSet(new String[] { "http", "https" });
 }
