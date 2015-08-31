@@ -4,7 +4,6 @@ import java.awt.Point;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashSet;
 
 import mapwriter.Mw;
 import mapwriter.api.IMwDataProvider;
@@ -33,8 +32,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-
-import com.google.common.collect.Sets;
 
 @SideOnly(Side.CLIENT)
 public class MwGui extends GuiScreen {

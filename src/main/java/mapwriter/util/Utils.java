@@ -185,8 +185,8 @@ public class Utils
 		int Width = 1;
         for(int i=0; i<arr.length; i++)
         {
-        	int w1 = 0, w11 = 0;
-        	int w2 = 0, w21 = 0;
+        	int w1 = 0;
+        	int w2 = 0;
         	
         	if (i<arr.length)
         	{

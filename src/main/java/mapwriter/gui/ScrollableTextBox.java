@@ -2,15 +2,14 @@ package mapwriter.gui;
 
 import java.util.List;
 
-import org.lwjgl.input.Keyboard;
-
 import mapwriter.util.Reference;
 import mapwriter.util.Render;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.texture.TextureManager;
+
+import org.lwjgl.input.Keyboard;
 
 public class ScrollableTextBox extends GuiTextField
 	{
@@ -100,7 +99,7 @@ public class ScrollableTextBox extends GuiTextField
 				Render.drawTexturedRect(
 						this.leftArrowX, 
 						this.arrowsY,
-						this.arrowsWidth, 
+						ScrollableTextBox.arrowsWidth, 
 						this.arrowsHeight, 
 						0.0, 
 						0.0, 
@@ -111,7 +110,7 @@ public class ScrollableTextBox extends GuiTextField
 				Render.drawTexturedRect(
 						this.rightArrowX, 
 						this.arrowsY,
-						this.arrowsWidth, 
+						ScrollableTextBox.arrowsWidth, 
 						this.arrowsHeight, 
 						0.0, 
 						0.0, 
@@ -126,15 +125,15 @@ public class ScrollableTextBox extends GuiTextField
 						this.textFieldY, 
 						0xff900000);
 				drawRect(this.textFieldX - 1, this.textFieldY - 1,
-						this.textFieldX, this.textFieldY + this.textFieldHeight	+ 1,
+						this.textFieldX, this.textFieldY + ScrollableTextBox.textFieldHeight	+ 1,
 						0xff900000);
 				drawRect(this.textFieldX + this.textFieldWidth + 1,
-						this.textFieldY + this.textFieldHeight + 1,
+						this.textFieldY + ScrollableTextBox.textFieldHeight + 1,
 						this.textFieldX,
-						this.textFieldY + this.textFieldHeight, 
+						this.textFieldY + ScrollableTextBox.textFieldHeight, 
 						0xff900000);
 				drawRect(this.textFieldX + this.textFieldWidth + 1,
-						this.textFieldY + this.textFieldHeight + 1,
+						this.textFieldY + ScrollableTextBox.textFieldHeight + 1,
 						this.textFieldX + this.textFieldWidth, this.textFieldY,
 						0xff900000);
 			}
@@ -166,11 +165,11 @@ public class ScrollableTextBox extends GuiTextField
 		 */
 		public int posWithinArrows(int x, int y) {
 			if ((x >= this.leftArrowX) && (y >= this.arrowsY)
-					&& (x <= this.arrowsWidth + this.leftArrowX)
+					&& (x <= ScrollableTextBox.arrowsWidth + this.leftArrowX)
 					&& (y <= this.arrowsHeight + this.arrowsY))
 				return -1;
 			else if ((x >= this.rightArrowX) && (y >= this.arrowsY)
-					&& (x <= this.arrowsWidth + this.rightArrowX)
+					&& (x <= ScrollableTextBox.arrowsWidth + this.rightArrowX)
 					&& (y <= this.arrowsHeight + this.arrowsY))
 				return 1;
 			else
@@ -180,7 +179,7 @@ public class ScrollableTextBox extends GuiTextField
 		public boolean posWithinTextField(int x, int y) {
 			return (x >= this.textFieldX) && (y >= this.textFieldY)
 					&& (x <= this.textFieldWidth + this.textFieldX)
-					&& (y <= this.textFieldHeight + this.textFieldY);
+					&& (y <= ScrollableTextBox.textFieldHeight + this.textFieldY);
 		}
 
 		public void textFieldScroll(int direction) {

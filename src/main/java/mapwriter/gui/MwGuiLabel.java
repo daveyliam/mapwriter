@@ -5,7 +5,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.resources.I18n;
 
 public class MwGuiLabel 
 {
@@ -49,7 +48,7 @@ public class MwGuiLabel
     		
     		if(Background)
     		{
-    			parentScreen.drawRect(this.x, this.y, this.x + this.w + spacingX, this.h + this.y + spacingY, 0x80000000);
+    			Gui.drawRect(this.x, this.y, this.x + this.w + spacingX, this.h + this.y + spacingY, 0x80000000);
     		}
     		
     		this.fontRendererObj.drawSplitString(str, this.x + 5 , this.y + 2, this.w, 0xffffff);

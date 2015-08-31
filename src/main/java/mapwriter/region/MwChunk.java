@@ -22,8 +22,6 @@ import net.minecraftforge.fml.common.FMLLog;
 
 import org.apache.logging.log4j.Level;
 
-import org.apache.logging.log4j.Level;
-
 public class MwChunk implements IChunk {
 	public static final int SIZE = 16;
 
@@ -301,7 +299,7 @@ public class MwChunk implements IChunk {
 			}
 			if (FMPMethodParts != null) {
 				try {
-					for (Object temp : (List) FMPMethodParts.invoke(value)) {
+					for (Object temp : (List<?>) FMPMethodParts.invoke(value)) {
 						Object material = FMPMethodMaterial.invoke(temp);
 						Block block = (Block) FMPFieldBlock.get(material);
 						id = Block.getIdFromBlock(block);

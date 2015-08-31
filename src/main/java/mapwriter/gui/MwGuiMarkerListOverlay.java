@@ -1,11 +1,8 @@
 package mapwriter.gui;
 
-import mapwriter.Mw;
-import mapwriter.map.MapView;
 import mapwriter.map.Marker;
 import mapwriter.map.MarkerManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 
 public class MwGuiMarkerListOverlay extends GuiScreen
