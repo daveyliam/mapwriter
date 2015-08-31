@@ -16,6 +16,7 @@ buildscript {
 }
 
 apply plugin: 'forge'
+apply plugin: 'curseforge'
 
 repositories {
 	mavenLocal()
@@ -115,4 +116,10 @@ gradle.taskGraph.whenReady { taskGraph ->
       println '----------------------------------------------------------------------'
     }
   }
+}
+
+curse {
+    projectId = config.curse_project_id
+    apiKey = project.hasProperty('curseForgeApiKey') ? project.curseForgeApiKey : ''
+    releaseType = 'release'
 }
