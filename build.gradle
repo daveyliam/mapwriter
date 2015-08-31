@@ -16,6 +16,7 @@ buildscript {
 }
 
 apply plugin: 'forge'
+apply plugin: 'curseforge'
 
 repositories {
 	mavenLocal()
@@ -73,7 +74,7 @@ processResources
 version = "${project.minecraft.version}-${project.version}"
 
 jar {
-// = 'universal'
+//classifier = 'universal'
 }
 
 task sourceJar(type: Jar) {
@@ -110,9 +111,15 @@ gradle.taskGraph.whenReady { taskGraph ->
   if (!taskGraph.allTasks.findAll{ it.name == 'eclipseClasspath' }.empty) {
     gradle.buildFinished {
       println '----------------------------------------------------------------------'
-      print   "Please set the Eclipse classpath variable 'GRADLE_CACHE' in Preferences "
+      print   "Please set the Eclipse classpath variable 'GRADLE_USER_HOME' in Preferences "
       println "-> Java -> Build path -> Classpath Variable to $gradle.gradleUserHomeDir"
       println '----------------------------------------------------------------------'
     }
   }
+}
+
+curse {
+    projectId = config.curse_project_id
+    apiKey = project.hasProperty('curseForgeApiKey') ? project.curseForgeApiKey : ''
+    releaseType = 'release'
 }

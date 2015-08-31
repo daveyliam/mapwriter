@@ -182,24 +182,27 @@ public class Utils
 	public static int getMaxWidth(String[] arr, String[] arr2)
 	{
 		FontRenderer fontRendererObj = Minecraft.getMinecraft().fontRendererObj;
-		int maxWidth = 1;
+		int Width = 1;
         for(int i=0; i<arr.length; i++)
         {
-        	int w1 = 0;
-        	int w2 = 0;
+        	int w1 = 0, w11 = 0;
+        	int w2 = 0, w21 = 0;
         	
         	if (i<arr.length)
         	{
-        		w1 = fontRendererObj.getStringWidth(I18n.format(arr[i], new Object[0]));
+        		String s = I18n.format(arr[i], new Object[0]);
+        		w1 = fontRendererObj.getStringWidth(s);
         	}
         	if (arr2 != null && i < arr2.length)
         	{
-        		w2 = fontRendererObj.getStringWidth(I18n.format(arr2[i], new Object[0])) + 65;
+        		String s = I18n.format(arr2[i], new Object[0]);
+        		w2 = fontRendererObj.getStringWidth(s);
+        		w2 += 65;
         	}
         	int wTot = w1 > w2 ? w1 : w2;
-        	maxWidth = maxWidth > wTot ? maxWidth : wTot;
+        	Width = Width > wTot ? Width : wTot;
         }
-        return maxWidth;
+        return Width;
 	}
     
 	/*
