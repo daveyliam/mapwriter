@@ -99,9 +99,9 @@ public class MwGuiMarkerListOverlay extends MwGuiSlot
 	@Override
 	protected void drawSlot(int entryID, int x, int y, int slotHeight, int mouseXIn, int mouseYIn) 
 	{
-		MwGuiLabel label = new MwGuiLabel();
+		MwGuiLabel label = new MwGuiLabel(getLabelString(entryID), null, x, y, false, false, this.listWidth, this.height);
 
-		label.draw(getLabelString(entryID), null, x, y, false, false, this.listWidth, this.height);
+		label.draw();
 	}
 	
 	@Override

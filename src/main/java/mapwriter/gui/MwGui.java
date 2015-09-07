@@ -127,16 +127,7 @@ public class MwGui extends GuiScreen {
 				this.mw.playerDimension);
 		this.mapView.setZoomLevel(Config.fullScreenZoomLevel);
 
-		this.helpLabel = new MwGuiLabel();
-		this.optionsLabel = new MwGuiLabel();
-		this.dimensionLabel = new MwGuiLabel();
-		this.groupLabel = new MwGuiLabel();
-		this.overlayLabel = new MwGuiLabel();
-		this.updateLabel = new MwGuiLabel();
-		this.helpTooltipLabel = new MwGuiLabel();
-		this.updateTooltipLabel = new MwGuiLabel();
-		this.statusLabel = new MwGuiLabel();
-		this.markerLabel = new MwGuiLabel();
+		this.initLabels();
 		
 		this.MarkerOverlay = new MwGuiMarkerListOverlay(this, this.mw.markerManager);
 		
@@ -154,9 +145,141 @@ public class MwGui extends GuiScreen {
 	// is resized
 	public void initGui() 
 	{
+		this.helpLabel.setParentWidthAndHeight(this.width, this.height);
+		this.optionsLabel.setParentWidthAndHeight(this.width, this.height);
+		this.dimensionLabel.setParentWidthAndHeight(this.width, this.height);
+		this.groupLabel.setParentWidthAndHeight(this.width, this.height);
+		this.overlayLabel.setParentWidthAndHeight(this.width, this.height);
+		this.updateLabel.setParentWidthAndHeight(this.width, this.height);
+		
+		this.helpTooltipLabel.setParentWidthAndHeight(this.width, this.height);
+		this.updateTooltipLabel.setParentWidthAndHeight(this.width, this.height);
+		this.statusLabel.setParentWidthAndHeight(this.width, this.height);
+		this.markerLabel.setParentWidthAndHeight(this.width, this.height);
+		
 		MarkerOverlay.setDimensions(MarkerOverlay.listWidth, this.height - 20, MarkerOverlay.ListY, 10 + this.height - 20, this.width - 110);
 	}
 
+	public void initLabels()
+	{
+		this.helpLabel = new MwGuiLabel(
+				new String[]{"[" + I18n.format("mw.gui.mwgui.help", new Object[0]) + "]"},
+				null, 
+				menuX, 
+				menuY, 
+				true, 
+				false, 
+				this.width, 
+				this.height
+				);
+		this.optionsLabel = new MwGuiLabel(
+				new String[]{"[" + I18n.format("mw.gui.mwgui.options", new Object[0]) + "]"}, 
+				null, 
+				0, 
+				0, 
+				true, 
+				false, 
+				this.width, 
+				this.height
+				);		
+		this.dimensionLabel = new MwGuiLabel(
+				null, 
+				null,
+				0,
+				0,
+				true, 
+				false, 
+				this.width, 
+				this.height
+				);
+		this.groupLabel = new MwGuiLabel(
+				null, 
+				null,
+				0,
+				0,
+				true, 
+				false, 
+				this.width, 
+				this.height
+				);
+		this.overlayLabel = new MwGuiLabel(
+				null, 
+				null, 
+				0, 
+				0, 
+				true, 
+				false, 
+				this.width, 
+				this.height
+				);
+		String updateString = String.format(
+				"[" + I18n.format("mw.gui.mwgui.newversion", 
+				new Object[0]) + ": %s]",
+				VersionCheck.getLatestVersion()
+				);
+		this.updateLabel = new MwGuiLabel(
+				new String[]{updateString},
+				null,
+				0,
+				0,
+				true, 
+				false, 
+				this.width, 
+				this.height
+				);
+		this.helpTooltipLabel = new MwGuiLabel(
+				HelpText1,
+				HelpText2, 
+				0, 
+				0, 
+				true, 
+				false, 
+				this.width, 
+				this.height
+				);
+
+		this.updateTooltipLabel = new MwGuiLabel(
+				new String[]{VersionCheck.getUpdateURL()},
+				null, 
+				0, 
+				0, 
+				true, 
+				false, 
+				this.width, 
+				this.height
+				);
+
+		this.statusLabel = new MwGuiLabel(
+				null, 
+				null, 
+				0, 
+				0, 
+				true, 
+				false, 
+				this.width, 
+				this.height
+				);
+		this.markerLabel = new MwGuiLabel(
+				null, 
+				null,
+				0,
+				0,
+				true,
+				true, 
+				this.width, 
+				this.height		
+				);
+		
+		this.optionsLabel.drawToRightOf(this.helpLabel);
+		this.dimensionLabel.drawToRightOf(this.optionsLabel);
+		this.groupLabel.drawToRightOf(this.dimensionLabel);
+		this.overlayLabel.drawToRightOf(this.groupLabel);
+		this.updateLabel.drawToRightOf(this.overlayLabel);
+		
+		this.helpTooltipLabel.drawToBelowOf(this.helpLabel);
+		this.updateTooltipLabel.drawToBelowOf(this.helpLabel);
+	}
+	
 	// called when a button is pressed
 	protected void actionPerformed(GuiButton button) 
 	{
@@ -543,7 +666,9 @@ public class MwGui extends GuiScreen {
 		String s = builder.toString();
 		int x = this.width / 2 - 10 - (this.fontRendererObj.getStringWidth(s)/ 2);
 		
-		statusLabel.draw(new String[]{builder.toString()}, null, x, this.height - 21, true, false, this.width, this.height);
+		this.statusLabel.setCoords(x, this.height - 21);
+		this.statusLabel.setText(new String[]{builder.toString()}, null);
+		statusLabel.draw();
 	}
 
 	// also called every frame
@@ -590,78 +715,89 @@ public class MwGui extends GuiScreen {
 		this.mouseBlockY = this.getHeightAtBlockPos(this.mouseBlockX,
 				this.mouseBlockZ);
 
-		// draw name of marker under mouse cursor
-		Marker marker = this.getMarkerNearScreenPos(mouseX, mouseY);
-		if (marker != null) {
-			markerLabel.draw(new String[]{
-					marker.name, 
-					String.format("(%d, %d, %d)",
-							marker.x, 
-							marker.y, 
-							marker.z)},
-							null,
-							mouseX + 5, 
-							mouseY,
-							true,
-							true, 
-							this.width, 
-							this.height							
-							);
-		}
-
-		// draw name of player under mouse cursor
-		if (this.isPlayerNearScreenPos(mouseX, mouseY)) {
-			markerLabel.draw(new String[]{
-					this.mc.thePlayer.getDisplayNameString(), 
-					String.format("(%d, %d, %d)", 
-					this.mw.playerXInt, 
-					this.mw.playerYInt, 
-					this.mw.playerZInt)},
-					null,
-					mouseX + 5, 
-					mouseY, 
-					true,
-					true, 
-					this.width, 
-					this.height
-					);
-		}
+		//draw the label near mousepointer
+		this.drawMarkerLabel(mouseX, mouseY, f);
 
 		// draw status message
 		this.drawStatus(this.mouseBlockX, this.mouseBlockY, this.mouseBlockZ);
 
 		// draw labels
-		this.helpLabel.draw(new String[]{"[" + I18n.format("mw.gui.mwgui.help", new Object[0]) + "]"}, null, menuX, menuY, true, false, this.width, this.height);
-		this.optionsLabel.drawToRightOf(this.helpLabel, new String[]{"[" + I18n.format("mw.gui.mwgui.options", new Object[0]) + "]"}, true, false, this.width, this.height);
-		String dimString = String.format("[" + I18n.format("mw.gui.mwgui.dimension", new Object[0]) + ": %d]",
-				this.mapView.getDimension());
-		this.dimensionLabel.drawToRightOf(this.optionsLabel, new String[]{dimString}, true, false, this.width, this.height);
-		String groupString = String.format("[" + I18n.format("mw.gui.mwgui.group", new Object[0]) + ": %s]",
-				this.mw.markerManager.getVisibleGroupName());
-		this.groupLabel.drawToRightOf(this.dimensionLabel, new String[]{groupString}, true, false, this.width, this.height);
-		String overlayString = String.format("[" + I18n.format("mw.gui.mwgui.overlay", new Object[0]) + ": %s]",
-				MwAPI.getCurrentProviderName());
-		this.overlayLabel.drawToRightOf(this.groupLabel, new String[]{overlayString}, true, false, this.width, this.height);
-
-		if (!VersionCheck.isLatestVersion()) {
-			String updateString = String.format("[" + I18n.format("mw.gui.mwgui.newversion", new Object[0]) + ": %s]",
-					VersionCheck.getLatestVersion());
-			this.updateLabel.drawToRightOf(this.overlayLabel, new String[]{updateString}, true, false, this.width, this.height);
-		}
-
-		// help message on mouse over
-		if (this.helpLabel.posWithin(mouseX, mouseY)) {
-			helpTooltipLabel.draw(HelpText1,HelpText2, 10 , 20, true, false, this.width, this.height);
-		}
-		if (this.updateLabel.posWithin(mouseX, mouseY)) {
-			updateTooltipLabel.draw(new String[]{VersionCheck.getUpdateURL()},null, 10 , 20, true, false, this.width, this.height);
-		}
+		this.drawLabel(mouseX, mouseY, f);
 
 		MarkerOverlay.drawScreen(mouseX, mouseY, f);;
 		
 		super.drawScreen(mouseX, mouseY, f);
 	}
 
+	private void drawMarkerLabel(int mouseX, int mouseY, float f)
+	{
+		// draw name of marker under mouse cursor
+		Marker marker = this.getMarkerNearScreenPos(mouseX, mouseY);
+		if (marker != null) {
+			markerLabel.setText(
+					new String[]{
+					marker.name, 
+					String.format("(%d, %d, %d)",
+							marker.x, 
+							marker.y, 
+							marker.z)
+							},
+					null
+					);
+			markerLabel.setCoords(mouseX + 8, mouseY);
+			markerLabel.draw();
+		}
+
+		// draw name of player under mouse cursor
+		if (this.isPlayerNearScreenPos(mouseX, mouseY)) {
+			markerLabel.setText(
+					new String[]{
+							this.mc.thePlayer.getDisplayNameString(), 
+							String.format("(%d, %d, %d)", 
+							this.mw.playerXInt, 
+							this.mw.playerYInt, 
+							this.mw.playerZInt)
+							},
+					null
+					);
+			markerLabel.setCoords(mouseX + 8, mouseY);
+			markerLabel.draw();
+			}
+	}
+
+	private void drawLabel(int mouseX, int mouseY, float f)
+	{
+		this.helpLabel.draw();
+		this.optionsLabel.draw();
+		String dimString = String.format("[" + I18n.format("mw.gui.mwgui.dimension", new Object[0]) + ": %d]",
+				this.mapView.getDimension());
+		this.dimensionLabel.setText(new String[]{dimString}, null);
+		this.dimensionLabel.draw();
+		
+		String groupString = String.format("[" + I18n.format("mw.gui.mwgui.group", new Object[0]) + ": %s]",
+				this.mw.markerManager.getVisibleGroupName());
+		this.groupLabel.setText(new String[]{groupString}, null);
+		this.groupLabel.draw();
+		
+		String overlayString = String.format("[" + I18n.format("mw.gui.mwgui.overlay", new Object[0]) + ": %s]",
+				MwAPI.getCurrentProviderName());
+		this.overlayLabel.setText(new String[]{overlayString}, null);
+		this.overlayLabel.draw();
+		
+		if (!VersionCheck.isLatestVersion()) {
+			
+			this.updateLabel.draw();
+		}
+
+		// help message on mouse over
+		if (this.helpLabel.posWithin(mouseX, mouseY)) {
+			helpTooltipLabel.draw();
+		}
+		if (this.updateLabel.posWithin(mouseX, mouseY)) {
+			updateTooltipLabel.draw();
+		}
+	}
+	
 	public void confirmClicked(boolean result, int id) {
 		if (id == 31102009) {
 			if (result) {
