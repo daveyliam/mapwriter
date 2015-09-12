@@ -9,6 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.ColorizerGrass;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -145,7 +146,7 @@ public class BlockColourGen {
 							blockColour = getIconMapColour(icon, terrainTexture);
 							//request icon with meta 16, carpenterblocks uses this method to get the real texture
 							//this makes the carpenterblocks render as brown blocks on the map
-							if (((String) Block.blockRegistry.getNameForObject(block)).contains("CarpentersBlocks"))
+							if (((ResourceLocation)Block.blockRegistry.getNameForObject(block)).getResourceDomain().contains("CarpentersBlocks"))
 							{
 								//icon = block.getIcon(1, 16);	
 								//blockColour = getIconMapColour(icon, terrainTexture);
