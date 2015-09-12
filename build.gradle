@@ -121,5 +121,5 @@ gradle.taskGraph.whenReady { taskGraph ->
 curse {
     projectId = config.curse_project_id
     apiKey = project.hasProperty('curseForgeApiKey') ? project.curseForgeApiKey : ''
-    releaseType = 'release'
+    releaseType = config.release_type
 }
