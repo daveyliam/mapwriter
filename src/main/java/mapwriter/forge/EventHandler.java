@@ -79,8 +79,8 @@ public class EventHandler {
             Mw.getInstance().onTick();
         }
     }
-    @SubscribeEvent
     
+    @SubscribeEvent
     public void onTextureStitchEventPost(TextureStitchEvent.Post event){ 
     		mw.reloadBlockColours();
     }

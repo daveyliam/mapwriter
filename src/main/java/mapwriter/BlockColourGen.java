@@ -145,7 +145,7 @@ public class BlockColourGen {
 							blockColour = getIconMapColour(icon, terrainTexture);
 							//request icon with meta 16, carpenterblocks uses this method to get the real texture
 							//this makes the carpenterblocks render as brown blocks on the map
-							if (block.delegate != null && block.delegate.name().contains("CarpentersBlocks"))
+							if (((String) Block.blockRegistry.getNameForObject(block)).contains("CarpentersBlocks"))
 							{
 								//icon = block.getIcon(1, 16);	
 								//blockColour = getIconMapColour(icon, terrainTexture);

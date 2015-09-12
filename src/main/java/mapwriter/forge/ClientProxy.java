@@ -44,7 +44,7 @@ public class ClientProxy extends CommonProxy {
 			VersionCheck versionCheck = new VersionCheck();
 			Thread versionCheckThread = new Thread(versionCheck, "Version Check");
 			versionCheckThread.start();
-
+		}
 		if (Loader.isModLoaded("CarpentersBlocks")) {
 			MwChunk.carpenterdata();
 		}
@@ -55,5 +55,4 @@ public class ClientProxy extends CommonProxy {
 		MwAPI.registerDataProvider("Slime", new OverlaySlime());
 		MwAPI.registerDataProvider("Grid", new OverlayGrid());
 	}
-}
 }
