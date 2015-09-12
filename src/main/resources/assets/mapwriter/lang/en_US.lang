@@ -147,6 +147,10 @@ mw.gui.mwguimarkerdialognew.editMarkerGroup=Group
 mw.gui.mwguimarkerdialognew.editMarkerX=X
 mw.gui.mwguimarkerdialognew.editMarkerY=Y
 mw.gui.mwguimarkerdialognew.editMarkerZ=Z
-
+mw.gui.mwguimarkerdialognew.editMarkerColor=Color
 mw.gui.mwguimarkerdialognew.title=Teleport Height
 mw.gui.mwguimarkerdialognew.error=invalid height
+
+mw.gui.ScrollableColorSelector.Red=Red
+mw.gui.ScrollableColorSelector.Green=Green
+mw.gui.ScrollableColorSelector.Blue=Blue

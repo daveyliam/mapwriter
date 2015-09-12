@@ -2,6 +2,7 @@ package mapwriter.gui;
 
 import mapwriter.map.Marker;
 import mapwriter.map.MarkerManager;
+import mapwriter.util.Utils;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.relauncher.Side;
@@ -93,7 +94,7 @@ public class MwGuiMarkerDialog extends MwGuiTextDialog {
 			this.markerZ = this.getInputAsInt();
 			if (this.inputValid) {
 				done = true;
-				int colour = Marker.getCurrentColour();
+				int colour = Utils.getCurrentColour();
 	    		if (this.editingMarker != null) {
 	    			colour = this.editingMarker.colour;
 	    			this.markerManager.delMarker(this.editingMarker);

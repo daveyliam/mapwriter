@@ -205,6 +205,29 @@ public class Utils
         return Width;
 	}
     
+	private static int[] colours = new int[] {
+		0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff00ff, 0x00ffff,
+		0xff8000, 0x8000ff};
+	// static so that current index is shared between all markers
+    public static int colourIndex = 0;
+    private static int getColoursLengt()
+    {
+    	return colours.length;
+    }
+	public static int getCurrentColour() {
+    	return 0xff000000 | colours[colourIndex];
+    }
+	public static int getNextColour()
+	{
+		Utils.colourIndex = (Utils.colourIndex + 1) % Utils.getColoursLengt();
+		return Utils.getCurrentColour();
+	}
+    public static int getPrevColour() {
+    	Utils.colourIndex = (Utils.colourIndex + Utils.getColoursLengt() - 1) % Utils.getColoursLengt();
+    	return Utils.getCurrentColour();
+    }
+
+
 	/*
 	 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 	 *
@@ -259,7 +282,8 @@ public class Utils
 	   * @throws ClassCastException if some key or value in the raw map was not well-typed, and only if <code>strict</code> was true
 	   */
 	@SuppressWarnings("rawtypes")
-	public static <K,V> Map<K,V> checkedMapByCopy(Map rawMap, Class<K> keyType, Class<V> valueType, boolean strict) throws ClassCastException {
+	public static 
+<K,V> Map<K,V> checkedMapByCopy(Map rawMap, Class<K> keyType, Class<V> valueType, boolean strict) throws ClassCastException {
 	      Map<K,V> m2 = new HashMap<K,V>(rawMap.size() * 4 / 3 + 1);
 	      Iterator it = rawMap.entrySet().iterator();
 	      while (it.hasNext()) {

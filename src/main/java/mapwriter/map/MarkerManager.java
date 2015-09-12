@@ -3,6 +3,7 @@ package mapwriter.map;
 import java.util.ArrayList;
 import java.util.List;
 
+import mapwriter.Mw;
 import mapwriter.map.mapmode.MapMode;
 import mapwriter.util.Logging;
 import mapwriter.util.Utils;
@@ -127,7 +128,12 @@ public class MarkerManager {
 	
 	// returns true if the marker exists in the arraylist.
 	// safe to pass null.
-	public boolean delMarker(Marker markerToDelete) {
+	public boolean delMarker(Marker markerToDelete) 
+	{
+		if (this.selectedMarker == markerToDelete)
+		{
+			selectedMarker = null;
+		}
 		return this.markerList.remove(markerToDelete);
 	}
 	

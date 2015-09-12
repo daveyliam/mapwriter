@@ -4,6 +4,7 @@ import java.awt.Point;
 
 import mapwriter.map.mapmode.MapMode;
 import mapwriter.util.Render;
+import mapwriter.util.Utils;
 
 public class Marker {
 	public final String name;
@@ -15,12 +16,6 @@ public class Marker {
 	public int colour;
 	
 	public Point.Double screenPos = new Point.Double(0, 0);
-	
-	private static int[] colours = new int[] {
-    		0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff00ff, 0x00ffff,
-    		0xff8000, 0x8000ff};
-	// static so that current index is shared between all markers
-    private static int colourIndex = 0;
 	
 	public Marker(String name, String groupName, int x, int y, int z, int dimension, int colour) {
 		this.name = name;
@@ -37,18 +32,14 @@ public class Marker {
 				this.name, this.groupName, this.x, this.y, this.z, this.dimension, this.colour & 0xffffff);
 	}
 	
-	public static int getCurrentColour() {
-    	return 0xff000000 | colours[colourIndex];
-    }
-	
-    public void colourNext() {
-    	colourIndex = (colourIndex + 1) % colours.length;
-		this.colour = getCurrentColour();
+    public void colourNext() 
+    {
+		this.colour = Utils.getNextColour();
     }
     
-    public void colourPrev() {
-    	colourIndex = (colourIndex + colours.length - 1) % colours.length;
-		this.colour = getCurrentColour();
+    public void colourPrev() 
+    {
+		this.colour = Utils.getPrevColour();
     }
     
     public void draw(MapMode mapMode, MapView mapView, int borderColour) {

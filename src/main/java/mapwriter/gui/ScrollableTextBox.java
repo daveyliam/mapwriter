@@ -11,169 +11,85 @@ import net.minecraft.client.renderer.texture.TextureManager;
 
 import org.lwjgl.input.Keyboard;
 
-public class ScrollableTextBox extends GuiTextField
-	{
-		public int x;
-		public int y;
-		public int width;
-		// private int height;
-		public int labelX;
-		public int labelY;
-		public int labelWidth;
-		public int labelHeight;
-		public String label;
-		public boolean drawArrows = false;
-		public int leftArrowX;
-		public int rightArrowX;
-		public int arrowsY;
-		public static int arrowsWidth = 7;
-		public int arrowsHeight = 12;
+public class ScrollableTextBox extends ScrollableField
+	{		
 		public int textFieldX;
 		public int textFieldY;
 		public int textFieldWidth;
-		public static int textFieldHeight = 12;
+		private static int textFieldHeight = 12;
+		
 		public List<String> scrollableElements;
-		private final FontRenderer fontRendererInstance;
+		
+		protected GuiTextField textField;
 		
 		ScrollableTextBox(int x, int y, int width, String label, FontRenderer fontrendererObj) 
-		{
-			super(			
-				0,
-				fontrendererObj, 
-				x + arrowsWidth,
-				y, 
-				width - arrowsWidth * 2 - 25, 
-				textFieldHeight
-				);
-			
-			this.x = x;
-			this.y = y;
-			this.width = width;
-			this.label = label;
-			this.fontRendererInstance = fontrendererObj;
-			
+		{	
+			super(x, y, width, label, fontrendererObj);
 			this.init();
 		}
 
 		ScrollableTextBox(int x, int y, int width, String label, List<String> scrollableElements, FontRenderer fontrendererObj) 
-		{
-			super(			
-				0,
-				fontrendererObj, 
-				x + arrowsWidth,
-				y, 
-				width - arrowsWidth * 2 - 25, 
-				textFieldHeight
-				);
-			
-			this.x = x;
-			this.y = y;
-			this.width = width;
-			this.label = label;
+		{			
+			super(x, y, width, label, fontrendererObj);
 			this.scrollableElements = scrollableElements;
-			this.fontRendererInstance = fontrendererObj;
 			this.init();
 		}
 
-		private void init() {
-			setMaxStringLength(32);
-			this.textFieldX = x + arrowsWidth;
+		private void init() 
+		{
+			this.textFieldX = this.x + this.arrowsWidth + 3;
 			this.textFieldY = this.y;
-			this.textFieldWidth = width - arrowsWidth * 2 - 25;
-			this.labelWidth = fontRendererInstance
-					.getStringWidth(this.label);
-			this.labelHeight = this.fontRendererInstance.FONT_HEIGHT;
-			this.labelX = this.x - this.labelWidth - 4;
-			this.labelY = this.y + this.labelHeight / 2 - 2;
-			this.leftArrowX = this.x - 1;
-			this.rightArrowX = this.textFieldX + this.textFieldWidth + 1;
-			this.arrowsY = this.y;
+			this.textFieldWidth = this.width - 5 - ScrollableField.arrowsWidth * 2;
+			
+			textField = new GuiTextField(
+					0,
+					this.fontrendererObj,
+					this.textFieldX,
+					this.textFieldY, 
+					this.textFieldWidth, 
+					this.textFieldHeight
+					);
+			
+			textField.setMaxStringLength(32);
+
 		}
 
-		public void draw() {
-			drawString(this.fontRendererInstance, this.label, this.labelX, this.labelY, 0xffffff);
-			if (this.drawArrows) 
+		@Override
+		public void draw() 
+		{
+			super.draw();
+			this.textField.drawTextBox();
+			if (!this.validateTextFieldData()) 
 			{
-				TextureManager renderEngine = Minecraft.getMinecraft().renderEngine;
-				renderEngine.bindTexture(Reference.leftArrowTexture);
-				Render.drawTexturedRect(
-						this.leftArrowX, 
-						this.arrowsY,
-						ScrollableTextBox.arrowsWidth, 
-						this.arrowsHeight, 
-						0.0, 
-						0.0, 
-						1.0, 
-						1.0
-						);
-				renderEngine.bindTexture(Reference.rightArrowTexture);
-				Render.drawTexturedRect(
-						this.rightArrowX, 
-						this.arrowsY,
-						ScrollableTextBox.arrowsWidth, 
-						this.arrowsHeight, 
-						0.0, 
-						0.0, 
-						1.0, 
-						1.0
-						);
-			}
-			drawTextBox();
-			if (!this.validateTextFieldData()) {
-				drawRect(this.textFieldX - 1, this.textFieldY - 1,
-						this.textFieldX + this.textFieldWidth + 1,
-						this.textFieldY, 
-						0xff900000);
-				drawRect(this.textFieldX - 1, this.textFieldY - 1,
-						this.textFieldX, this.textFieldY + ScrollableTextBox.textFieldHeight	+ 1,
-						0xff900000);
-				drawRect(this.textFieldX + this.textFieldWidth + 1,
-						this.textFieldY + ScrollableTextBox.textFieldHeight + 1,
-						this.textFieldX,
-						this.textFieldY + ScrollableTextBox.textFieldHeight, 
-						0xff900000);
-				drawRect(this.textFieldX + this.textFieldWidth + 1,
-						this.textFieldY + ScrollableTextBox.textFieldHeight + 1,
-						this.textFieldX + this.textFieldWidth, this.textFieldY,
-						0xff900000);
+				//draw a red rectangle over the textbox to indicate that the text is invallid
+				int x1 = this.textFieldX - 1;
+				int y1 = this.textFieldY - 1;
+				int x2 = this.textFieldX + this.textFieldWidth;
+				int y2 = this.textFieldY + ScrollableTextBox.textFieldHeight;
+				int colour = 0xff900000;
+						
+				this.drawHorizontalLine(x1, x2, y1, colour);
+				this.drawHorizontalLine(x1, x2, y2, colour);
+				
+				this.drawVerticalLine(x1, y1, y2, colour);
+				this.drawVerticalLine(x2, y1, y2, colour);
 			}
 		}
 
-		public void mouseClicked(int x, int y, int button) {
-			int direction = this.posWithinArrows(x, y);
-			if (direction != 0)
-				this.textFieldScroll(direction);
+		@Override
+		public void mouseClicked(int x, int y, int button)
+		{
 			super.mouseClicked(x, y, button);
+			this.textField.mouseClicked(x, y, button);		
 		}
-
-		public void setDrawArrows(boolean value) {
-			this.drawArrows = value;
-		}
-
+		
 		public void mouseDWheelScrolled(int x, int y, int direction) {
 			if (posWithinTextField(x, y))
 				textFieldScroll(-direction);
 		}
 
 		public boolean validateTextFieldData() {
-			return getText().length() > 0;
-		}
-
-		/**
-		 * 
-		 * @return Returns clicked arrow: 1 for right and -1 for left
-		 */
-		public int posWithinArrows(int x, int y) {
-			if ((x >= this.leftArrowX) && (y >= this.arrowsY)
-					&& (x <= ScrollableTextBox.arrowsWidth + this.leftArrowX)
-					&& (y <= this.arrowsHeight + this.arrowsY))
-				return -1;
-			else if ((x >= this.rightArrowX) && (y >= this.arrowsY)
-					&& (x <= ScrollableTextBox.arrowsWidth + this.rightArrowX)
-					&& (y <= this.arrowsHeight + this.arrowsY))
-				return 1;
-			else
-				return 0;
+			return this.getText().length() > 0;
 		}
 
 		public boolean posWithinTextField(int x, int y) {
@@ -184,7 +100,7 @@ public class ScrollableTextBox extends GuiTextField
 
 		public void textFieldScroll(int direction) {
 			if (this.scrollableElements != null) {
-				int index = this.scrollableElements.indexOf(getText().trim());
+				int index = this.scrollableElements.indexOf( this.getText().trim());
 				if (direction > 0) {
 					if (index == -1
 							|| index == this.scrollableElements.size() - 1)
@@ -197,37 +113,138 @@ public class ScrollableTextBox extends GuiTextField
 					else
 						index--;
 				}
-				setText(this.scrollableElements.get(index));
+				 this.textField.setText(this.scrollableElements.get(index));
 			}
+		}
+
+		@Override
+		public void nextElement() 
+		{
+			this.textFieldScroll(1);
+		}
+
+		@Override
+		public void previousElement() 
+		{
+			this.textFieldScroll(-1);			
+		}
+	
+		public String getText()
+		{
+			return this.textField.getText();
+		}
+		
+		public void setText(String text)
+		{
+			this.textField.setText(text);
+		}
+	
+		public void setFocused(Boolean focus)
+		{
+			this.textField.setFocused(focus);
+			this.textField.setSelectionPos(0);
+		}
+		
+		public Boolean isFocused()
+		{
+			return this.textField.isFocused();
+		}
+		
+		public void KeyTyped(char c, int key)
+		{
+			this.textField.textboxKeyTyped(c, key);
+		}
+		
+		public int getCursorPosition()
+		{
+			return this.textField.getCursorPosition();
+		}
+		
+		public void setCursorPositionEnd()
+		{
+			this.textField.setCursorPositionEnd();
 		}
 	}
 
 class ScrollableNumericTextBox extends ScrollableTextBox {
 
+	public int maxValue = -1;
+	public int minValue = -1;
+	
 	public ScrollableNumericTextBox(int x, int y, int width, String label, FontRenderer fontrendererObj) {
 		super(x, y, width, label, fontrendererObj);
 	}
 
 	@Override
-	public void textFieldScroll(int direction) {
-		if (this.validateTextFieldData()) {
-			int value = this.getTextFieldIntValue();
+	public void textFieldScroll(int direction) 
+	{
+		int newValue = 0;
+		if (this.validateTextFieldData()) 
+		{
+			newValue = this.getTextFieldIntValue();
 			if (direction > 0)
-				setText("" + (value + 1));
+			{
+				if(this.maxValue < 0 || newValue + 1 <= this.maxValue)
+				{
+					newValue += 1;
+				}
+			}
 			else if (direction < 0)
-				setText("" + (value - 1));
+			{
+				if(this.minValue < 0 || newValue - 1 >= this.minValue)
+				{
+					newValue -= 1;
+				}
+			}
+		}
+			this.setText(newValue);
+	}
+
+	public int getTextFieldIntValue() 
+	{
+	     try 
+	     {
+	    	 return Integer.parseInt(this.getText());
+	     }
+	     catch (NumberFormatException e) 
+	     {
+	    	 return 0;
+	     }  
+	}
+	 
+	public void setText(int num)
+	{
+		if(this.maxValue < 0 || num <= this.maxValue || num >= this.minValue )
+		{
+			this.setText(Integer.toString(num));	
 		}
 	}
 
-	public int getTextFieldIntValue() {
-		return Integer.parseInt(getText());
-	}
-
-	public void validateTextboxKeyTyped(char c, int key) {
+	@Override
+	public void KeyTyped(char c, int key) 
+	{
 		if ((c >= '0' && c <= '9') || key == Keyboard.KEY_BACK
 				|| key == Keyboard.KEY_LEFT || key == Keyboard.KEY_RIGHT
-				|| (c == '-' && (getCursorPosition() == 0)))
-			textboxKeyTyped(c, key);
+				|| (c == '-' && (this.getCursorPosition() == 0))
+				)
+		{
+			if (Character.isDigit(c) && (this.maxValue > -1 && Integer.parseInt(this.getText() + c) > this.maxValue))
+			{
+				return;
+			}
+			super.KeyTyped(c, key);
+		}
+	}
+	
+	public void setMaxValue(int max)
+	{
+		this.maxValue = max;
+		this.textField.setMaxStringLength(Integer.toString(max).length());
+	}
+	
+	public void setMinValue(int min)
+	{
+		this.minValue = min;
 	}
 }
 
