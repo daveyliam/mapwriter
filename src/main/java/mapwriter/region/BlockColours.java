@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
 
+import mapwriter.util.Logging;
 import mapwriter.util.Render;
 import net.minecraft.block.Block;
 
@@ -163,7 +164,7 @@ public class BlockColours {
 		} else if (typeString.equalsIgnoreCase("opaque")) {
 			blockType = BlockType.OPAQUE;
 		} else {
-			RegionManager.logWarning("unknown block type '%s'", typeString);
+			Logging.logWarning("unknown block type '%s'", typeString);
 		}
 		return blockType;
 	}
@@ -306,12 +307,12 @@ public class BlockColours {
 					this.setBiomeFoliageShading(biomeId, foliageMultiplier);
 				}
 			} else {
-				RegionManager.logWarning("biome ID '%d' out of range",
+				Logging.logWarning("biome ID '%d' out of range",
 						startBiomeId);
 			}
 
 		} catch (NumberFormatException e) {
-			RegionManager.logWarning(
+			Logging.logWarning(
 					"invalid biome colour line '%s %s %s %s %s'", split[0],
 					split[1], split[2], split[3], split[4]);
 		}
@@ -330,7 +331,7 @@ public class BlockColours {
 			this.setColour(split[1], split[2], colour);
 
 		} catch (NumberFormatException e) {
-			RegionManager.logWarning("invalid block colour line '%s %s %s %s'",
+			Logging.logWarning("invalid block colour line '%s %s %s %s'",
 					split[0], split[1], split[2], split[3]);
 		}
 	}
@@ -341,7 +342,7 @@ public class BlockColours {
 			BlockType type = getBlockTypeFromString(split[3]);
 			this.setBlockType(split[1], split[2], type);
 		} catch (NumberFormatException e) {
-			RegionManager.logWarning("invalid block colour line '%s %s %s %s'",
+			Logging.logWarning("invalid block colour line '%s %s %s %s'",
 					split[0], split[1], split[2], split[3]);
 		}
 	}
@@ -365,13 +366,13 @@ public class BlockColours {
 							&& (lineSplit.length == 4)) {
 						this.loadBlockTypeLine(lineSplit);
 					} else {
-						RegionManager.logWarning(
+						Logging.logWarning(
 								"invalid map colour line '%s'", line);
 					}
 				}
 			}
 		} catch (IOException e) {
-			RegionManager.logError("loading block colours: no such file '%s'",
+			Logging.logError("loading block colours: no such file '%s'",
 					f);
 
 		} finally {
@@ -521,7 +522,7 @@ public class BlockColours {
 			this.saveBlocks(fout);
 
 		} catch (IOException e) {
-			RegionManager.logError(
+			Logging.logError(
 					"saving block colours: could not write to '%s'", f);
 
 		} finally {
@@ -557,6 +558,7 @@ public class BlockColours {
 					+ "blocktype minecraft:flowing_water * water	# flowing water block\n"
 					+ "blocktype minecraft:water * water			# still water block\n"
 					+ "blocktype minecraft:leaves * leaves    		# leaves block\n"
+					+ "blocktype minecraft:leaves2 * leaves    		# leaves block\n"
 					+ "blocktype minecraft:leaves 1 opaque    		# pine leaves (not biome colorized)\n"
 					+ "blocktype minecraft:leaves 2 opaque    		# birch leaves (not biome colorized)\n"
 					+ "blocktype minecraft:tallgrass * grass     	# tall grass block\n"
@@ -585,7 +587,7 @@ public class BlockColours {
 			// + "blocktype 3278 * opaque 						# natura rare leaves\n"
 			// + "blocktype 3258 * opaque  						# natura sakura leaves\n"
 		} catch (IOException e) {
-			RegionManager.logError(
+			Logging.logError(
 					"saving block overrides: could not write to '%s'", f);
 
 		} finally {

@@ -7,6 +7,8 @@ import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 
+import mapwriter.util.Logging;
+
 public class SurfacePixels {
 	
 	protected Region region;
@@ -131,7 +133,7 @@ public class SurfacePixels {
 			//MwUtil.log("writing region %s to %s", this, this.imageFile);
 			ImageIO.write(img, "png", filename);
 		} catch (IOException e) {
-			RegionManager.logError("saveImage: error: could not write image to %s", filename);
+			Logging.logError("saveImage: error: could not write image to %s", filename);
 		}
 	}
 	
@@ -148,7 +150,7 @@ public class SurfacePixels {
 				pixels = new int[w * h];
 				img.getRGB(0, 0, w, h, pixels, 0, w);
 			} else {
-				RegionManager.logWarning(
+				Logging.logWarning(
 						"loadImage: image '%s' does not match expected dimensions (got %dx%d expected %dx%d)",
 						filename, img.getWidth(), img.getHeight(), w, h
 				);

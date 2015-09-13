@@ -6,6 +6,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import mapwriter.util.Logging;
+
 import org.apache.logging.log4j.Logger;
 
 public class RegionManager {
@@ -45,24 +47,6 @@ public class RegionManager {
 	public int maxZoom;
 	public int minZoom;
 	
-	public static void logInfo(String s, Object...args) {
-		if (logger != null) {
-			logger.info(String.format(s, args));
-		}
-	}
-	
-	public static void logWarning(String s, Object...args) {
-		if (logger != null) {
-			logger.warn(String.format(s, args));
-		}
-	}
-	
-	public static void logError(String s, Object...args) {
-		if (logger != null) {
-			logger.error(String.format(s, args));
-		}
-	}
-	
 	public RegionManager(File worldDir, File imageDir, BlockColours blockColours, int minZoom, int maxZoom) {
 		this.worldDir = worldDir;
 		this.imageDir = imageDir;
@@ -93,17 +77,17 @@ public class RegionManager {
 	}
 	
 	public void printLoadedRegionStats() {
-		logInfo("loaded region listing:");
+		Logging.logInfo("loaded region listing:");
 		Map<String, Integer> stats = new HashMap<String, Integer>();
 		for (Region region : this.regionMap.values()) {
-			logInfo("  %s", region);
+			Logging.logInfo("  %s", region);
 			incrStatsCounter(stats, String.format("dim%d", region.dimension));
 			incrStatsCounter(stats, String.format("zoom%d", region.zoomLevel));
 			incrStatsCounter(stats, "total");
 		}
-		logInfo("loaded region stats:");
+		Logging.logInfo("loaded region stats:");
 		for (Entry<String, Integer> e : stats.entrySet()) {
-			logInfo("  %s: %d", e.getKey(), e.getValue());
+			Logging.logInfo("  %s: %d", e.getKey(), e.getValue());
 		}
 	}
 	
@@ -132,7 +116,7 @@ public class RegionManager {
 		w = (w + Region.SIZE) & Region.MASK;
 		h = (h + Region.SIZE) & Region.MASK;
 		
-		logInfo("rebuilding regions from (%d, %d) to (%d, %d)", xStart, zStart, xStart + w, zStart + h);
+		Logging.logInfo("rebuilding regions from (%d, %d) to (%d, %d)", xStart, zStart, xStart + w, zStart + h);
 		
 		for (int rX = xStart; rX < (xStart + w); rX += Region.SIZE) {
 			for (int rZ = zStart; rZ < (zStart + h); rZ += Region.SIZE) {

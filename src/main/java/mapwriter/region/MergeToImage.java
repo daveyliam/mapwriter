@@ -6,6 +6,8 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import mapwriter.util.Logging;
+
 public class MergeToImage {
 	public static final int MAX_WIDTH = 8192;
 	public static final int MAX_HEIGHT = 8192;
@@ -62,7 +64,7 @@ public class MergeToImage {
 		int xMax = xMin + w;
 		int zMax = zMin + h;
 		
-		RegionManager.logInfo("merging area starting at (%d,%d), %dx%d blocks",
+		Logging.logInfo("merging area starting at (%d,%d), %dx%d blocks",
 				xMin, zMin, w, h);
 		
 		
@@ -76,7 +78,7 @@ public class MergeToImage {
 				
 				String imgName = String.format("%s.%d.%d.png", basename, countX, countZ);
 				File f = new File(dir, imgName);
-				RegionManager.logInfo("merging regions to image %s", f);
+				Logging.logInfo("merging regions to image %s", f);
 				
 				BufferedImage img = mergeRegions(regionManager, x, z, imgW, imgH, dimension);
 				writeImage(img, f);

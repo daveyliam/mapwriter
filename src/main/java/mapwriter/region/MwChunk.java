@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import mapwriter.util.Logging;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -118,9 +119,7 @@ public class MwChunk implements IChunk {
 				int zNbt = level.getInteger("zPos");
 
 				if ((xNbt != x) || (zNbt != z)) {
-					RegionManager.logWarning(
-							"chunk (%d, %d) has NBT coords (%d, %d)", x, z,
-							xNbt, zNbt);
+					Logging.logWarning("chunk (%d, %d) has NBT coords (%d, %d)", x, z, xNbt, zNbt);
 				}
 
 				NBTTagList sections = level.getTagList("Sections", 10);
@@ -165,15 +164,12 @@ public class MwChunk implements IChunk {
 				}
 
 			} catch (IOException e) {
-				RegionManager.logError(
-						"%s: could not read chunk (%d, %d) from region file\n",
-						e, x, z);
+				Logging.logError("%s: could not read chunk (%d, %d) from region file\n",e, x, z);
 			} finally {
 				try {
 					dis.close();
 				} catch (IOException e) {
-					RegionManager.logError(
-							"MwChunk.read: %s while closing input stream", e);
+					Logging.logError("MwChunk.read: %s while closing input stream", e);
 				}
 			}
 			// this.log("MwChunk.read: chunk (%d, %d) empty=%b", this.x, this.z,
@@ -422,29 +418,20 @@ public class MwChunk implements IChunk {
 					// Data
 					CompressedStreamTools.write(writeChunkToNBT(), dos);
 				} catch (IOException e) {
-					RegionManager
-							.logError(
-									"%s: could not write chunk (%d, %d) to region file",
-									e, this.x, this.z);
+					Logging.logError("%s: could not write chunk (%d, %d) to region file", e, this.x, this.z);
 					error = true;
 				} finally {
 					try {
 						dos.close();
 					} catch (IOException e) {
-						RegionManager.logError(
-								"%s while closing chunk data output stream", e);
+						Logging.logError(	"%s while closing chunk data output stream", e);
 					}
 				}
 			} else {
-				RegionManager
-						.logError(
-								"error: could not get output stream for chunk (%d, %d)",
-								this.x, this.z);
+				Logging.logError("error: could not get output stream for chunk (%d, %d)", this.x, this.z);
 			}
 		} else {
-			RegionManager.logError(
-					"error: could not open region file for chunk (%d, %d)",
-					this.x, this.z);
+			Logging.logError("error: could not open region file for chunk (%d, %d)", this.x, this.z);
 		}
 
 		return error;

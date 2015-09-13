@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
+import mapwriter.util.Logging;
+
 /* 
 Anvil region file reader/writer implementation.
 This code is very similar to RegionFile and RegionFileChunkBuffer from Minecraft.
@@ -71,7 +73,7 @@ public class RegionFile {
 		}
 		for (int i = section.startSector; i < endSector; i++) {
 			if (filled && this.filledSectorArray.get(i)) {
-				RegionManager.logError("sector %d already filled, possible chunk overlap", i);
+				Logging.logError("sector %d already filled, possible chunk overlap", i);
 			}
 			this.filledSectorArray.set(i, Boolean.valueOf(filled));
 		}
@@ -144,7 +146,7 @@ public class RegionFile {
 				freeCount++;
 			}
 		}
-		RegionManager.logInfo("Region File %s: filled sectors = %d, free sectors = %d", this, filledCount, freeCount);
+		Logging.logInfo("Region File %s: filled sectors = %d, free sectors = %d", this, filledCount, freeCount);
 		
 		String s = "";
 		int i;
@@ -154,11 +156,11 @@ public class RegionFile {
 			}
 			s += this.filledSectorArray.get(i) ? '1' : '0';
 			if ((i & 31) == 31) {
-				RegionManager.logInfo("%s", s);
+				Logging.logInfo("%s", s);
 			}
 		}
 		if ((i & 31) != 31) {
-			RegionManager.logInfo("%s", s);
+			Logging.logInfo("%s", s);
 		}
 	}
 	
@@ -182,12 +184,12 @@ public class RegionFile {
 		File dir = this.file.getParentFile();
 		if (dir.exists()) {
 			if (!dir.isDirectory()) {
-				RegionManager.logError("path %s exists and is not a directory", dir);
+				Logging.logError("path %s exists and is not a directory", dir);
 				return true;
 			}
 		} else {
 			if (!dir.mkdirs()) {
-				RegionManager.logError("could not create directory %s", dir);
+				Logging.logError("could not create directory %s", dir);
 				return true;
 			}
 		}
@@ -220,7 +222,7 @@ public class RegionFile {
 							this.chunkSectionsArray[i] = section;
 							this.setFilledSectorArray(section, true);
 						} else {
-							RegionManager.logError("chunk %d overlaps another chunk, file may be corrupt", i);
+							Logging.logError("chunk %d overlaps another chunk, file may be corrupt", i);
 						}
 					}
 				}
@@ -233,7 +235,7 @@ public class RegionFile {
 			
 		} catch (Exception e) {
 			this.fin = null;
-			RegionManager.logError("exception when opening region file '%s': %s", this.file, e);
+			Logging.logError("exception when opening region file '%s': %s", this.file, e);
 			
 		}
 		
@@ -266,10 +268,10 @@ public class RegionFile {
 						// create a buffered inflater stream on the compressed data
 						dis = new DataInputStream(new BufferedInputStream(new InflaterInputStream(new ByteArrayInputStream(compressedChunkData))));
 					} else {
-						RegionManager.logError("data length (%d) or version (%d) invalid for chunk (%d, %d)", length, version, x, z);
+						Logging.logError("data length (%d) or version (%d) invalid for chunk (%d, %d)", length, version, x, z);
 					}
 				} catch (Exception e) {
-					RegionManager.logError("exception while reading chunk (%d, %d): %s", x, z, e);
+					Logging.logError("exception while reading chunk (%d, %d): %s", x, z, e);
 					dis = null;
 				}
 			}
@@ -331,7 +333,7 @@ public class RegionFile {
 		// free sectors longer than the length of the chunk data, or the end of the file (append).
 		
 		if (length <= 0) {
-			RegionManager.logWarning("not writing chunk (%d, %d) with length %d", x, z, length);
+			Logging.logWarning("not writing chunk (%d, %d) with length %d", x, z, length);
 			return true;
 		}
 		
@@ -364,7 +366,7 @@ public class RegionFile {
 			this.updateChunkSection(x, z, newSection);
 			error = false;
 		} catch (IOException e) {
-			RegionManager.logError("could not write chunk (%d, %d) to region file: %s", x, z, e);
+			Logging.logError("could not write chunk (%d, %d) to region file: %s", x, z, e);
 		}
 		
 		return error;
