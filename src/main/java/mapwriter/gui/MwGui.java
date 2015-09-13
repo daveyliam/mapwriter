@@ -348,7 +348,7 @@ public class MwGui extends GuiScreen {
 				(int) this.mapView.getWidth(), (int) this.mapView.getHeight(),
 				(int) this.mapView.getMinX(), (int) this.mapView.getMinZ()));
 		// this.mw.reloadBlockColours();
-		this.mw.executor.addTask2(new RebuildRegionsTask(this.mw,
+		this.mw.executor.addTask(new RebuildRegionsTask(this.mw,
 				(int) this.mapView.getMinX(), (int) this.mapView.getMinZ(),
 				(int) this.mapView.getWidth(), (int) this.mapView.getHeight(),
 				this.mapView.getDimension()));

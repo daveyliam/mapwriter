@@ -121,13 +121,14 @@ public class ChunkManager {
 				
 				if ((flags & VISIBLE_FLAG) != 0) {
 					chunkArray[i] = copyToMwChunk(chunk);
+					this.mw.executor.addTask(new UpdateSurfaceChunksTask(this.mw, chunkArray[i]));
 				} else {
 					chunkArray[i] = null;
 				}
 			}
 		}
 		
-		this.mw.executor.addTask(new UpdateSurfaceChunksTask(this.mw, chunkArray));
+		//this.mw.executor.addTask(new UpdateSurfaceChunksTask(this.mw, chunkArray));
 	}
 	
 	public void onTick() {
@@ -140,15 +141,11 @@ public class ChunkManager {
 		}
 	}
 	
-	public void forceChunks(MwChunk[] chunkArray){
-		this.mw.executor.addTask(new UpdateSurfaceChunksTask(this.mw, chunkArray));
-	}
-	
 	private void addSaveChunkTask(Chunk chunk) {
 		if ((Minecraft.getMinecraft().isSingleplayer() && Config.regionFileOutputEnabledMP) || 
 			(!Minecraft.getMinecraft().isSingleplayer() && Config.regionFileOutputEnabledSP)) {
 			if (!chunk.isEmpty()) {
-				this.mw.executor.addTask2(new SaveChunkTask(copyToMwChunk(chunk), this.mw.regionManager));
+				this.mw.executor.addTask(new SaveChunkTask(copyToMwChunk(chunk), this.mw.regionManager));
 			}
 		}
 	}

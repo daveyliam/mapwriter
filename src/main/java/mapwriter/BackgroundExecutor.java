@@ -1,15 +1,17 @@
 package mapwriter;
 
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import mapwriter.tasks.Task;
+import mapwriter.tasks.UpdateSurfaceChunksTask;
 import mapwriter.util.Logging;
-
-
+import net.minecraft.world.ChunkCoordIntPair;
 
 /*
 This class handles executing and managing 'tasks'.
@@ -49,33 +51,47 @@ may run in the order:
 public class BackgroundExecutor {
 	
 	private ExecutorService executor;
-	private ExecutorService executor2;
 	private LinkedList<Task> taskQueue;
+	private Map chunksUpdating = new HashMap<Long,UpdateSurfaceChunksTask>();
 	public boolean closed = false;
 	
 	public BackgroundExecutor() {
 		this.executor = Executors.newSingleThreadExecutor();
 		this.taskQueue = new LinkedList<Task>();
-		this.executor2 = Executors.newSingleThreadExecutor();
 	}
 	
 	// add a task to the queue
 	public boolean addTask(Task task) {
-		if (!this.closed) {
-			Future<?> future = this.executor.submit(task);
-			task.setFuture(future);
-			this.taskQueue.add(task);
-		} else {
-			Logging.log("MwExecutor.addTask: error: cannot add task to closed executor");
-		}
-		return this.closed;
-	}
-	
-	public boolean addTask2(Task task) {
-		if (!this.closed) {
-			Future<?> future = this.executor2.submit(task);
-			task.setFuture(future);
-			this.taskQueue.add(task);
+		if (!this.closed) 
+		{
+			if (task instanceof UpdateSurfaceChunksTask)
+			{
+				UpdateSurfaceChunksTask updatetask = (UpdateSurfaceChunksTask) task;
+				Long coords = ChunkCoordIntPair.chunkXZ2Int(updatetask.getChunkX(), updatetask.getChunkZ());
+				
+				if (!chunksUpdating.containsKey(coords))
+				{
+					Future<?> future = this.executor.submit(task);
+					task.setFuture(future);
+					this.taskQueue.add(task);	
+					chunksUpdating.put(coords, task);
+				}
+				else
+				{
+					UpdateSurfaceChunksTask task2 = (UpdateSurfaceChunksTask)chunksUpdating.get(coords);
+					if(task2.Running.get() == false)
+					{
+						task2.UpdateChunkData(((UpdateSurfaceChunksTask)task).getChunk());
+					}	
+				}				
+			}
+			else
+			{
+				Future<?> future = this.executor.submit(task);
+				task.setFuture(future);
+				this.taskQueue.add(task);
+			}
+			
 		} else {
 			Logging.log("MwExecutor.addTask: error: cannot add task to closed executor");
 		}
@@ -92,6 +108,15 @@ public class BackgroundExecutor {
 			if (task.isDone()) {
 				task.printException();
 				task.onComplete();
+				
+				if (task instanceof UpdateSurfaceChunksTask)
+				{
+					UpdateSurfaceChunksTask updatetask = (UpdateSurfaceChunksTask) task;
+					Long coords = ChunkCoordIntPair.chunkXZ2Int(updatetask.getChunkX(), updatetask.getChunkZ());
+					
+					chunksUpdating.remove(coords, updatetask);
+				
+				}
 				processed = true;
 			} else {
 				// put entry back on top of queue
