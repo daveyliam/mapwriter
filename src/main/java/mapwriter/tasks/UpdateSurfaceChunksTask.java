@@ -22,7 +22,7 @@ public class UpdateSurfaceChunksTask extends Task {
 	
 	@Override
 	public void run() {
-		Running.set(true);;
+		Running.set(true);
 		//for (MwChunk chunk : this.chunkArray) {
 			if (chunk != null) {
 				// update the chunk in the region pixels
