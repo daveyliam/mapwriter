@@ -359,6 +359,8 @@ public class MwChunk implements IChunk {
 
 		iterator1 = this.tileentityMap.values().iterator();
 
+		int skipped = 0;
+		
 		while (iterator1.hasNext()) {
 			TileEntity tileentity = (TileEntity) iterator1.next();
 			nbttagcompound2 = new NBTTagCompound();
@@ -366,11 +368,9 @@ public class MwChunk implements IChunk {
 				tileentity.writeToNBT(nbttagcompound2);
 				nbttaglist3.appendTag(nbttagcompound2);
 			} catch (Exception e) {
-				FMLLog.log(
-						Level.ERROR,
-						e,
-						"A TileEntity type %s has throw an exception trying to write state. It will not persist. Report this to the mod author",
-						tileentity.getClass().getName());
+				//ignoring errors here becouse they will happen.
+				//mods might have server only code behind this method and thus we will fail when calling it.
+				//this is not a direct problem, the tile entity will just get lost in the local mapwriter save of the world
 			}
 		}
 		nbttagcompound1.setTag("TileEntities", nbttaglist3);
