@@ -10,30 +10,36 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  * @author TheTemportalist
  */
 @SideOnly(Side.CLIENT)
-public class Api {
+public class Api
+{
 
 	/**
 	 * Checks if NotEnoughKeys is loaded in the current environment
 	 *
 	 * @return 'true' if loaded
 	 */
-	public static boolean isLoaded() {
+	public static boolean isLoaded()
+	{
 		return Loader.isModLoaded("notenoughkeys");
 	}
 
 	/**
 	 * Registers a mod's keys with NEK
 	 *
-	 * @param modname        The NAME of the mod registering the key
-	 * @param keyDescriptions A String[] (Array[String]) of the key descriptions
-	 *                           as an inherit array. i.e. ("modName", "key.hotbar1", "key.hotbar2")
+	 * @param modname
+	 *            The NAME of the mod registering the key
+	 * @param keyDescriptions
+	 *            A String[] (Array[String]) of the key descriptions as an
+	 *            inherit array. i.e. ("modName", "key.hotbar1", "key.hotbar2")
 	 */
-	public static void registerMod(String modname, String... keyDescriptions) {
-		try {
-			Class.forName("modwarriors.notenoughkeys.keys.KeyHelper").getMethod(
-					"registerMod", String.class, String[].class
-			).invoke(null, modname, keyDescriptions);
-		} catch (Exception e) {
+	public static void registerMod(String modname, String... keyDescriptions)
+	{
+		try
+		{
+			Class.forName("modwarriors.notenoughkeys.keys.KeyHelper").getMethod("registerMod", String.class, String[].class).invoke(null, modname, keyDescriptions);
+		}
+		catch (Exception e)
+		{
 			e.printStackTrace();
 		}
 	}

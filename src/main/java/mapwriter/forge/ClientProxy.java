@@ -15,26 +15,31 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 
+public class ClientProxy extends CommonProxy
+{
 
-public class ClientProxy extends CommonProxy {
-
-	public void preInit(File configFile) 
+	@Override
+	public void preInit(File configFile)
 	{
 		ConfigurationHandler.init(configFile);
 		FMLCommonHandler.instance().bus().register(new ConfigurationHandler());
 	}
 
-	public void load() {
+	@Override
+	public void load()
+	{
 		EventHandler eventHandler = new EventHandler(Mw.getInstance());
 		MinecraftForge.EVENT_BUS.register(eventHandler);
 		FMLCommonHandler.instance().bus().register(eventHandler);
-		
+
 		MwKeyHandler keyEventHandler = new MwKeyHandler();
 		FMLCommonHandler.instance().bus().register(keyEventHandler);
 		MinecraftForge.EVENT_BUS.register(keyEventHandler);
 	}
 
-	public void postInit() {
+	@Override
+	public void postInit()
+	{
 		if (Loader.isModLoaded("VersionChecker"))
 		{
 			FMLInterModComms.sendRuntimeMessage(Reference.MOD_ID, "VersionChecker", "addVersionCheck", Reference.VersionURL);
@@ -45,10 +50,12 @@ public class ClientProxy extends CommonProxy {
 			Thread versionCheckThread = new Thread(versionCheck, "Version Check");
 			versionCheckThread.start();
 		}
-		if (Loader.isModLoaded("CarpentersBlocks")) {
+		if (Loader.isModLoaded("CarpentersBlocks"))
+		{
 			MwChunk.carpenterdata();
 		}
-		if (Loader.isModLoaded("ForgeMultipart")) {
+		if (Loader.isModLoaded("ForgeMultipart"))
+		{
 			MwChunk.FMPdata();
 
 		}

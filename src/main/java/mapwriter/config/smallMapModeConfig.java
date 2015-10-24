@@ -4,25 +4,25 @@ import mapwriter.util.Reference;
 
 public class smallMapModeConfig extends largeMapModeConfig
 {
-	public smallMapModeConfig(String configCategory) 
+	public smallMapModeConfig(String configCategory)
 	{
 		super(configCategory);
 	}
-	
+
 	@Override
 	public void loadConfig()
 	{
 		super.loadConfig();
-		this.heightPercent = ConfigurationHandler.configuration.getInt("heightPercent",this.configCategory, this.heightPercentDef, 0, 100, "mw.config.map.heightPercent");
+		this.heightPercent = ConfigurationHandler.configuration.getInt("heightPercent", this.configCategory, this.heightPercentDef, 0, 100, "mw.config.map.heightPercent");
 		this.Position = ConfigurationHandler.configuration.getString("Position", this.configCategory, this.PositionDef, "mw.config.map.Position", miniMapPositionStringArray);
 	}
-	
+
 	@Override
 	public void setDefaults()
-	{		
+	{
 		this.rotateDef = true;
 		this.circularDef = true;
-		this.coordsModeDef = coordsModeStringArray[1];	
+		this.coordsModeDef = coordsModeStringArray[1];
 		this.borderModeDef = true;
 		this.playerArrowSizeDef = 4;
 		this.markerSizeDef = 3;

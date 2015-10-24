@@ -9,33 +9,34 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class MwGuiTeleportDialog extends MwGuiTextDialog {
+public class MwGuiTeleportDialog extends MwGuiTextDialog
+{
 
 	final Mw mw;
 	final MapView mapView;
 	final int teleportX, teleportZ;
-    
-    public MwGuiTeleportDialog(GuiScreen parentScreen, Mw mw, MapView mapView, int x, int y, int z) {
-        super(parentScreen, 
-        		I18n.format("mw.gui.mwguimarkerdialognew.title", new Object[0]) + ":", 
-        		Integer.toString(y), 
-        		I18n.format("mw.gui.mwguimarkerdialognew.error", new Object[0]));
-        this.mw = mw;
-        this.mapView = mapView;
-        this.teleportX = x;
-        this.teleportZ = z;
-        this.backToGameOnSubmit = true;
-    }
-    	
+
+	public MwGuiTeleportDialog(GuiScreen parentScreen, Mw mw, MapView mapView, int x, int y, int z)
+	{
+		super(parentScreen, I18n.format("mw.gui.mwguimarkerdialognew.title", new Object[0]) + ":", Integer.toString(y), I18n.format("mw.gui.mwguimarkerdialognew.error", new Object[0]));
+		this.mw = mw;
+		this.mapView = mapView;
+		this.teleportX = x;
+		this.teleportZ = z;
+		this.backToGameOnSubmit = true;
+	}
+
 	@Override
-	public boolean submit() {
+	public boolean submit()
+	{
 		boolean done = false;
 		int height = this.getInputAsInt();
-		if (this.inputValid) {
-    		height = Math.min(Math.max(0, height), 255);
-    		Config.defaultTeleportHeight = height;
-    		this.mw.teleportToMapPos(this.mapView, this.teleportX, height, this.teleportZ);
-    		done = true;
+		if (this.inputValid)
+		{
+			height = Math.min(Math.max(0, height), 255);
+			Config.defaultTeleportHeight = height;
+			this.mw.teleportToMapPos(this.mapView, this.teleportX, height, this.teleportZ);
+			done = true;
 		}
 		return done;
 	}

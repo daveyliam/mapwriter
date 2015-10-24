@@ -15,7 +15,8 @@ import net.minecraftforge.fml.common.gameevent.InputEvent;
 
 import org.lwjgl.input.Keyboard;
 
-public class MwKeyHandler {
+public class MwKeyHandler
+{
 	public static KeyBinding keyMapGui = new KeyBinding("key.mw_open_gui", Keyboard.KEY_M, "Mapwriter");
 	public static KeyBinding keyNewMarker = new KeyBinding("key.mw_new_marker", Keyboard.KEY_INSERT, "Mapwriter");
 	public static KeyBinding keyMapMode = new KeyBinding("key.mw_next_map_mode", Keyboard.KEY_N, "Mapwriter");
@@ -24,9 +25,8 @@ public class MwKeyHandler {
 	public static KeyBinding keyZoomIn = new KeyBinding("key.mw_zoom_in", Keyboard.KEY_PRIOR, "Mapwriter");
 	public static KeyBinding keyZoomOut = new KeyBinding("key.mw_zoom_out", Keyboard.KEY_NEXT, "Mapwriter");
 	public static KeyBinding keyUndergroundMode = new KeyBinding("key.mw_underground_mode", Keyboard.KEY_U, "Mapwriter");
-	//public static KeyBinding keyQuickLargeMap = new KeyBinding("key.mw_quick_large_map", Keyboard.KEY_NONE);
-	
-	public final KeyBinding[] keys = 
+
+	public final KeyBinding[] keys =
 		{
 			keyMapGui,
 			keyNewMarker,
@@ -36,8 +36,8 @@ public class MwKeyHandler {
 			keyZoomIn,
 			keyZoomOut,
 			keyUndergroundMode
-	};
-	
+		};
+
 	public MwKeyHandler()
 	{
 		ArrayList<String> listKeyDescs = new ArrayList<String>();
@@ -49,14 +49,14 @@ public class MwKeyHandler {
 				ClientRegistry.registerKeyBinding(key);
 			}
 			listKeyDescs.add(key.getKeyDescription());
-			}
-		
+		}
+
 		if (Loader.isModLoaded("notenoughkeys"))
 		{
 			Api.registerMod(Reference.MOD_ID, listKeyDescs.toArray(new String[0]));
 		}
 	}
-	
+
 	@SubscribeEvent
 	public void keyEvent(InputEvent.KeyInputEvent event)
 	{
@@ -65,19 +65,19 @@ public class MwKeyHandler {
 			this.checkKeys();
 		}
 	}
-	
+
 	@Optional.Method(modid = "notenoughkeys")
 	@SubscribeEvent
-	public void keyEventSpecial(KeyBindingPressedEvent event) 
+	public void keyEventSpecial(KeyBindingPressedEvent event)
 	{
 		Mw.getInstance().onKeyDown(event.keyBinding);
 	}
-	
-	private void checkKeys() 
+
+	private void checkKeys()
 	{
-		for (KeyBinding key : keys) 
+		for (KeyBinding key : this.keys)
 		{
-			if (key != null && key.isPressed()) 
+			if ((key != null) && key.isPressed())
 			{
 				Mw.getInstance().onKeyDown(key);
 			}

@@ -10,33 +10,42 @@ import net.minecraftforge.fml.common.Loader;
 
 import org.apache.commons.io.IOUtils;
 
-public class VersionCheck implements Runnable {
+public class VersionCheck implements Runnable
+{
 	private static boolean isLatestVersion = true;
 	private static String latestVersion = "";
 	private static String updateURL = "";
 
 	/**
 	 * @author jabelar
-	 * @link 
+	 * @link
 	 *       http://jabelarminecraft.blogspot.nl/p/minecraft-forge-1721710-making
 	 *       -mod.html
 	 */
 
 	@Override
-	public void run() {
+	public void run()
+	{
 		InputStream in = null;
-		try {
+		try
+		{
 			in = new URL(Reference.VersionURL).openStream();
-		} catch (MalformedURLException e) {
-		} catch (IOException e) {
+		}
+		catch (MalformedURLException e)
+		{
+		}
+		catch (IOException e)
+		{
 		}
 
-		try {
+		try
+		{
 			List<String> list = IOUtils.readLines(in);
 			int index = -1;
-			for (int i = 0; i < list.size(); i++) {
-				if (list.get(i)
-						.contains(Loader.instance().getMCVersionString())) {
+			for (int i = 0; i < list.size(); i++)
+			{
+				if (list.get(i).contains(Loader.instance().getMCVersionString()))
+				{
 					index = i;
 					break;
 				}
@@ -55,19 +64,23 @@ public class VersionCheck implements Runnable {
 			VersionCheck.updateURL = updateURL;
 
 			isLatestVersion = Reference.VERSION.equals(version);
-		} catch (IOException e) {
+		}
+		catch (IOException e)
+		{
 		}
 
 	}
 
-	public static boolean isLatestVersion() {
+	public static boolean isLatestVersion()
+	{
 		return isLatestVersion;
 	}
 
-	public static String getLatestVersion() {
+	public static String getLatestVersion()
+	{
 		return latestVersion;
 	}
-	
+
 	public static String getUpdateURL()
 	{
 		return updateURL;

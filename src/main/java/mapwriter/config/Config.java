@@ -2,13 +2,15 @@ package mapwriter.config;
 
 import mapwriter.util.Reference;
 
-public class Config {
-	public static final String[] backgroundModeStringArray = {
+public class Config
+{
+	public static final String[] backgroundModeStringArray =
+		{
 		"none",
 		"static",
 		"panning"
-	};
-	
+		};
+
 	// configuration options
 	public static boolean linearTextureScalingDef = true;
 	public static boolean linearTextureScaling = linearTextureScalingDef;
@@ -56,16 +58,16 @@ public class Config {
 	public static boolean drawMarkersNameInWorld = drawMarkersNameInWorldDef;
 	public static boolean drawMarkersDistanceInWorldDef = false;
 	public static boolean drawMarkersDistanceInWorld = drawMarkersDistanceInWorldDef;
-	
-	//World configuration Options
+
+	// World configuration Options
 	public static int overlayModeIndexDef = 0;
 	public static int overlayModeIndex = overlayModeIndexDef;
 	public static int overlayZoomLevelDef = 0;
 	public static int overlayZoomLevel = overlayZoomLevelDef;
 	public static int fullScreenZoomLevelDef = 0;
 	public static int fullScreenZoomLevel = fullScreenZoomLevelDef;
-	
+
 	public static largeMapModeConfig largeMap = new largeMapModeConfig(Reference.catLargeMapConfig);
-	public static smallMapModeConfig smallMap = new smallMapModeConfig(Reference.catSmallMapConfig);	
-	public static MapModeConfig fullScreenMap = new MapModeConfig(Reference.catFullMapConfig);	
+	public static smallMapModeConfig smallMap = new smallMapModeConfig(Reference.catSmallMapConfig);
+	public static MapModeConfig fullScreenMap = new MapModeConfig(Reference.catFullMapConfig);
 }
