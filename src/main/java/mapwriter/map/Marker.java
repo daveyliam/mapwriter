@@ -2,6 +2,8 @@ package mapwriter.map;
 
 import java.awt.Point;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.util.MathHelper;
 import mapwriter.map.mapmode.MapMode;
 import mapwriter.util.Render;
 import mapwriter.util.Utils;
@@ -67,4 +69,12 @@ public class Marker {
 		}
 		return false;
 	}
+	
+    public double getDistanceToMarker(Entity entityIn)
+    {
+        double d0 = this.x - entityIn.posX;
+        double d1 = this.y - entityIn.posY;
+        double d2 = this.z - entityIn.posZ;
+        return (double)MathHelper.sqrt_double(d0 * d0 + d1 * d1 + d2 * d2);
+    }
 }

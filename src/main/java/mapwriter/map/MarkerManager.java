@@ -3,11 +3,22 @@ package mapwriter.map;
 import java.util.ArrayList;
 import java.util.List;
 
-import mapwriter.Mw;
+import mapwriter.config.Config;
 import mapwriter.map.mapmode.MapMode;
 import mapwriter.util.Logging;
 import mapwriter.util.Utils;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraftforge.common.config.Configuration;
+
+import org.lwjgl.opengl.GL11;
+import static  org.lwjgl.opengl.ARBDepthClamp.GL_DEPTH_CLAMP;
 
 public class MarkerManager {
 	
@@ -282,5 +293,193 @@ public class MarkerManager {
 		if (this.selectedMarker != null) {
 			this.selectedMarker.draw(mapMode, mapView, 0xffffffff);
 		}
+	}
+
+	public void drawMarkersWorld(float partialTicks)
+	{
+		if (!Config.drawMarkersInWorld && !Config.drawMarkersNameInWorld)
+		{
+			return;
+		}
+
+		for (Marker m : this.visibleMarkerList)
+		{
+			if (m.dimension == Minecraft.getMinecraft().thePlayer.dimension)
+			{
+				if (Config.drawMarkersInWorld)
+				{
+					drawBeam(m, partialTicks);
+				}
+				if (Config.drawMarkersNameInWorld)
+				{
+					drawLabel(m);
+				}
+			}
+		}
+	}
+
+	public void drawBeam(Marker m, float partialTicks)
+	{
+		Tessellator tessellator = Tessellator.getInstance();
+		WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+
+		float f2 = (float) Minecraft.getMinecraft().theWorld.getTotalWorldTime() + partialTicks;
+		double d3 = (double) f2 * 0.025D * -1.5D;
+		// the height of the beam always to the max height
+		double d17 = 255.0D;
+
+		double x = (double) m.x - TileEntityRendererDispatcher.staticPlayerX;
+		double y = 0.0D - TileEntityRendererDispatcher.staticPlayerY;
+		double z = (double) m.z - TileEntityRendererDispatcher.staticPlayerZ;
+
+		GlStateManager.pushMatrix();
+		GlStateManager.disableTexture2D();
+		GlStateManager.disableLighting();
+		GlStateManager.disableCull();
+		GlStateManager.enableBlend();
+		GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+		GlStateManager.depthMask(false);
+
+		worldrenderer.startDrawingQuads();
+		// size of the square from middle to edge
+		double d4 = 0.2D;
+
+		double d5 = 0.5D + Math.cos(d3 + 2.356194490192345D) * d4;
+		double d6 = 0.5D + Math.sin(d3 + 2.356194490192345D) * d4;
+		double d7 = 0.5D + Math.cos(d3 + (Math.PI / 4D)) * d4;
+		double d8 = 0.5D + Math.sin(d3 + (Math.PI / 4D)) * d4;
+		double d9 = 0.5D + Math.cos(d3 + 3.9269908169872414D) * d4;
+		double d10 = 0.5D + Math.sin(d3 + 3.9269908169872414D) * d4;
+		double d11 = 0.5D + Math.cos(d3 + 5.497787143782138D) * d4;
+		double d12 = 0.5D + Math.sin(d3 + 5.497787143782138D) * d4;
+
+		worldrenderer.setColorRGBA_I(m.colour, 50);
+
+		worldrenderer.addVertex(x + d5, y + d17, z + d6);
+		worldrenderer.addVertex(x + d5, y, z + d6);
+		worldrenderer.addVertex(x + d7, y, z + d8);
+		worldrenderer.addVertex(x + d7, y + d17, z + d8);
+		worldrenderer.addVertex(x + d11, y + d17, z + d12);
+		worldrenderer.addVertex(x + d11, y, z + d12);
+		worldrenderer.addVertex(x + d9, y, z + d10);
+		worldrenderer.addVertex(x + d9, y + d17, z + d10);
+		worldrenderer.addVertex(x + d7, y + d17, z + d8);
+		worldrenderer.addVertex(x + d7, y, z + d8);
+		worldrenderer.addVertex(x + d11, y, z + d12);
+		worldrenderer.addVertex(x + d11, y + d17, z + d12);
+		worldrenderer.addVertex(x + d9, y + d17, z + d10);
+		worldrenderer.addVertex(x + d9, y, z + d10);
+		worldrenderer.addVertex(x + d5, y, z + d6);
+		worldrenderer.addVertex(x + d5, y + d17, z + d6);
+		tessellator.draw();
+
+		worldrenderer.startDrawingQuads();
+		worldrenderer.setColorRGBA_I(m.colour, 50);
+		// size of the square from middle to edge
+		d4 = 0.5D;
+
+		d5 = 0.5D + Math.sin(d3 + 2.356194490192345D) * d4;
+		d6 = 0.5D + Math.cos(d3 + 2.356194490192345D) * d4;
+		d7 = 0.5D + Math.sin(d3 + (Math.PI / 4D)) * d4;
+		d8 = 0.5D + Math.cos(d3 + (Math.PI / 4D)) * d4;
+		d9 = 0.5D + Math.sin(d3 + 3.9269908169872414D) * d4;
+		d10 = 0.5D + Math.cos(d3 + 3.9269908169872414D) * d4;
+		d11 = 0.5D + Math.sin(d3 + 5.497787143782138D) * d4;
+		d12 = 0.5D + Math.cos(d3 + 5.497787143782138D) * d4;
+
+		worldrenderer.addVertex(x + d5, y + d17, z + d6);
+		worldrenderer.addVertex(x + d5, y, z + d6);
+		worldrenderer.addVertex(x + d7, y, z + d8);
+		worldrenderer.addVertex(x + d7, y + d17, z + d8);
+		worldrenderer.addVertex(x + d11, y + d17, z + d12);
+		worldrenderer.addVertex(x + d11, y, z + d12);
+		worldrenderer.addVertex(x + d9, y, z + d10);
+		worldrenderer.addVertex(x + d9, y + d17, z + d10);
+		worldrenderer.addVertex(x + d7, y + d17, z + d8);
+		worldrenderer.addVertex(x + d7, y, z + d8);
+		worldrenderer.addVertex(x + d11, y, z + d12);
+		worldrenderer.addVertex(x + d11, y + d17, z + d12);
+		worldrenderer.addVertex(x + d9, y + d17, z + d10);
+		worldrenderer.addVertex(x + d9, y, z + d10);
+		worldrenderer.addVertex(x + d5, y, z + d6);
+		worldrenderer.addVertex(x + d5, y + d17, z + d6);
+		tessellator.draw();
+
+		GlStateManager.enableLighting();
+		GlStateManager.enableTexture2D();
+		GlStateManager.depthMask(true);
+		GlStateManager.disableBlend();
+		GlStateManager.popMatrix();
+	}
+	
+	public void drawLabel(Marker m)
+	{
+		float growFactor = 0.17F; 
+		Minecraft mc = Minecraft.getMinecraft();
+		RenderManager renderManager = mc.getRenderManager();
+		FontRenderer fontrenderer = mc.fontRendererObj;
+
+		double x = 0.5D + (double) m.x - TileEntityRendererDispatcher.staticPlayerX;
+		double y = 0.5D + (double) m.y - TileEntityRendererDispatcher.staticPlayerY;
+		double z = 0.5D + (double) m.z - TileEntityRendererDispatcher.staticPlayerZ;
+		
+		double distance = m.getDistanceToMarker(renderManager.livingPlayer);
+		
+		String strText = m.name;
+		String strDistance = " (" + (int)distance + "m)";
+		
+		int strTextWidth = fontrenderer.getStringWidth(strText) / 2;
+		int strDistanceWidth = fontrenderer.getStringWidth(strDistance) / 2;
+		int offstet = 9;
+		
+		float f = (float) (1.0F + (distance)*growFactor);
+		float f1 = 0.016666668F * f;
+
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(x, y, z);
+		GL11.glNormal3f(0.0F, 1.0F, 0.0F);
+		GlStateManager.rotate(-renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
+		GlStateManager.rotate(renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
+		GlStateManager.scale(-f1, -f1, f1);
+		GlStateManager.disableLighting();
+		GlStateManager.depthMask(false);
+		GlStateManager.disableDepth();
+		GlStateManager.enableBlend();
+		GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+		GL11.glEnable(GL_DEPTH_CLAMP);
+		
+		Tessellator tessellator = Tessellator.getInstance();
+		WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+
+		GlStateManager.disableTexture2D();
+
+		worldrenderer.startDrawingQuads();
+		worldrenderer.setColorRGBA_I(m.colour, 64);
+		worldrenderer.addVertex((double) (-strTextWidth - 1), (double) (-1), 0.0D);
+		worldrenderer.addVertex((double) (-strTextWidth - 1), (double) (8), 0.0D);
+		worldrenderer.addVertex((double) (strTextWidth + 1), (double) (8), 0.0D);
+		worldrenderer.addVertex((double) (strTextWidth + 1), (double) (-1), 0.0D);
+		tessellator.draw();
+		
+		worldrenderer.startDrawingQuads();
+		worldrenderer.setColorRGBA_I(m.colour, 64);
+		worldrenderer.addVertex((double) (-strDistanceWidth - 1), (double) (-1 + offstet), 0.0D);
+		worldrenderer.addVertex((double) (-strDistanceWidth - 1), (double) (8 + offstet), 0.0D);
+		worldrenderer.addVertex((double) (strDistanceWidth + 1), (double) (8 + offstet), 0.0D);
+		worldrenderer.addVertex((double) (strDistanceWidth + 1), (double) (-1 + offstet), 0.0D);
+		tessellator.draw();
+
+		GlStateManager.enableTexture2D();
+		GlStateManager.depthMask(true);
+
+		fontrenderer.drawString(strText, -strTextWidth, 0, -1);
+		fontrenderer.drawString(strDistance, -strDistanceWidth, offstet, -1);
+
+		GL11.glDisable(GL_DEPTH_CLAMP);
+		GlStateManager.enableDepth();
+		GlStateManager.enableLighting();
+		GlStateManager.disableBlend();
+		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+		GlStateManager.popMatrix();
 	}
 }

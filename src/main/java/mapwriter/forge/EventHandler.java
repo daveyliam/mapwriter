@@ -7,6 +7,7 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.world.ChunkEvent;
@@ -83,5 +84,14 @@ public class EventHandler {
     @SubscribeEvent
     public void onTextureStitchEventPost(TextureStitchEvent.Post event){ 
     		mw.reloadBlockColours();
+    }
+
+    @SubscribeEvent
+    public void renderWorldLastEvent(RenderWorldLastEvent event)
+    {
+        if (Mw.getInstance().ready)
+        {
+        	Mw.getInstance().markerManager.drawMarkersWorld(event.partialTicks);
+        }
     }
 }

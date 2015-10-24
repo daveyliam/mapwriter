@@ -48,9 +48,12 @@ mw.config.moreRealisticMap=Enables realistic map
 mw.config.moreRealisticMap.tooltip=Enable the use of a different height algorithm that makes the map look more realistic
 mw.config.newMarkerDialog=New Marker Dialog
 mw.config.newMarkerDialog.tooltip=Enable to use the new marker dialog
-mw.config.useFeetHeight=Use feet height
-mw.config.useFeetHeight.tooltip=Have cordinates show feet height instead of head height
-
+mw.config.drawMarkersInWorld=Show markers in world
+mw.config.drawMarkersInWorld.tooltip=Makes a light beam visable in the world on the marker location
+mw.config.drawMarkersNameInWorld=Show markers names in world
+mw.config.drawMarkersNameInWorld.tooltip=Draws a nameplate on the location of the marker in the world
+mw.config.drawMarkersDistanceInWorld=Show markers distance in world
+mw.config.drawMarkersDistanceInWorld.tooltip=Draws a distance label on the location of the marker in the world
 
 #Config Temp
 mw.config.overlayModeIndex=

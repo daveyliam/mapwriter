@@ -50,7 +50,12 @@ public class Config {
 	public static boolean moreRealisticMap = moreRealisticMapDef;
 	public static boolean newMarkerDialogDef = true;
 	public static boolean newMarkerDialog = newMarkerDialogDef;
-
+	public static boolean drawMarkersInWorldDef = false;
+	public static boolean drawMarkersInWorld = drawMarkersInWorldDef;
+	public static boolean drawMarkersNameInWorldDef = false;
+	public static boolean drawMarkersNameInWorld = drawMarkersNameInWorldDef;
+	public static boolean drawMarkersDistanceInWorldDef = false;
+	public static boolean drawMarkersDistanceInWorld = drawMarkersDistanceInWorldDef;
 	
 	//World configuration Options
 	public static int overlayModeIndexDef = 0;

@@ -50,7 +50,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 			Config.moreRealisticMap = configuration.getBoolean("moreRealisticMap", Reference.catOptions, Config.moreRealisticMapDef, "mw.config.moreRealisticMap");
 			
 			Config.newMarkerDialog = configuration.getBoolean("newMarkerDialog", Reference.catOptions, Config.newMarkerDialogDef, "mw.config.newMarkerDialog");
-
+			Config.drawMarkersInWorld = configuration.getBoolean("drawMarkersInWorld", Reference.catOptions, Config.drawMarkersInWorldDef, "mw.config.drawMarkersInWorld");
+			Config.drawMarkersNameInWorld = configuration.getBoolean("drawMarkersNameInWorld", Reference.catOptions, Config.drawMarkersNameInWorldDef, "mw.config.drawMarkersNameInWorld");
+			Config.drawMarkersDistanceInWorld = configuration.getBoolean("drawMarkersDistanceInWorld", Reference.catOptions, Config.drawMarkersDistanceInWorldDef, "mw.config.drawMarkersDistanceInWorld");
+			
 			Config.fullScreenMap.loadConfig();
 			Config.largeMap.loadConfig();
 			Config.smallMap.loadConfig();
