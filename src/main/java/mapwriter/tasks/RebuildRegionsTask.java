@@ -37,4 +37,10 @@ public class RebuildRegionsTask extends Task
 		Utils.printBoth("rebuild task complete");
 	}
 
+	@Override
+	public boolean CheckForDuplicate()
+	{
+		return false;
+	}
+
 }

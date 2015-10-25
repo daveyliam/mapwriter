@@ -47,4 +47,10 @@ public class MergeTask extends Task
 		Utils.printBoth(this.msg);
 	}
 
+	@Override
+	public boolean CheckForDuplicate()
+	{
+		return false;
+	}
+
 }

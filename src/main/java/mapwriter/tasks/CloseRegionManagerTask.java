@@ -22,4 +22,10 @@ public class CloseRegionManagerTask extends Task
 	public void onComplete()
 	{
 	}
+
+	@Override
+	public boolean CheckForDuplicate()
+	{
+		return false;
+	}
 }

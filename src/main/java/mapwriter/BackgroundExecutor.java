@@ -54,8 +54,8 @@ public class BackgroundExecutor
 
 	private ExecutorService executor;
 	private LinkedList<Task> taskQueue;
-	private Map chunksUpdating = new HashMap<Long, UpdateSurfaceChunksTask>();
 	public boolean closed = false;
+	private boolean doDiag = true;
 
 	public BackgroundExecutor()
 	{
@@ -68,34 +68,25 @@ public class BackgroundExecutor
 	{
 		if (!this.closed)
 		{
-			if (task instanceof UpdateSurfaceChunksTask)
-			{
-				UpdateSurfaceChunksTask updatetask = (UpdateSurfaceChunksTask) task;
-				Long coords = ChunkCoordIntPair.chunkXZ2Int(updatetask.getChunkX(), updatetask.getChunkZ());
-
-				if (!this.chunksUpdating.containsKey(coords))
-				{
-					Future<?> future = this.executor.submit(task);
-					task.setFuture(future);
-					this.taskQueue.add(task);
-					this.chunksUpdating.put(coords, task);
-				}
-				else
-				{
-					UpdateSurfaceChunksTask task2 = (UpdateSurfaceChunksTask) this.chunksUpdating.get(coords);
-					if (task2.Running.get() == false)
-					{
-						task2.UpdateChunkData(((UpdateSurfaceChunksTask) task).getChunk());
-					}
-				}
-			}
-			else
+			if (!task.CheckForDuplicate())
 			{
 				Future<?> future = this.executor.submit(task);
 				task.setFuture(future);
 				this.taskQueue.add(task);
 			}
-
+			
+			//bit for diagnostics on task left to optimize code
+			if (this.tasksRemaining() > 500 && doDiag)
+			{
+				doDiag = false;
+				Logging.logError("Taskque went over 500 starting diagnostic");
+				taskLeftPerType();
+				Logging.logError("End of diagnostic");
+			}
+			else
+			{
+				doDiag = true;	
+			}
 		}
 		else
 		{
@@ -118,15 +109,7 @@ public class BackgroundExecutor
 			{
 				task.printException();
 				task.onComplete();
-
-				if (task instanceof UpdateSurfaceChunksTask)
-				{
-					UpdateSurfaceChunksTask updatetask = (UpdateSurfaceChunksTask) task;
-					Long coords = ChunkCoordIntPair.chunkXZ2Int(updatetask.getChunkX(), updatetask.getChunkZ());
-
-					this.chunksUpdating.remove(coords, updatetask);
-
-				}
+				
 				processed = true;
 			}
 			else
@@ -167,6 +150,7 @@ public class BackgroundExecutor
 		boolean error = true;
 		try
 		{
+			taskLeftPerType();
 			// stop accepting new tasks
 			this.executor.shutdown();
 			// process remaining tasks
@@ -182,5 +166,30 @@ public class BackgroundExecutor
 		}
 		this.closed = true;
 		return error;
+	}
+
+	private void taskLeftPerType()
+	{
+		HashMap<String, Object> tasksLeft = new HashMap<String, Object>();
+		
+		for (Task t : this.taskQueue)
+		{
+			String className = t.getClass().toString();
+			if (tasksLeft.containsKey(className))
+			{
+				tasksLeft.put(className, ((Integer)tasksLeft.get(className)) + 1);
+			}
+			else
+			{
+				tasksLeft.put(className, 1);
+			}
+		}
+		
+		for (Map.Entry<String, Object> entry : tasksLeft.entrySet()) {
+		    String key = entry.getKey();
+		    Object value = entry.getValue();
+		    
+		    Logging.log("waiting for %d %s to finish...", value, key);
+		}
 	}
 }

@@ -18,6 +18,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
+import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.chunk.NibbleArray;
 import net.minecraftforge.fml.common.FMLLog;
 
@@ -513,5 +514,10 @@ public class MwChunk implements IChunk
 		}
 
 		return error;
+	}
+	
+	public Long getCoordIntPair()
+	{
+		return ChunkCoordIntPair.chunkXZ2Int(this.x, this.z);
 	}
 }

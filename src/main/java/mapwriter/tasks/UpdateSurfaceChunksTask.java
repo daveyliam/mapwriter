@@ -1,7 +1,11 @@
 package mapwriter.tasks;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import net.minecraft.world.ChunkCoordIntPair;
 import mapwriter.Mw;
 import mapwriter.map.MapTexture;
 import mapwriter.region.MwChunk;
@@ -9,10 +13,11 @@ import mapwriter.region.RegionManager;
 
 public class UpdateSurfaceChunksTask extends Task
 {
-	MwChunk chunk;
-	RegionManager regionManager;
-	MapTexture mapTexture;
-	public AtomicBoolean Running = new AtomicBoolean();
+	private MwChunk chunk;
+	private RegionManager regionManager;
+	private MapTexture mapTexture;
+	private AtomicBoolean Running = new AtomicBoolean();
+	private static Map chunksUpdating = new HashMap<Long, UpdateSurfaceChunksTask>();
 
 	public UpdateSurfaceChunksTask(Mw mw, MwChunk chunk)
 	{
@@ -25,7 +30,6 @@ public class UpdateSurfaceChunksTask extends Task
 	public void run()
 	{
 		this.Running.set(true);
-		// for (MwChunk chunk : this.chunkArray) {
 		if (this.chunk != null)
 		{
 			// update the chunk in the region pixels
@@ -33,23 +37,14 @@ public class UpdateSurfaceChunksTask extends Task
 			// copy updated region pixels to maptexture
 			this.mapTexture.updateArea(this.regionManager, this.chunk.x << 4, this.chunk.z << 4, MwChunk.SIZE, MwChunk.SIZE, this.chunk.dimension);
 		}
-		// }
-		this.Running.set(false);
 	}
 
 	@Override
 	public void onComplete()
 	{
-	}
-
-	public int getChunkX()
-	{
-		return this.chunk.x;
-	}
-
-	public int getChunkZ()
-	{
-		return this.chunk.z;
+		Long coords = this.chunk.getCoordIntPair();
+		this.chunksUpdating.remove(coords, this);
+		this.Running.set(false);
 	}
 
 	public void UpdateChunkData(MwChunk chunk)
@@ -57,8 +52,29 @@ public class UpdateSurfaceChunksTask extends Task
 		this.chunk = chunk;
 	}
 
-	public MwChunk getChunk()
+	@Override
+	public boolean CheckForDuplicate()
 	{
-		return this.chunk;
+		Long coords = ChunkCoordIntPair.chunkXZ2Int(this.chunk.x, this.chunk.z);
+
+		if (!this.chunksUpdating.containsKey(coords))
+		{
+			this.chunksUpdating.put(coords, this);
+			return false;
+		}
+		else
+		{
+			UpdateSurfaceChunksTask task2 = (UpdateSurfaceChunksTask) this.chunksUpdating.get(coords);
+			if (task2.Running.get() == false)
+			{
+				task2.UpdateChunkData(this.chunk);
+			}
+			else
+			{
+				this.chunksUpdating.put(coords, this);
+				return false;
+			}
+		}
+		return true;
 	}
 }

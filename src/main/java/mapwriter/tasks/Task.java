@@ -17,6 +17,9 @@ public abstract class Task implements Runnable
 	@Override
 	public abstract void run();
 
+	//returns false if the task has to be added to a new future
+	public abstract boolean CheckForDuplicate();	
+	
 	// methods to access the tasks Future variable
 	public final Future<?> getFuture()
 	{
