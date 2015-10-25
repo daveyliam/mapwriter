@@ -1,19 +1,23 @@
-.gradle
-build
-out
-classes
-*.iml
-*.ipr
-*.iws
-runtime
+# eclipse
+bin
+*.launch
+.settings
+.metadata
 .classpath
 .project
-.settings
-bin
-Build.bat
-Clean.bat
-Deploy.bat
-FixDependicies.bat
-Install Forge.bat
+
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
+
+# gradle
+build
+.gradle
+
+# other
 eclipse
+run
 /Run.bat

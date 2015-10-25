@@ -1,22 +1,25 @@
+/*
+// For those who want the bleeding edge
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
         maven {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
         }
-        maven {
-            name = "sonatype"
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
-        }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.0-SNAPSHOT'
     }
 }
+apply plugin: 'net.minecraftforge.gradle.forge'
+*/
 
-apply plugin: 'forge'
-apply plugin: 'curseforge'
+// for people who want stable
+plugins {
+    id "net.minecraftforge.gradle.forge" version "2.0.1"
+	id 'com.matthewprenger.cursegradle' version '1.0.1'
+}
 
 repositories {
 	mavenLocal()
@@ -77,14 +80,9 @@ jar {
 //classifier = 'universal'
 }
 
-task sourceJar(type: Jar) {
-    from sourceSets.main.allSource
-    classifier = 'src'
-}
-
 task devJar(type: Jar) {
-from sourceSets.main.output
-classifier = 'dev'
+	from sourceSets.main.output
+	classifier = 'dev'
 }
 
 artifacts {
@@ -118,8 +116,12 @@ gradle.taskGraph.whenReady { taskGraph ->
   }
 }
 
-curse {
-    projectId = config.curse_project_id
-    apiKey = project.hasProperty('curseForgeApiKey') ? project.curseForgeApiKey : ''
+curseforge {
+  apiKey = project.hasProperty('curseForgeApiKey') ? project.curseForgeApiKey : ''
+  project {
+	//changelogType = "text"
+    id = config.curse_project_id
+    changelog = "" // A file can also be set using: changelog = file('changelog.txt')
     releaseType = config.release_type
+  }
 }
