@@ -128,7 +128,31 @@ public class ScrollableColorSelector extends ScrollableField
 
 	public void mouseDWheelScrolled(int x, int y, int direction)
 	{
-		// TODO Auto-generated method stub
+		this.ScrollableNumericTextBoxColourRed.mouseDWheelScrolled(x, y, direction);
+		this.ScrollableNumericTextBoxColourGreen.mouseDWheelScrolled(x, y, direction);
+		this.ScrollableNumericTextBoxColourBlue.mouseDWheelScrolled(x, y, direction);
+
+		if (this.posWithinColourField(x, y))
+		{
+			this.colourFieldScroll(-direction);
+		}
+	}
+
+	public boolean posWithinColourField(int x, int y)
+	{
+		return (x >= this.colourFieldX) && (y >= this.colourFieldY) && (x <= (this.colourFieldW + this.colourFieldX)) && (y <= (this.colourFieldH + this.colourFieldY));
+	}
+
+	public void colourFieldScroll(int direction)
+	{
+		if (direction > 0)
+		{
+			this.nextElement();
+		}
+		else if (direction < 0)
+		{
+			this.previousElement();
+		}
 	}
 
 	public void KeyTyped(char c, int key)
