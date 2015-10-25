@@ -6,6 +6,7 @@ import java.util.List;
 import mapwriter.BackgroundExecutor;
 import mapwriter.region.Region;
 import mapwriter.region.RegionManager;
+import mapwriter.tasks.MapUpdateViewTask;
 import mapwriter.util.Texture;
 
 import org.lwjgl.opengl.GL11;

@@ -1,7 +1,8 @@
-package mapwriter.map;
+package mapwriter.tasks;
 
+import mapwriter.map.MapTexture;
+import mapwriter.map.MapViewRequest;
 import mapwriter.region.RegionManager;
-import mapwriter.tasks.Task;
 
 public class MapUpdateViewTask extends Task
 {
@@ -32,5 +33,11 @@ public class MapUpdateViewTask extends Task
 	{
 		// set currentView in mapTexture to requestedView
 		this.mapTexture.setLoaded(this.req);
+	}
+
+	@Override
+	public boolean CheckForDuplicate()
+	{
+		return false;
 	}
 }
