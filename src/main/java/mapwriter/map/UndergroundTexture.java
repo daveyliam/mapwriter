@@ -73,10 +73,10 @@ public class UndergroundTexture extends Texture
 		this.setLinearScaling(false);
 		this.textureSize = textureSize;
 		this.textureChunks = textureSize >> 4;
-			this.loadedChunkArray = new Point[this.textureChunks * this.textureChunks];
-			this.pixels = new int[textureSize * textureSize];
-			Arrays.fill(this.pixels, 0xff000000);
-			this.mw = mw;
+		this.loadedChunkArray = new Point[this.textureChunks * this.textureChunks];
+		this.pixels = new int[textureSize * textureSize];
+		Arrays.fill(this.pixels, 0xff000000);
+		this.mw = mw;
 	}
 
 	public void clear()
@@ -124,8 +124,8 @@ public class UndergroundTexture extends Texture
 	public void requestView(MapView view)
 	{
 		int cxMin = ((int) view.getMinX()) >> 4;
-			int czMin = ((int) view.getMinZ()) >> 4;
-			int cxMax = ((int) view.getMaxX()) >> 4;
+		int czMin = ((int) view.getMinZ()) >> 4;
+		int cxMax = ((int) view.getMaxX()) >> 4;
 		int czMax = ((int) view.getMaxZ()) >> 4;
 		for (int cz = czMin; cz <= czMax; cz++)
 		{

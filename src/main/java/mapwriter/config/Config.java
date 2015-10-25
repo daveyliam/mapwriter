@@ -5,11 +5,11 @@ import mapwriter.util.Reference;
 public class Config
 {
 	public static final String[] backgroundModeStringArray =
-		{
-		"none",
-		"static",
-		"panning"
-		};
+	{
+			"none",
+			"static",
+			"panning"
+	};
 
 	// configuration options
 	public static boolean linearTextureScalingDef = true;

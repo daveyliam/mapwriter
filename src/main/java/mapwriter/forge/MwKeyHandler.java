@@ -27,7 +27,7 @@ public class MwKeyHandler
 	public static KeyBinding keyUndergroundMode = new KeyBinding("key.mw_underground_mode", Keyboard.KEY_U, "Mapwriter");
 
 	public final KeyBinding[] keys =
-		{
+	{
 			keyMapGui,
 			keyNewMarker,
 			keyMapMode,
@@ -36,7 +36,7 @@ public class MwKeyHandler
 			keyZoomIn,
 			keyZoomOut,
 			keyUndergroundMode
-		};
+	};
 
 	public MwKeyHandler()
 	{

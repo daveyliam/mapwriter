@@ -42,7 +42,7 @@ public class MwGui extends GuiScreen
 	private MapRenderer map;
 
 	private String[] HelpText1 = new String[]
-			{
+	{
 			"Keys:",
 			"",
 			"  Space",
@@ -67,9 +67,9 @@ public class MwGui extends GuiScreen
 			"mw.gui.mwgui.helptext.7",
 			"mw.gui.mwgui.helptext.8",
 			"mw.gui.mwgui.helptext.9"
-			};
+	};
 	private String[] HelpText2 = new String[]
-			{
+	{
 			"",
 			"",
 			"mw.gui.mwgui.helptext.nextmarkergroup",
@@ -83,7 +83,7 @@ public class MwGui extends GuiScreen
 			"mw.gui.mwgui.helptext.regenerate",
 			"mw.gui.mwgui.helptext.undergroundmap",
 			"mw.gui.mwgui.helptext.markerlist"
-			};
+	};
 
 	private final static double PAN_FACTOR = 0.3D;
 
@@ -168,27 +168,27 @@ public class MwGui extends GuiScreen
 	public void initLabels()
 	{
 		this.helpLabel = new MwGuiLabel(new String[]
-				{
-				"[" + I18n.format("mw.gui.mwgui.help", new Object[0]) + "]"
-				}, null, menuX, menuY, true, false, this.width, this.height);
+		{
+			"[" + I18n.format("mw.gui.mwgui.help", new Object[0]) + "]"
+		}, null, menuX, menuY, true, false, this.width, this.height);
 		this.optionsLabel = new MwGuiLabel(new String[]
-				{
-				"[" + I18n.format("mw.gui.mwgui.options", new Object[0]) + "]"
-				}, null, 0, 0, true, false, this.width, this.height);
+		{
+			"[" + I18n.format("mw.gui.mwgui.options", new Object[0]) + "]"
+		}, null, 0, 0, true, false, this.width, this.height);
 		this.dimensionLabel = new MwGuiLabel(null, null, 0, 0, true, false, this.width, this.height);
 		this.groupLabel = new MwGuiLabel(null, null, 0, 0, true, false, this.width, this.height);
 		this.overlayLabel = new MwGuiLabel(null, null, 0, 0, true, false, this.width, this.height);
 		String updateString = String.format("[" + I18n.format("mw.gui.mwgui.newversion", new Object[0]) + ": %s]", VersionCheck.getLatestVersion());
 		this.updateLabel = new MwGuiLabel(new String[]
-				{
-				updateString
-				}, null, 0, 0, true, false, this.width, this.height);
+		{
+			updateString
+		}, null, 0, 0, true, false, this.width, this.height);
 		this.helpTooltipLabel = new MwGuiLabel(this.HelpText1, this.HelpText2, 0, 0, true, false, this.width, this.height);
 
 		this.updateTooltipLabel = new MwGuiLabel(new String[]
-				{
-				VersionCheck.getUpdateURL()
-				}, null, 0, 0, true, false, this.width, this.height);
+		{
+			VersionCheck.getUpdateURL()
+		}, null, 0, 0, true, false, this.width, this.height);
 
 		this.statusLabel = new MwGuiLabel(null, null, 0, 0, true, false, this.width, this.height);
 		this.markerLabel = new MwGuiLabel(null, null, 0, 0, true, true, this.width, this.height);
@@ -651,9 +651,9 @@ public class MwGui extends GuiScreen
 
 		this.statusLabel.setCoords(x, this.height - 21);
 		this.statusLabel.setText(new String[]
-				{
-				builder.toString()
-				}, null);
+		{
+			builder.toString()
+		}, null);
 		this.statusLabel.draw();
 	}
 
@@ -723,10 +723,10 @@ public class MwGui extends GuiScreen
 		if (marker != null)
 		{
 			this.markerLabel.setText(new String[]
-					{
+			{
 					marker.name,
 					String.format("(%d, %d, %d)", marker.x, marker.y, marker.z)
-					}, null);
+			}, null);
 			this.markerLabel.setCoords(mouseX + 8, mouseY);
 			this.markerLabel.draw();
 		}
@@ -735,10 +735,10 @@ public class MwGui extends GuiScreen
 		if (this.isPlayerNearScreenPos(mouseX, mouseY))
 		{
 			this.markerLabel.setText(new String[]
-					{
+			{
 					this.mc.thePlayer.getDisplayNameString(),
 					String.format("(%d, %d, %d)", this.mw.playerXInt, this.mw.playerYInt, this.mw.playerZInt)
-					}, null);
+			}, null);
 			this.markerLabel.setCoords(mouseX + 8, mouseY);
 			this.markerLabel.draw();
 		}
@@ -750,23 +750,23 @@ public class MwGui extends GuiScreen
 		this.optionsLabel.draw();
 		String dimString = String.format("[" + I18n.format("mw.gui.mwgui.dimension", new Object[0]) + ": %d]", this.mapView.getDimension());
 		this.dimensionLabel.setText(new String[]
-				{
-				dimString
-				}, null);
+		{
+			dimString
+		}, null);
 		this.dimensionLabel.draw();
 
 		String groupString = String.format("[" + I18n.format("mw.gui.mwgui.group", new Object[0]) + ": %s]", this.mw.markerManager.getVisibleGroupName());
 		this.groupLabel.setText(new String[]
-				{
-				groupString
-				}, null);
+		{
+			groupString
+		}, null);
 		this.groupLabel.draw();
 
 		String overlayString = String.format("[" + I18n.format("mw.gui.mwgui.overlay", new Object[0]) + ": %s]", MwAPI.getCurrentProviderName());
 		this.overlayLabel.setText(new String[]
-				{
-				overlayString
-				}, null);
+		{
+			overlayString
+		}, null);
 		this.overlayLabel.draw();
 
 		if (!VersionCheck.isLatestVersion())

@@ -8,19 +8,19 @@ public class MapModeConfig
 {
 	public final String configCategory;
 	public static final String[] coordsModeStringArray =
-		{
-		"disabled",
-		"small",
-		"large"
-		};
+	{
+			"disabled",
+			"small",
+			"large"
+	};
 
 	public static final String[] miniMapPositionStringArray =
-		{
-		"top right",
-		"top left",
-		"bottom right",
-		"bottom left"
-		};
+	{
+			"top right",
+			"top left",
+			"bottom right",
+			"bottom left"
+	};
 
 	public boolean enabledDef = true;
 	public boolean enabled = this.enabledDef;

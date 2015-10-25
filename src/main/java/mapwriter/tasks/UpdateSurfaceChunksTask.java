@@ -2,14 +2,13 @@ package mapwriter.tasks;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import net.minecraft.world.ChunkCoordIntPair;
 import mapwriter.Mw;
 import mapwriter.map.MapTexture;
 import mapwriter.region.MwChunk;
 import mapwriter.region.RegionManager;
+import net.minecraft.world.ChunkCoordIntPair;
 
 public class UpdateSurfaceChunksTask extends Task
 {
@@ -43,7 +42,7 @@ public class UpdateSurfaceChunksTask extends Task
 	public void onComplete()
 	{
 		Long coords = this.chunk.getCoordIntPair();
-		this.chunksUpdating.remove(coords, this);
+		UpdateSurfaceChunksTask.chunksUpdating.remove(coords);
 		this.Running.set(false);
 	}
 
@@ -57,21 +56,21 @@ public class UpdateSurfaceChunksTask extends Task
 	{
 		Long coords = ChunkCoordIntPair.chunkXZ2Int(this.chunk.x, this.chunk.z);
 
-		if (!this.chunksUpdating.containsKey(coords))
+		if (!UpdateSurfaceChunksTask.chunksUpdating.containsKey(coords))
 		{
-			this.chunksUpdating.put(coords, this);
+			UpdateSurfaceChunksTask.chunksUpdating.put(coords, this);
 			return false;
 		}
 		else
 		{
-			UpdateSurfaceChunksTask task2 = (UpdateSurfaceChunksTask) this.chunksUpdating.get(coords);
+			UpdateSurfaceChunksTask task2 = (UpdateSurfaceChunksTask) UpdateSurfaceChunksTask.chunksUpdating.get(coords);
 			if (task2.Running.get() == false)
 			{
 				task2.UpdateChunkData(this.chunk);
 			}
 			else
 			{
-				this.chunksUpdating.put(coords, this);
+				UpdateSurfaceChunksTask.chunksUpdating.put(coords, this);
 				return false;
 			}
 		}

@@ -11,15 +11,15 @@ public class CircularHashMap<K, V>
 	/*
 	 * A hash map where each node is linked to the previous and next nodes in
 	 * the order of insertion.
-	 *
+	 * 
 	 * The 'head' node is the most recently added node. Its next pointer links
 	 * to the first node added, forming a circle.
-	 *
+	 * 
 	 * The getNextEntry and getPrevEntry methods use an internal pointer to the
 	 * 'current' node, and return either the current nodes 'next' or 'prev' node
 	 * respectively. The current node becomes the node that was returned, such
 	 * that repeated calls traverse all nodes in the map.
-	 *
+	 * 
 	 * Most methods are similar to those in the java.util.Map interface. The
 	 * CircularHashMap class does not implement Map however as some of the
 	 * required methods seemed unnecessary.

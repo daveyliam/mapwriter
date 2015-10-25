@@ -23,7 +23,7 @@ public class MwGuiMarkerListOverlay extends MwGuiSlot
 				ListY, // topIn
 				(10 + parentScreen.height) - 20, // bottomIn
 				parentScreen.width - 110 // left
-				);
+		);
 
 		this.height = parentScreen.height - 20;
 

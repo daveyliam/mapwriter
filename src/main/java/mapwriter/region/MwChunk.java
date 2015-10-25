@@ -515,7 +515,7 @@ public class MwChunk implements IChunk
 
 		return error;
 	}
-	
+
 	public Long getCoordIntPair()
 	{
 		return ChunkCoordIntPair.chunkXZ2Int(this.x, this.z);

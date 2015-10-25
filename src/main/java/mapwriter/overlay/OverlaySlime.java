@@ -130,7 +130,7 @@ public class OverlaySlime implements IMwDataProvider
 				for (int z = limitMinZ; z <= limitMaxZ; z++)
 				{
 
-					Random rnd = new Random((seed + x * x * 0x4c1906 + x * 0x5ac0db + (z * z * 0x4307a7L) + z * 0x5f24f) ^ 0x3ad8025f);
+					Random rnd = new Random((seed + (x * x * 0x4c1906) + (x * 0x5ac0db) + (z * z * 0x4307a7L) + (z * 0x5f24f)) ^ 0x3ad8025f);
 					if (rnd.nextInt(10) == 0)
 					{
 						chunks.add(new ChunkOverlay(x, z));

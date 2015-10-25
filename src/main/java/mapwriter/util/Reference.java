@@ -42,8 +42,8 @@ public final class Reference
 	public static final ResourceLocation rightArrowTexture = new ResourceLocation("mapwriter", "textures/map/arrow_text_right.png");
 
 	public static final HashSet<String> PROTOCOLS = Sets.newHashSet(new String[]
-			{
+	{
 			"http",
 			"https"
-			});
+	});
 }

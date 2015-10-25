@@ -19,7 +19,8 @@ public class VersionCheck implements Runnable
 	/**
 	 * @author jabelar
 	 * @link
-	 *       http://jabelarminecraft.blogspot.nl/p/minecraft-forge-1721710-making
+	 *       http://jabelarminecraft.blogspot.nl/p/minecraft-forge-1721710-
+	 *       making
 	 *       -mod.html
 	 */
 

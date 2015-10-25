@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import net.minecraft.world.ChunkCoordIntPair;
 import mapwriter.region.MwChunk;
 import mapwriter.region.RegionManager;
 
@@ -13,7 +12,7 @@ public class SaveChunkTask extends Task
 	private MwChunk chunk;
 	private RegionManager regionManager;
 	private AtomicBoolean Running = new AtomicBoolean();
-	private static Map chunksUpdating = new HashMap<Long, UpdateSurfaceChunksTask>();
+	private static HashMap<Long, SaveChunkTask> chunksUpdating = new HashMap<Long, SaveChunkTask>();
 
 	public SaveChunkTask(MwChunk chunk, RegionManager regionManager)
 	{
@@ -32,7 +31,7 @@ public class SaveChunkTask extends Task
 	public void onComplete()
 	{
 		Long coords = this.chunk.getCoordIntPair();
-		this.chunksUpdating.remove(coords,this);
+		SaveChunkTask.chunksUpdating.remove(coords);
 		this.Running.set(false);
 	}
 
@@ -41,27 +40,27 @@ public class SaveChunkTask extends Task
 	{
 		Long coords = this.chunk.getCoordIntPair();
 
-		if (!this.chunksUpdating.containsKey(coords))
+		if (!SaveChunkTask.chunksUpdating.containsKey(coords))
 		{
-			this.chunksUpdating.put(coords, this);
+			SaveChunkTask.chunksUpdating.put(coords, this);
 			return false;
 		}
 		else
 		{
-			SaveChunkTask task2 = (SaveChunkTask) this.chunksUpdating.get(coords);
+			SaveChunkTask task2 = (SaveChunkTask) SaveChunkTask.chunksUpdating.get(coords);
 			if (task2.Running.get() == false)
 			{
-				task2.UpdateChunkData(this.chunk,this.regionManager);
+				task2.UpdateChunkData(this.chunk, this.regionManager);
 			}
 			else
 			{
-				this.chunksUpdating.put(coords, this);
+				SaveChunkTask.chunksUpdating.put(coords, this);
 				return false;
 			}
 		}
 		return true;
 	}
-	
+
 	public void UpdateChunkData(MwChunk chunk, RegionManager regionManager)
 	{
 		this.chunk = chunk;

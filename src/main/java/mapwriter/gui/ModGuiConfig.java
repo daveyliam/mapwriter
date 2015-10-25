@@ -23,8 +23,8 @@ public class ModGuiConfig extends GuiConfig
 	public ModGuiConfig(GuiScreen guiScreen)
 	{
 		super(guiScreen, getConfigElements(),
-				// new
-				// ConfigElement(ConfigurationHandler.configuration.getCategory(Reference.catOptions)).getChildElements(),
+		// new
+		// ConfigElement(ConfigurationHandler.configuration.getCategory(Reference.catOptions)).getChildElements(),
 				Reference.MOD_ID,
 				"Options",
 				false,
@@ -137,9 +137,9 @@ public class ModGuiConfig extends GuiConfig
 		public Boolean[] getCurrentValues()
 		{
 			return new Boolean[]
-					{
-					this.getCurrentValue()
-					};
+			{
+				this.getCurrentValue()
+			};
 		}
 
 		@Override

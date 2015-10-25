@@ -189,12 +189,12 @@ public class Utils
 			Class<?> oclass = Class.forName("java.awt.Desktop");
 			Object object = oclass.getMethod("getDesktop", new Class[0]).invoke((Object) null, new Object[0]);
 			oclass.getMethod("browse", new Class[]
-					{
-					URI.class
-					}).invoke(object, new Object[]
-							{
-							p_175282_1_
-							});
+			{
+				URI.class
+			}).invoke(object, new Object[]
+			{
+				p_175282_1_
+			});
 		}
 		catch (Throwable throwable)
 		{
@@ -240,16 +240,16 @@ public class Utils
 	}
 
 	private static int[] colours = new int[]
-			{
-		0xff0000,
-		0x00ff00,
-		0x0000ff,
-		0xffff00,
-		0xff00ff,
-		0x00ffff,
-		0xff8000,
-		0x8000ff
-			};
+	{
+			0xff0000,
+			0x00ff00,
+			0x0000ff,
+			0xffff00,
+			0xff00ff,
+			0x00ffff,
+			0xff8000,
+			0x8000ff
+	};
 	// static so that current index is shared between all markers
 	public static int colourIndex = 0;
 
@@ -277,9 +277,9 @@ public class Utils
 
 	/*
 	 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-	 *
+	 * 
 	 * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
-	 *
+	 * 
 	 * The contents of this file are subject to the terms of either the GNU
 	 * General Public License Version 2 only ("GPL") or the Common Development
 	 * and Distribution License("CDDL") (collectively, the "License"). You may
@@ -295,13 +295,13 @@ public class Utils
 	 * Header, with the fields enclosed by brackets [] replaced by your own
 	 * identifying information:
 	 * "Portions Copyrighted [year] [name of copyright owner]"
-	 *
+	 * 
 	 * Contributor(s):
-	 *
+	 * 
 	 * The Original Software is NetBeans. The Initial Developer of the Original
 	 * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
 	 * Microsystems, Inc. All Rights Reserved.
-	 *
+	 * 
 	 * If you wish your version of this file to be governed by only the CDDL or
 	 * only the GPL Version 2, indicate your decision by adding "[Contributor]
 	 * elects to include this software in this distribution under the [CDDL or
@@ -312,27 +312,27 @@ public class Utils
 	 * Version 2 code and therefore, elected the GPL Version 2 license, then the
 	 * option applies only if the new code is made subject to such option by the
 	 * copyright holder.
-	 *
+	 * 
 	 * @since 4.37
-	 *
+	 * 
 	 * @author Jaroslav Tulach
 	 */
 	/*
 	 * Create a typesafe copy of a raw map.
-	 *
+	 * 
 	 * @param rawMap an unchecked map
-	 *
+	 * 
 	 * @param keyType the desired supertype of the keys
-	 *
+	 * 
 	 * @param valueType the desired supertype of the values
-	 *
+	 * 
 	 * @param strict true to throw a <code>ClassCastException</code> if the raw
 	 * map has an invalid key or value, false to skip over such map entries
 	 * (warnings may be logged)
-	 *
+	 * 
 	 * @return a typed map guaranteed to contain only keys and values assignable
 	 * to the named types (or they may be null)
-	 *
+	 * 
 	 * @throws ClassCastException if some key or value in the raw map was not
 	 * well-typed, and only if <code>strict</code> was true
 	 */
