@@ -1,11 +1,15 @@
 package mapwriter.forge;
 
 import mapwriter.Mw;
+import mapwriter.config.Config;
 import mapwriter.overlay.OverlaySlime;
+import mapwriter.util.Logging;
+import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -105,7 +109,14 @@ public class EventHandler
 	@SubscribeEvent
 	public void onTextureStitchEventPost(TextureStitchEvent.Post event)
 	{
-		this.mw.reloadBlockColours();
+		if (Config.reloadColours)
+		{
+			Logging.logInfo("Skipping the first generation of blockcolours, models are not loaded yet", (Object[])null);
+		}
+		else
+		{
+			this.mw.reloadBlockColours();
+		}
 	}
 
 	@SubscribeEvent
@@ -114,6 +125,19 @@ public class EventHandler
 		if (Mw.getInstance().ready)
 		{
 			Mw.getInstance().markerManager.drawMarkersWorld(event.partialTicks);
+		}
+	}
+	
+	
+	//a bit odd way to reload the blockcolours. if the models are not loaded yet then the uv values and icons will be wrong.
+	//this only happens if fml.skipFirstTextureLoad is enabled.
+	@SubscribeEvent
+	public void onGuiOpenEvent(GuiOpenEvent event)
+	{
+		if (event.gui instanceof GuiMainMenu && Config.reloadColours)
+		{
+			this.mw.reloadBlockColours();
+			Config.reloadColours = false;
 		}
 	}
 }

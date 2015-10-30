@@ -70,4 +70,6 @@ public class Config
 	public static largeMapModeConfig largeMap = new largeMapModeConfig(Reference.catLargeMapConfig);
 	public static smallMapModeConfig smallMap = new smallMapModeConfig(Reference.catSmallMapConfig);
 	public static MapModeConfig fullScreenMap = new MapModeConfig(Reference.catFullMapConfig);
+	
+	public static boolean reloadColours = Boolean.parseBoolean(System.getProperty("fml.skipFirstTextureLoad", "true"));
 }
