@@ -21,7 +21,7 @@ buildscript {
 // for people who want stable
 plugins {
     id "net.minecraftforge.gradle.forge" version "2.0.2"
-	id 'com.matthewprenger.cursegradle' version '1.0.1'
+	id 'com.matthewprenger.cursegradle' version '1.0.3'
 }
 
 //apply plugin: 'net.minecraftforge.gradle.forge'
@@ -129,5 +129,7 @@ curseforge {
     id = config.curse_project_id
     changelog = "" // A file can also be set using: changelog = file('changelog.txt')
     releaseType = config.release_type
+	mainArtifact jar
+	addGameVersion config.mc_version
   }
 }

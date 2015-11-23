@@ -17,7 +17,12 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.VERSION, guiFactory = Reference.MOD_GUIFACTORY_CLASS, clientSideOnly = true)
+@Mod(modid = Reference.MOD_ID,
+name = Reference.MOD_NAME,
+version = Reference.VERSION,
+guiFactory = Reference.MOD_GUIFACTORY_CLASS,
+clientSideOnly = true,
+updateJSON = Reference.ForgeVersionURL)
 public class MwForge
 {
 

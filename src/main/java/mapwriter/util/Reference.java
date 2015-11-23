@@ -17,6 +17,7 @@ public final class Reference
 	public static final String SERVER_PROXY_CLASS = "mapwriter.forge.CommonProxy";
 
 	public static final String VersionURL = "https://raw.githubusercontent.com/Vectron/Versions/master/MwVersion.json";
+	public static final String ForgeVersionURL = "https://raw.githubusercontent.com/Vectron/Versions/master/ForgeMwVersion.json";
 
 	public static final String catOptions = "options";
 	public static final String catLargeMapConfig = "largemap";
