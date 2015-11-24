@@ -45,6 +45,11 @@ public class Utils
 		s = s.replace('\\', '_');
 		return Reference.patternInvalidChars.matcher(s).replaceAll("");
 	}
+	
+	public static String mungeStringForConfig(String s)
+	{
+		return Reference.patternInvalidChars2.matcher(s).replaceAll("");
+	}
 
 	public static File getFreeFilename(File dir, String baseName, String ext)
 	{

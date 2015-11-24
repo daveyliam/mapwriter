@@ -6,8 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mapwriter.config.Config;
+import mapwriter.config.WorldConfig;
 import mapwriter.map.mapmode.MapMode;
 import mapwriter.util.Logging;
+import mapwriter.util.Reference;
 import mapwriter.util.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -69,6 +71,7 @@ public class MarkerManager
 
 	public void save(Configuration config, String category)
 	{
+		config.removeCategory(config.getCategory(category));
 		config.get(category, "markerCount", 0).set(this.markerList.size());
 		config.get(category, "visibleGroup", "").set(this.visibleGroupName);
 
@@ -80,13 +83,18 @@ public class MarkerManager
 			config.get(category, key, "").set(value);
 			i++;
 		}
+		
+		if (config.hasChanged())
+		{
+			config.save();
+		}
 	}
 
 	public void setVisibleGroupName(String groupName)
 	{
 		if (groupName != null)
 		{
-			this.visibleGroupName = Utils.mungeString(groupName);
+			this.visibleGroupName = Utils.mungeStringForConfig(groupName);
 		}
 		else
 		{
@@ -150,12 +158,11 @@ public class MarkerManager
 	public void addMarker(Marker marker)
 	{
 		this.markerList.add(marker);
+		this.save(WorldConfig.getInstance().worldConfiguration, Reference.catMarkers);
 	}
-
+	
 	public void addMarker(String name, String groupName, int x, int y, int z, int dimension, int colour)
 	{
-		name = name.replace(":", "");
-		groupName = groupName.replace(":", "");
 		this.addMarker(new Marker(name, groupName, x, y, z, dimension, colour));
 	}
 
@@ -167,7 +174,11 @@ public class MarkerManager
 		{
 			this.selectedMarker = null;
 		}
-		return this.markerList.remove(markerToDelete);
+		boolean result = this.markerList.remove(markerToDelete);
+		
+		this.save(WorldConfig.getInstance().worldConfiguration, Reference.catMarkers);
+		
+		return result;
 	}
 
 	// deletes the first marker with matching name and group.
@@ -187,15 +198,6 @@ public class MarkerManager
 		// (i.e. if markerToDelete is null)
 		return this.delMarker(markerToDelete);
 	}
-
-	/*
-	 * public boolean delGroup(String groupName) { boolean error =
-	 * !this.groupList.remove(groupName); Iterator it =
-	 * this.markerMap.entrySet().iterator(); while (it.hasNext()) { Map.Entry
-	 * entry = (Map.Entry) it.next(); Marker marker = (Marker) entry.getValue();
-	 * if (marker.groupName.equals(groupName)) { it.remove(); } } if (groupName
-	 * == this.visibleGroupName) { this.nextGroup(); } return error; }
-	 */
 
 	public void update()
 	{

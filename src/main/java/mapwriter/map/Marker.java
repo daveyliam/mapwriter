@@ -22,13 +22,13 @@ public class Marker
 
 	public Marker(String name, String groupName, int x, int y, int z, int dimension, int colour)
 	{
-		this.name = name;
+		this.name = Utils.mungeStringForConfig(name);
 		this.x = x;
 		this.y = y;
 		this.z = z;
 		this.dimension = dimension;
 		this.colour = colour;
-		this.groupName = groupName;
+		this.groupName = Utils.mungeStringForConfig(groupName);
 	}
 
 	public String getString()
