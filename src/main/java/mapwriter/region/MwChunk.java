@@ -450,7 +450,7 @@ public class MwChunk implements IChunk
 			nbttagcompound2 = new NBTTagCompound();
 			try
 			{
-				tileentity.writeToNBT(nbttagcompound2);
+				//tileentity.writeToNBT(nbttagcompound2);
 				nbttaglist3.appendTag(nbttagcompound2);
 			}
 			catch (Exception e)
