@@ -3,6 +3,7 @@ package mapwriter.gui;
 import mapwriter.Mw;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.resources.I18n;
 
 public class MwGuiOptions extends GuiScreen {
 	
@@ -20,7 +21,7 @@ public class MwGuiOptions extends GuiScreen {
     	this.optionSlot = new MwGuiOptionSlot(this, this.mc, this.mw);
         this.optionSlot.registerScrollButtons(7, 8);
         
-        this.buttonList.add(new GuiButton(200, (this.width / 2) - 50, this.height - 28, 100, 20, "Done"));
+        this.buttonList.add(new GuiButton(200, (this.width / 2) - 50, this.height - 28, 100, 20, I18n.format("gui.done")));
     }
     
     protected void actionPerformed(GuiButton button) {
@@ -35,7 +36,7 @@ public class MwGuiOptions extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float f) {
         this.drawDefaultBackground();
         this.optionSlot.drawScreen(mouseX, mouseY, f);
-        this.drawCenteredString(this.fontRendererObj, "MapWriter Options", this.width / 2, 10, 0xffffff);
+        this.drawCenteredString(this.fontRendererObj, I18n.format("mw.gui.mwguioptions.mwOptions"), this.width / 2, 10, 0xffffff);
         super.drawScreen(mouseX, mouseY, f);
     }
 

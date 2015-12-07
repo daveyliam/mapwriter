@@ -16,6 +16,7 @@ import mapwriter.tasks.MergeTask;
 import mapwriter.tasks.RebuildRegionsTask;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.resources.I18n;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -173,11 +174,12 @@ public class MwGui extends GuiScreen {
 					this.mw.worldDir,
 					this.mw.worldDir.getName()));
 			
-			MwUtil.printBoth("merging to '" + this.mw.worldDir.getAbsolutePath() + "'");
+			MwUtil.printBoth(I18n.format("mw.gui.mwgui.chatmsg.merge") + " '" + this.mw.worldDir.getAbsolutePath() + "'");
     }
     
     public void regenerateView() {
-    	MwUtil.printBoth(String.format("regenerating %dx%d blocks starting from (%d, %d)",
+    	MwUtil.printBoth(String.format(
+				I18n.format("mw.gui.mwgui.chatmsg.regenmap.1") + " %dx%d " + I18n.format("mw.gui.mwgui.chatmsg.regenmap.2") + " (%d, %d)",
 				(int) this.mapView.getWidth(),
 				(int) this.mapView.getHeight(),
 				(int) this.mapView.getMinX(),
@@ -375,7 +377,7 @@ public class MwGui extends GuiScreen {
     			// open new marker dialog
     			String group = this.mw.markerManager.getVisibleGroupName();
         		if (group.equals("none")) {
-        			group = "group";
+        			group = I18n.format("mw.gui.mwgui.group");
         		}
         		
         		int mx, my, mz;
@@ -503,13 +505,13 @@ public class MwGui extends GuiScreen {
     public void drawStatus(int bX, int bY, int bZ) {
     	 String s;
     	 if (bY != 0) {
-          	s = String.format("cursor: (%d, %d, %d)", bX, bY, bZ);
+          	s = I18n.format("mw.gui.mwgui.status.cursor", bX, bY, bZ);
           } else {
-          	s = String.format("cursor: (%d, ?, %d)", bX, bZ);
+          	s = I18n.format("mw.gui.mwgui.status.cursorNoY", bX, bZ);
           }
     	 if (this.mc.theWorld != null) {
     		 if (!this.mc.theWorld.getChunkFromBlockCoords(bX, bZ).isEmpty()) {
-    			 s += String.format(", biome: %s", this.mc.theWorld.getBiomeGenForCoords(bX, bZ).biomeName);
+    			 s += String.format(", " + I18n.format("mw.gui.mwgui.status.biome", this.mc.theWorld.getBiomeGenForCoords(bX, bZ).biomeName));
     		 }
     	 }
          
@@ -529,7 +531,7 @@ public class MwGui extends GuiScreen {
     public void drawHelp() {
     	drawRect(10, 20, this.width - 20, this.height - 30, 0x80000000);
     	this.fontRendererObj.drawSplitString(
-    			"Keys:\n\n" + 
+    			I18n.format("mw.gui.mwgui.keys") + ":\n\n" + 
     			"  Space\n" +
     			"  Delete\n" +
     			"  C\n" +
@@ -540,24 +542,24 @@ public class MwGui extends GuiScreen {
     			"  P\n" +
     			"  R\n" +
     			"  U\n\n" +
-    			"Left click drag or arrow keys pan the map.\n" +
-    			"Mouse wheel or Page Up/Down zooms map.\n" +
-    			"Right click map to create a new marker.\n" +
-    			"Left click drag a selected marker to move it.\n" +
-    			"Mouse wheel over selected marker to cycle colour.\n" + 
-    			"Mouse wheel over dimension or group box to cycle.\n",
+    			I18n.format("mw.gui.mwgui.helptext.1") + "\n" +
+    			I18n.format("mw.gui.mwgui.helptext.2") + "\n" +
+    			I18n.format("mw.gui.mwgui.helptext.3") + "\n" +
+    			I18n.format("mw.gui.mwgui.helptext.4") + "\n" +
+    			I18n.format("mw.gui.mwgui.helptext.5") + "\n" +
+    			I18n.format("mw.gui.mwgui.helptext.6") + "\n",
     			15, 24, this.width - 30, 0xffffff);
     	this.fontRendererObj.drawSplitString(
-    			"| Next marker group\n" +
-    			"| Delete selected marker\n" +
-    			"| Cycle selected marker colour\n" +
-    			"| Centre map on player\n" +
-    			"| Centre map on selected marker\n" +
-    			"| Select next marker\n" +
-    			"| Teleport to cursor or selected marker\n" +
-    			"| Save PNG of visible map area\n" +
-    			"| Regenerate visible map area from region files\n" +
-    			"| Underground map mode\n",
+    			"| " + I18n.format("mw.gui.mwgui.helptext.nextmarkergroup") + "\n" +
+    			"| " + I18n.format("mw.gui.mwgui.helptext.deletemarker") + "\n" +
+    			"| " + I18n.format("mw.gui.mwgui.helptext.cyclecolour") + "\n" +
+    			"| " + I18n.format("mw.gui.mwgui.helptext.centermap") + "\n" +
+    			"| " + I18n.format("mw.gui.mwgui.helptext.centermapplayer") + "\n" +
+    			"| " + I18n.format("mw.gui.mwgui.helptext.selectnextmarker") + "\n" +
+    			"| " + I18n.format("mw.gui.mwgui.helptext.teleport") + "\n" +
+    			"| " + I18n.format("mw.gui.mwgui.helptext.savepng") + "\n" +
+    			"| " + I18n.format("mw.gui.mwgui.helptext.regenerate") + "\n" +
+    			"| " + I18n.format("mw.gui.mwgui.helptext.undergroundmap") + "\n",
     			75, 42, this.width - 90, 0xffffff);
     }
     
@@ -634,13 +636,13 @@ public class MwGui extends GuiScreen {
        this.drawStatus(this.mouseBlockX, this.mouseBlockY, this.mouseBlockZ);
         
         // draw labels
-       this.helpLabel.draw(menuX, menuY, "[help]");
-       this.optionsLabel.drawToRightOf(this.helpLabel, "[options]");
-       String dimString = String.format("[dimension: %d]", this.mapView.getDimension());
+       this.helpLabel.draw(menuX, menuY, "[" + I18n.format("mw.gui.mwgui.help") + "]");
+       this.optionsLabel.drawToRightOf(this.helpLabel, "[" + I18n.format("mw.gui.mwgui.options") + "]");
+       String dimString = String.format("[" + I18n.format("mw.gui.mwgui.dimension", this.mapView.getDimension()) + "]");
        this.dimensionLabel.drawToRightOf(this.optionsLabel, dimString);
-       String groupString = String.format("[group: %s]", this.mw.markerManager.getVisibleGroupName());
+       String groupString = String.format("[" + I18n.format("mw.gui.mwgui.group") + ": %s]", this.mw.markerManager.getVisibleGroupName());
        this.groupLabel.drawToRightOf(this.dimensionLabel, groupString);
-       String overlayString = String.format("[overlay : %s]", MwAPI.getCurrentProviderName());
+       String overlayString = String.format("[" + I18n.format("mw.gui.mwgui.overlay", MwAPI.getCurrentProviderName()) + "]");
        this.overlayLabel.drawToRightOf(this.groupLabel, overlayString);
         
         // help message on mouse over
