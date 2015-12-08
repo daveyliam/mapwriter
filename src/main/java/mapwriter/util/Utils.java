@@ -212,7 +212,7 @@ public class Utils
 		StringBuilder builder = new StringBuilder();
 		for (String s : arr)
 		{
-			builder.append(I18n.format(s, new Object[0]));
+			builder.append(I18n.format(s));
 			builder.append("\n");
 		}
 		return builder.toString();
@@ -229,12 +229,12 @@ public class Utils
 
 			if (i < arr.length)
 			{
-				String s = I18n.format(arr[i], new Object[0]);
+				String s = I18n.format(arr[i]);
 				w1 = fontRendererObj.getStringWidth(s);
 			}
 			if ((arr2 != null) && (i < arr2.length))
 			{
-				String s = I18n.format(arr2[i], new Object[0]);
+				String s = I18n.format(arr2[i]);
 				w2 = fontRendererObj.getStringWidth(s);
 				w2 += 65;
 			}

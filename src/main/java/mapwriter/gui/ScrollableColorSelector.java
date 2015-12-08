@@ -34,27 +34,27 @@ public class ScrollableColorSelector extends ScrollableField
 	private void init()
 	{
 		int textboxWidth = 16;
-		int x1 = this.x + ScrollableField.arrowsWidth + this.fontrendererObj.getStringWidth(I18n.format(this.editGreen, new Object[0])) + 4;
+		int x1 = this.x + ScrollableField.arrowsWidth + this.fontrendererObj.getStringWidth(I18n.format(this.editGreen)) + 4;
 		int w = (ScrollableField.arrowsWidth * 2) + this.fontrendererObj.getStringWidth("999") + textboxWidth;
 
-		this.ScrollableNumericTextBoxColourRed = new ScrollableNumericTextBox(x1, this.y, w, I18n.format(this.editRed, new Object[0]), this.fontrendererObj);
+		this.ScrollableNumericTextBoxColourRed = new ScrollableNumericTextBox(x1, this.y, w, I18n.format(this.editRed), this.fontrendererObj);
 		this.ScrollableNumericTextBoxColourRed.setDrawArrows(true);
 		this.ScrollableNumericTextBoxColourRed.setMaxValue(255);
 		this.ScrollableNumericTextBoxColourRed.setMinValue(0);
 
-		this.ScrollableNumericTextBoxColourGreen = new ScrollableNumericTextBox(x1, this.y + MwGuiMarkerDialogNew.elementVSpacing, w, I18n.format(this.editGreen, new Object[0]), this.fontrendererObj);
+		this.ScrollableNumericTextBoxColourGreen = new ScrollableNumericTextBox(x1, this.y + MwGuiMarkerDialogNew.elementVSpacing, w, I18n.format(this.editGreen), this.fontrendererObj);
 		this.ScrollableNumericTextBoxColourGreen.setDrawArrows(true);
 		this.ScrollableNumericTextBoxColourGreen.setMaxValue(255);
 		this.ScrollableNumericTextBoxColourGreen.setMinValue(0);
 
-		this.ScrollableNumericTextBoxColourBlue = new ScrollableNumericTextBox(x1, this.y + (MwGuiMarkerDialogNew.elementVSpacing * 2), w, I18n.format(this.editBlue, new Object[0]), this.fontrendererObj);
+		this.ScrollableNumericTextBoxColourBlue = new ScrollableNumericTextBox(x1, this.y + (MwGuiMarkerDialogNew.elementVSpacing * 2), w, I18n.format(this.editBlue), this.fontrendererObj);
 		this.ScrollableNumericTextBoxColourBlue.setDrawArrows(true);
 		this.ScrollableNumericTextBoxColourBlue.setMaxValue(255);
 		this.ScrollableNumericTextBoxColourBlue.setMinValue(0);
 
 		this.colourFieldX = x1 + w + 2;
 		this.colourFieldY = this.y + 6;
-		this.colourFieldW = this.width - w - (ScrollableField.arrowsWidth * 2) - this.fontrendererObj.getStringWidth(I18n.format(this.editGreen, new Object[0])) - 8;
+		this.colourFieldW = this.width - w - (ScrollableField.arrowsWidth * 2) - this.fontrendererObj.getStringWidth(I18n.format(this.editGreen)) - 8;
 		this.colourFieldH = MwGuiMarkerDialogNew.elementVSpacing * 2;
 	}
 

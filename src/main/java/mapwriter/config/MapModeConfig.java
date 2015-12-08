@@ -9,17 +9,17 @@ public class MapModeConfig
 	public final String configCategory;
 	public static final String[] coordsModeStringArray =
 	{
-			"disabled",
-			"small",
-			"large"
+			"mw.config.map.coordsMode.disabled",
+			"mw.config.map.coordsMode.small",
+			"mw.config.map.coordsMode.large"
 	};
 
 	public static final String[] miniMapPositionStringArray =
 	{
-			"top right",
-			"top left",
-			"bottom right",
-			"bottom left"
+			"mw.config.map.position.topRight",
+			"mw.config.map.position.topLeft",
+			"mw.config.map.position.botRight",
+			"mw.config.map.position.botLeft"
 	};
 
 	public boolean enabledDef = true;
@@ -53,9 +53,9 @@ public class MapModeConfig
 	public void loadConfig()
 	{
 		// get options from config file
-		this.playerArrowSize = ConfigurationHandler.configuration.getInt("playerArrowSize", this.configCategory, this.playerArrowSizeDef, 1, 20, "mw.config.map.playerArrowSize");
-		this.markerSize = ConfigurationHandler.configuration.getInt("markerSize", this.configCategory, this.markerSizeDef, 1, 20, "mw.config.map.markerSize");
-		this.alphaPercent = ConfigurationHandler.configuration.getInt("alphaPercent", this.configCategory, this.alphaPercentDef, 0, 100, "mw.config.map.alphaPercent");
+		this.playerArrowSize = ConfigurationHandler.configuration.getInt("playerArrowSize", this.configCategory, this.playerArrowSizeDef, 1, 20, "", "mw.config.map.playerArrowSize");
+		this.markerSize = ConfigurationHandler.configuration.getInt("markerSize", this.configCategory, this.markerSizeDef, 1, 20, "", "mw.config.map.markerSize");
+		this.alphaPercent = ConfigurationHandler.configuration.getInt("alphaPercent", this.configCategory, this.alphaPercentDef, 0, 100, "", "mw.config.map.alphaPercent");
 
 		this.trailMarkerSize = Math.max(1, this.markerSize - 1);
 	}

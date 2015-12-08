@@ -43,7 +43,7 @@ public class MwGui extends GuiScreen
 
 	private String[] HelpText1 = new String[]
 	{
-			"Keys:",
+			"mw.gui.mwgui.keys",
 			"",
 			"  Space",
 			"  Delete",
@@ -169,16 +169,16 @@ public class MwGui extends GuiScreen
 	{
 		this.helpLabel = new MwGuiLabel(new String[]
 		{
-			"[" + I18n.format("mw.gui.mwgui.help", new Object[0]) + "]"
+			"[" + I18n.format("mw.gui.mwgui.help") + "]"
 		}, null, menuX, menuY, true, false, this.width, this.height);
 		this.optionsLabel = new MwGuiLabel(new String[]
 		{
-			"[" + I18n.format("mw.gui.mwgui.options", new Object[0]) + "]"
+			"[" + I18n.format("mw.gui.mwgui.options") + "]"
 		}, null, 0, 0, true, false, this.width, this.height);
 		this.dimensionLabel = new MwGuiLabel(null, null, 0, 0, true, false, this.width, this.height);
 		this.groupLabel = new MwGuiLabel(null, null, 0, 0, true, false, this.width, this.height);
 		this.overlayLabel = new MwGuiLabel(null, null, 0, 0, true, false, this.width, this.height);
-		String updateString = String.format("[" + I18n.format("mw.gui.mwgui.newversion", new Object[0]) + ": %s]", VersionCheck.getLatestVersion());
+		String updateString = "[" + I18n.format("mw.gui.mwgui.newversion", VersionCheck.getLatestVersion()) + "]";
 		this.updateLabel = new MwGuiLabel(new String[]
 		{
 			updateString
@@ -263,13 +263,12 @@ public class MwGui extends GuiScreen
 		this.mw.chunkManager.saveChunks();
 		this.mw.executor.addTask(new MergeTask(this.mw.regionManager, (int) this.mapView.getX(), (int) this.mapView.getZ(), (int) this.mapView.getWidth(), (int) this.mapView.getHeight(), this.mapView.getDimension(), this.mw.worldDir, this.mw.worldDir.getName()));
 
-		Utils.printBoth(I18n.format("mw.gui.mwgui.chatmsg.merge", new Object[0]) + " '" + this.mw.worldDir.getAbsolutePath() + "'");
+		Utils.printBoth(I18n.format("mw.gui.mwgui.chatmsg.merge", this.mw.worldDir.getAbsolutePath()));
 	}
 
 	public void regenerateView()
 	{
-		Utils.printBoth(String.format(
-				I18n.format("mw.gui.mwgui.chatmsg.regenmap.1", new Object[0]) + " %dx%d " + I18n.format("mw.gui.mwgui.chatmsg.regenmap.2", new Object[0]) + " (%d, %d)",
+		Utils.printBoth(I18n.format("mw.gui.mwgui.chatmsg.regenmap",
 				(int) this.mapView.getWidth(),
 				(int) this.mapView.getHeight(),
 				(int) this.mapView.getMinX(),
@@ -624,11 +623,11 @@ public class MwGui extends GuiScreen
 		StringBuilder builder = new StringBuilder();
 		if (bY != 0)
 		{
-			builder.append(String.format(I18n.format("mw.gui.mwgui.status.cursor", new Object[0]) + ": (%d, %d, %d)", bX, bY, bZ));
+			builder.append(I18n.format("mw.gui.mwgui.status.cursor", bX, bY, bZ));
 		}
 		else
 		{
-			builder.append(String.format(I18n.format("mw.gui.mwgui.status.cursor", new Object[0]) + ": (%d, ?, %d)", bX, bZ));
+			builder.append(I18n.format("mw.gui.mwgui.status.cursorNoY", bX, bZ));
 		}
 
 		if (this.mc.theWorld != null)
@@ -636,8 +635,7 @@ public class MwGui extends GuiScreen
 			if (!this.mc.theWorld.getChunkFromBlockCoords(new BlockPos(bX, 0, bZ)).isEmpty())
 			{
 				builder.append(", ");
-				builder.append(I18n.format("mw.gui.mwgui.status.biome", new Object[0]));
-				builder.append(String.format(": %s", this.mc.theWorld.getBiomeGenForCoords(new BlockPos(bX, 0, bZ)).biomeName));
+				builder.append(I18n.format("mw.gui.mwgui.status.biome", this.mc.theWorld.getBiomeGenForCoords(new BlockPos(bX, 0, bZ)).biomeName));
 			}
 		}
 
@@ -748,21 +746,21 @@ public class MwGui extends GuiScreen
 	{
 		this.helpLabel.draw();
 		this.optionsLabel.draw();
-		String dimString = String.format("[" + I18n.format("mw.gui.mwgui.dimension", new Object[0]) + ": %d]", this.mapView.getDimension());
+		String dimString = "[" + I18n.format("mw.gui.mwgui.dimension",this.mapView.getDimension()) + "]";
 		this.dimensionLabel.setText(new String[]
 		{
 			dimString
 		}, null);
 		this.dimensionLabel.draw();
 
-		String groupString = String.format("[" + I18n.format("mw.gui.mwgui.group", new Object[0]) + ": %s]", this.mw.markerManager.getVisibleGroupName());
+		String groupString = "[" + I18n.format("mw.gui.mwgui.group.1", this.mw.markerManager.getVisibleGroupName()) + "]";
 		this.groupLabel.setText(new String[]
 		{
 			groupString
 		}, null);
 		this.groupLabel.draw();
 
-		String overlayString = String.format("[" + I18n.format("mw.gui.mwgui.overlay", new Object[0]) + ": %s]", MwAPI.getCurrentProviderName());
+		String overlayString = "[" + I18n.format("mw.gui.mwgui.overlay", MwAPI.getCurrentProviderName()) + "]";
 		this.overlayLabel.setText(new String[]
 		{
 			overlayString
@@ -831,7 +829,7 @@ public class MwGui extends GuiScreen
 			String group = this.mw.markerManager.getVisibleGroupName();
 			if (group.equals("none"))
 			{
-				group = I18n.format("mw.gui.mwgui.group", new Object[0]);
+				group = I18n.format("mw.gui.mwgui.group.2");
 			}
 
 			int mx, my, mz;

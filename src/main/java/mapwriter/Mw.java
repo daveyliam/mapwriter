@@ -26,6 +26,7 @@ import mapwriter.util.Reference;
 import mapwriter.util.Render;
 import mapwriter.util.Utils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ChatComponentText;
@@ -174,7 +175,7 @@ public class Mw
 		}
 		else
 		{
-			Utils.printBoth("teleportation is disabled in mapwriter.cfg");
+			Utils.printBoth(I18n.format("mw.msg.tpdisabled"));
 		}
 	}
 
@@ -187,7 +188,7 @@ public class Mw
 		}
 		else
 		{
-			Utils.printBoth("teleportation is disabled in mapwriter.cfg");
+			Utils.printBoth(I18n.format("mw.msg.tpdisabled"));
 		}
 	}
 
@@ -200,7 +201,7 @@ public class Mw
 		}
 		else
 		{
-			Utils.printBoth("teleport command is set to 'warp', can only warp to markers");
+			Utils.printBoth(I18n.format("mw.msg.warp.error"));
 		}
 	}
 
@@ -216,7 +217,7 @@ public class Mw
 		}
 		else
 		{
-			Utils.printBoth("cannot teleport to marker in different dimension");
+			Utils.printBoth(I18n.format("mw.msg.tp.dimError"));
 		}
 	}
 

@@ -5,6 +5,7 @@ import java.io.File;
 import mapwriter.region.MergeToImage;
 import mapwriter.region.RegionManager;
 import mapwriter.util.Utils;
+import net.minecraft.client.resources.I18n;
 
 public class MergeTask extends Task
 {
@@ -33,11 +34,11 @@ public class MergeTask extends Task
 		int count = MergeToImage.merge(this.regionManager, this.x, this.z, this.w, this.h, this.dimension, this.outputDir, this.basename);
 		if (count > 0)
 		{
-			this.msg = String.format("successfully wrote merged images to directory %s", this.outputDir);
+			this.msg = I18n.format("mw.task.mergetask.chatmsg.merge.done", this.outputDir);
 		}
 		else
 		{
-			this.msg = String.format("merge error: could not write images to directory %s", this.outputDir);
+			this.msg = I18n.format("mw.task.mergetask.chatmsg.merge.error", this.outputDir);
 		}
 	}
 

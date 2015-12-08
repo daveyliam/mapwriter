@@ -18,7 +18,7 @@ public class MwGuiTeleportDialog extends MwGuiTextDialog
 
 	public MwGuiTeleportDialog(GuiScreen parentScreen, Mw mw, MapView mapView, int x, int y, int z)
 	{
-		super(parentScreen, I18n.format("mw.gui.mwguimarkerdialognew.title", new Object[0]) + ":", Integer.toString(y), I18n.format("mw.gui.mwguimarkerdialognew.error", new Object[0]));
+		super(parentScreen, I18n.format("mw.gui.mwguimarkerdialognew.title") + ":", Integer.toString(y), I18n.format("mw.gui.mwguimarkerdialognew.error"));
 		this.mw = mw;
 		this.mapView = mapView;
 		this.teleportX = x;

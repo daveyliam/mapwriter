@@ -6,9 +6,9 @@ public class Config
 {
 	public static final String[] backgroundModeStringArray =
 	{
-			"none",
-			"static",
-			"panning"
+			"mw.config.backgroundTextureMode.none",
+			"mw.config.backgroundTextureMode.static",
+			"mw.config.backgroundTextureMode.panning"
 	};
 
 	// configuration options

@@ -4,6 +4,7 @@ import mapwriter.Mw;
 import mapwriter.region.BlockColours;
 import mapwriter.region.RegionManager;
 import mapwriter.util.Utils;
+import net.minecraft.client.resources.I18n;
 
 public class RebuildRegionsTask extends Task
 {
@@ -34,7 +35,7 @@ public class RebuildRegionsTask extends Task
 	@Override
 	public void onComplete()
 	{
-		Utils.printBoth("rebuild task complete");
+		Utils.printBoth(I18n.format("mw.task.rebuildregionstask.chatmsg.rebuild.compleet"));
 	}
 
 	@Override

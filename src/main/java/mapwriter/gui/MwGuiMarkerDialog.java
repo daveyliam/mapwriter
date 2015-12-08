@@ -23,7 +23,7 @@ public class MwGuiMarkerDialog extends MwGuiTextDialog
 
 	public MwGuiMarkerDialog(GuiScreen parentScreen, MarkerManager markerManager, String markerName, String markerGroup, int x, int y, int z, int dimension)
 	{
-		super(parentScreen, I18n.format("mw.gui.mwguimarkerdialog.title.new", new Object[0]) + ":", markerName, I18n.format("mw.gui.mwguimarkerdialog.error", new Object[0]));
+		super(parentScreen, I18n.format("mw.gui.mwguimarkerdialog.title.new") + ":", markerName, I18n.format("mw.gui.mwguimarkerdialog.error"));
 		this.markerManager = markerManager;
 		this.markerName = markerName;
 		this.markerGroup = markerGroup;
@@ -36,7 +36,7 @@ public class MwGuiMarkerDialog extends MwGuiTextDialog
 
 	public MwGuiMarkerDialog(GuiScreen parentScreen, MarkerManager markerManager, Marker editingMarker)
 	{
-		super(parentScreen, I18n.format("mw.gui.mwguimarkerdialog.title.edit", new Object[0]) + ":", editingMarker.name, I18n.format("mw.gui.mwguimarkerdialog.error", new Object[0]));
+		super(parentScreen, I18n.format("mw.gui.mwguimarkerdialog.title.edit") + ":", editingMarker.name, I18n.format("mw.gui.mwguimarkerdialog.error"));
 		this.markerManager = markerManager;
 		this.editingMarker = editingMarker;
 		this.markerName = editingMarker.name;
@@ -57,9 +57,9 @@ public class MwGuiMarkerDialog extends MwGuiTextDialog
 			this.markerName = this.getInputAsString();
 			if (this.inputValid)
 			{
-				this.title = I18n.format("mw.gui.mwguimarkerdialog.title.group", new Object[0]) + ":";
+				this.title = I18n.format("mw.gui.mwguimarkerdialog.title.group") + ":";
 				this.setText(this.markerGroup);
-				this.error = I18n.format("mw.gui.mwguimarkerdialog.error.group", new Object[0]);
+				this.error = I18n.format("mw.gui.mwguimarkerdialog.error.group");
 				this.state++;
 			}
 			break;
@@ -67,9 +67,9 @@ public class MwGuiMarkerDialog extends MwGuiTextDialog
 			this.markerGroup = this.getInputAsString();
 			if (this.inputValid)
 			{
-				this.title = I18n.format("mw.gui.mwguimarkerdialog.title.x", new Object[0]) + ":";
+				this.title = I18n.format("mw.gui.mwguimarkerdialog.title.x") + ":";
 				this.setText("" + this.markerX);
-				this.error = I18n.format("mw.gui.mwguimarkerdialog.error.x", new Object[0]);
+				this.error = I18n.format("mw.gui.mwguimarkerdialog.error.x");
 				this.state++;
 			}
 			break;
@@ -77,9 +77,9 @@ public class MwGuiMarkerDialog extends MwGuiTextDialog
 			this.markerX = this.getInputAsInt();
 			if (this.inputValid)
 			{
-				this.title = I18n.format("mw.gui.mwguimarkerdialog.title.y", new Object[0]) + ":";
+				this.title = I18n.format("mw.gui.mwguimarkerdialog.title.y") + ":";
 				this.setText("" + this.markerY);
-				this.error = I18n.format("mw.gui.mwguimarkerdialog.error.y", new Object[0]);
+				this.error = I18n.format("mw.gui.mwguimarkerdialog.error.y");
 				this.state++;
 			}
 			break;
@@ -87,9 +87,9 @@ public class MwGuiMarkerDialog extends MwGuiTextDialog
 			this.markerY = this.getInputAsInt();
 			if (this.inputValid)
 			{
-				this.title = I18n.format("mw.gui.mwguimarkerdialog.title.z", new Object[0]) + ":";
+				this.title = I18n.format("mw.gui.mwguimarkerdialog.title.z") + ":";
 				this.setText("" + this.markerZ);
-				this.error = I18n.format("mw.gui.mwguimarkerdialog.error.z", new Object[0]);
+				this.error = I18n.format("mw.gui.mwguimarkerdialog.error.z");
 				this.state++;
 			}
 			break;
