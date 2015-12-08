@@ -17,3 +17,5 @@ FixDependicies.bat
 Install Forge.bat
 eclipse
 /Run.bat
+/mapwriter_Client.launch
+/mapwriter_Server.launch
