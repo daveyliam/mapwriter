@@ -8,6 +8,7 @@ import mapwriter.map.Marker;
 import mapwriter.map.MarkerManager;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.input.Keyboard;
@@ -17,14 +18,17 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class MwGuiMarkerDialogNew extends GuiScreen {
+public class MwGuiMarkerDialogNew extends GuiScreen
+{
 	private final GuiScreen parentScreen;
-	String title = "Add new marker";
-	private String editMarkerName = "Name:";
-	private String editMarkerGroup = "Group:";
-	private String editMarkerX = "X:";
-	private String editMarkerY = "Y:";
-	private String editMarkerZ = "Z:";
+	String title = "";
+	String titleNew = "mw.gui.mwguimarkerdialognew.title.new";
+	String titleEdit = "mw.gui.mwguimarkerdialognew.title.edit";
+	private String editMarkerName = "mw.gui.mwguimarkerdialognew.editMarkerName";
+	private String editMarkerGroup = "mw.gui.mwguimarkerdialognew.editMarkerGroup";
+	private String editMarkerX = "mw.gui.mwguimarkerdialognew.editMarkerX";
+	private String editMarkerY = "mw.gui.mwguimarkerdialognew.editMarkerY";
+	private String editMarkerZ = "mw.gui.mwguimarkerdialognew.editMarkerZ";
 	ScrollableTextBox scrollableTextBoxName = null;
 	ScrollableTextBox scrollableTextBoxGroup = null;
 	ScrollableNumericTextBox scrollableNumericTextBoxX = null;
@@ -35,8 +39,8 @@ public class MwGuiMarkerDialogNew extends GuiScreen {
 	static final int elementVSpacing = 20;
 	private final MarkerManager markerManager;
 	private Marker editingMarker;
-	private String markerName = "name";
-	private String markerGroup = "none";
+	private String markerName = "";
+	private String markerGroup = "";
 	private int markerX = 0;
 	private int markerY = 80;
 	private int markerZ = 0;
@@ -242,6 +246,7 @@ public class MwGuiMarkerDialogNew extends GuiScreen {
 		this.editingMarker = null;
 		this.dimension = dimension;
 		this.parentScreen = parentScreen;
+		this.title = this.titleNew;
 	}
 
 	public MwGuiMarkerDialogNew(GuiScreen parentScreen,
@@ -255,6 +260,7 @@ public class MwGuiMarkerDialogNew extends GuiScreen {
 		this.markerZ = editingMarker.z;
 		this.dimension = editingMarker.dimension;
 		this.parentScreen = parentScreen;
+		this.title = this.titleEdit;
 	}
 
 	public boolean submit() {
@@ -301,28 +307,28 @@ public class MwGuiMarkerDialogNew extends GuiScreen {
 		int x = (this.width - width) / 2 + labelsWidth;
 		int y = (this.height - elementVSpacing * 5) / 2;
 		this.scrollableTextBoxName = new ScrollableTextBox(x, y, width,
-				this.editMarkerName);
+				I18n.format(this.editMarkerName));
 		this.scrollableTextBoxName.init();
 		this.scrollableTextBoxName.textField.setFocused(true);
 		this.scrollableTextBoxName.textField.setText(this.markerName);
 		this.scrollableTextBoxGroup = new ScrollableTextBox(x, y
-				+ this.elementVSpacing, width, this.editMarkerGroup,
+				+ this.elementVSpacing, width, I18n.format(this.editMarkerGroup),
 				this.markerManager.groupList);
 		this.scrollableTextBoxGroup.init();
 		this.scrollableTextBoxGroup.textField.setText(this.markerGroup);
 		this.scrollableTextBoxGroup.setDrawArrows(true);
 		this.scrollableNumericTextBoxX = new ScrollableNumericTextBox(x, y
-				+ this.elementVSpacing * 2, width, this.editMarkerX);
+				+ this.elementVSpacing * 2, width, I18n.format(this.editMarkerX));
 		this.scrollableNumericTextBoxX.init();
 		this.scrollableNumericTextBoxX.textField.setText("" + this.markerX);
 		this.scrollableNumericTextBoxX.setDrawArrows(true);
 		this.scrollableNumericTextBoxY = new ScrollableNumericTextBox(x, y
-				+ this.elementVSpacing * 3, width, this.editMarkerY);
+				+ this.elementVSpacing * 3, width, I18n.format(this.editMarkerY));
 		this.scrollableNumericTextBoxY.init();
 		this.scrollableNumericTextBoxY.textField.setText("" + this.markerY);
 		this.scrollableNumericTextBoxY.setDrawArrows(true);
 		this.scrollableNumericTextBoxZ = new ScrollableNumericTextBox(x, y
-				+ this.elementVSpacing * 4, width, this.editMarkerZ);
+				+ this.elementVSpacing * 4, width, I18n.format(this.editMarkerZ));
 		this.scrollableNumericTextBoxZ.init();
 		this.scrollableNumericTextBoxZ.textField.setText("" + this.markerZ);
 		this.scrollableNumericTextBoxZ.setDrawArrows(true);
@@ -345,7 +351,7 @@ public class MwGuiMarkerDialogNew extends GuiScreen {
 				0x80000000);
 		this.drawCenteredString(
 				this.fontRendererObj,
-				this.title,
+				I18n.format(this.title),
 				(this.width) / 2, 
 				(this.height - this.elementVSpacing * 6) / 2
 						- this.elementVSpacing / 4,
