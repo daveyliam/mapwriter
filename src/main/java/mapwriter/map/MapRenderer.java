@@ -13,6 +13,8 @@ import mapwriter.map.mapmode.MapMode;
 import mapwriter.util.Reference;
 import mapwriter.util.Render;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.util.BlockPos;
 
 import org.lwjgl.opengl.GL11;
 
@@ -24,7 +26,8 @@ public class MapRenderer
 	// accessed by the MwGui to check whether the mouse cursor is near the
 	// player arrow on the rendered map
 	public Point.Double playerArrowScreenPos = new Point.Double(0, 0);
-
+	private int textOffset = 12;
+	
 	public MapRenderer(Mw mw, MapMode mapMode, MapView mapView)
 	{
 		this.mw = mw;
@@ -219,6 +222,14 @@ public class MapRenderer
 		this.drawPlayerArrow();
 	}
 
+	private void drawStatusText()
+	{
+		this.textOffset = 12;
+		drawCoords();
+		drawBiomeName();
+		drawUndergroundMode();
+	}
+	
 	private void drawCoords()
 	{
 		// draw coordinates
@@ -228,19 +239,46 @@ public class MapRenderer
 			GlStateManager.translate(this.mapMode.textX, this.mapMode.textY, 0);
 			if (this.mapMode.config.coordsMode.equals(MapModeConfig.coordsModeStringArray[1]))
 			{
-				GlStateManager.scale(0.5f, 0.5f, 1.0f);
+				GlStateManager.scale(0.5f, 0.5f, 1.0f);	
+				this.textOffset = (int)(this.textOffset * 0.5f);
 			}
-			int offset = 0;
 			Render.drawCentredString(0, 0, this.mapMode.textColour, "%d, %d, %d", this.mw.playerXInt, this.mw.playerYInt, this.mw.playerZInt);
-			offset += 12;
-			if (Config.undergroundMode)
+			this.mapMode.textY += this.textOffset;
+			GlStateManager.popMatrix();
+		}
+	}
+	
+	private void drawBiomeName()
+	{
+		if (!this.mapMode.config.biomeMode.equals(MapModeConfig.coordsModeStringArray[0]))
+		{
+			GlStateManager.pushMatrix();
+			GlStateManager.translate(this.mapMode.textX, this.mapMode.textY, 0);
+			if (this.mapMode.config.biomeMode.equals(MapModeConfig.coordsModeStringArray[1]))
 			{
-				Render.drawCentredString(0, offset, this.mapMode.textColour, "underground mode");
+				GlStateManager.scale(0.5f, 0.5f, 1.0f);
+				this.textOffset = (int)(this.textOffset * 0.5f);
 			}
+			Render.drawCentredString(0, 0, this.mapMode.textColour, this.mw.playerBiome);
+			this.mapMode.textY += this.textOffset;
 			GlStateManager.popMatrix();
 		}
 	}
 
+	private void drawUndergroundMode()
+	{
+		if (Config.undergroundMode)
+		{
+			GlStateManager.pushMatrix();
+			GlStateManager.translate(this.mapMode.textX, this.mapMode.textY, 0);
+			GlStateManager.scale(0.5f, 0.5f, 1.0f);
+			this.textOffset = (int)(this.textOffset * 0.5f);
+			Render.drawCentredString(0, 0, this.mapMode.textColour, "underground mode");
+			this.mapMode.textY += this.textOffset;
+			GlStateManager.popMatrix();
+		}
+	}
+	
 	private IMwDataProvider drawOverlay()
 	{
 		// draw overlays from registered providers
@@ -284,7 +322,7 @@ public class MapRenderer
 		}
 		this.drawIcons();
 
-		this.drawCoords();
+		this.drawStatusText();
 
 		// some shader mods seem to need depth testing re-enabled
 		GL11.glEnable(GL11.GL_DEPTH_TEST);

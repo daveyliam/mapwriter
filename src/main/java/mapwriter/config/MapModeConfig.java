@@ -44,6 +44,8 @@ public class MapModeConfig
 	public int heightPercent = this.heightPercentDef;
 	public String PositionDef = "FullScreen";
 	public String Position = this.PositionDef;
+	public String biomeModeDef = coordsModeStringArray[0];
+	public String biomeMode = this.biomeModeDef;
 
 	public MapModeConfig(String configCategory)
 	{

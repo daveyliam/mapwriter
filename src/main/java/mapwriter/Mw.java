@@ -29,6 +29,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.chunk.Chunk;
 
@@ -56,6 +57,7 @@ public class Mw
 	public int playerXInt = 0;
 	public int playerYInt = 0;
 	public int playerZInt = 0;
+	public String playerBiome = "";
 	public double playerHeading = 0.0;
 	public int playerDimension = 0;
 	public float mapRotationDegrees = 0.0f;
@@ -143,7 +145,15 @@ public class Mw
 		this.playerXInt = (int) Math.floor(this.playerX);
 		this.playerYInt = (int) Math.floor(this.playerY);
 		this.playerZInt = (int) Math.floor(this.playerZ);
-
+		
+		if (this.mc.theWorld != null)
+		{
+			if (!this.mc.theWorld.getChunkFromBlockCoords(new BlockPos(this.playerX, 0, this.playerZ)).isEmpty())
+			{
+				this.playerBiome = this.mc.theWorld.getBiomeGenForCoords(new BlockPos(this.playerX, 0, this.playerZ)).biomeName;
+			}
+		}
+		
 		// rotationYaw of 0 points due north, we want it to point due east
 		// instead
 		// so add pi/2 radians (90 degrees)

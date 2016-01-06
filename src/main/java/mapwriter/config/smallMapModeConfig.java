@@ -24,6 +24,7 @@ public class smallMapModeConfig extends largeMapModeConfig
 		this.rotateDef = true;
 		this.circularDef = true;
 		this.coordsModeDef = coordsModeStringArray[1];
+		this.biomeModeDef = coordsModeStringArray[0];
 		this.borderModeDef = true;
 		this.playerArrowSizeDef = 4;
 		this.markerSizeDef = 3;

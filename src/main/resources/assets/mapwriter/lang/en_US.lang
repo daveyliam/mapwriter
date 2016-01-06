@@ -91,14 +91,14 @@ mw.config.map.rotate=Rotate map
 mw.config.map.rotate.tooltip=Set to true to rotate the map, only possible in circular mode
 mw.config.map.circular=Circular map
 mw.config.map.circular.tooltip=True = Circular map, false = square map
-mw.config.map.coordsEnabled=Enable coordinates
-mw.config.map.coordsEnabled.tooltip=set to true to display coordinates under map
 mw.config.map.borderMode=Draw border
 mw.config.map.borderMode.tooltip=Set to true to draw the borders around the map
 mw.config.map.trailMarkerSize=Trail marker size
 mw.config.map.trailMarkerSize.tooltip=The size of trail markers on the map
 mw.config.map.coordsMode=Coordinates mode
 mw.config.map.coordsMode.tooltip=Switch between no,small or large coordinates under the minimap
+mw.config.map.biomeMode=Biome mode
+mw.config.map.biomeMode.tooltip=Switch between no,small or large biome name under the minimap
 mw.config.map.coordsMode.disabled=Disabled
 mw.config.map.coordsMode.small=Small
 mw.config.map.coordsMode.large=Large
