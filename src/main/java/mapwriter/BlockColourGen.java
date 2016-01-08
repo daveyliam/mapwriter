@@ -111,17 +111,14 @@ public class BlockColourGen
 		{
 			Block block = (Block) oblock;
 			int blockID = Block.getIdFromBlock(block);
-			if (blockID == 0)
-			{
-				continue;
-			}
+
 			for (int dv = 0; dv < 16; dv++)
 			{
 
 				// int blockAndMeta = ((blockID & 0xfff) << 4) | (dv & 0xf);
 				int blockColour = 0;
 
-				if (block != null)
+				if (block != null && block.getRenderType() != -1)
 				{
 
 					TextureAtlasSprite icon = null;
