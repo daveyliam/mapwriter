@@ -264,8 +264,9 @@ public class Mw
 	public void reloadBlockColours()
 	{
 		BlockColours bc = new BlockColours();
-		File f = new File(this.configDir, Reference.blockColourSaveFileName);
-		if (Config.useSavedBlockColours && f.isFile())
+		File f = new File(this.configDir, Reference.blockColourSaveFileName);		
+		
+		if (Config.useSavedBlockColours && f.isFile() && bc.CheckFileVersion(f))
 		{
 			// load block colours from file
 			Logging.logInfo("loading block colours from %s", f);
@@ -283,7 +284,7 @@ public class Mw
 		}
 		this.blockColours = bc;
 	}
-
+	
 	public void reloadMapTexture()
 	{
 		this.executor.addTask(new CloseRegionManagerTask(this.regionManager));

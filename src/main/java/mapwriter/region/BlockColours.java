@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.RandomAccessFile;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +17,7 @@ import java.util.Map.Entry;
 import java.util.Scanner;
 
 import mapwriter.util.Logging;
+import mapwriter.util.Reference;
 import mapwriter.util.Render;
 import net.minecraft.block.Block;
 
@@ -441,6 +443,10 @@ public class BlockColours
 					{
 						this.loadBlockTypeLine(lineSplit);
 					}
+					else if (lineSplit[0].equals("version:"))
+					{
+						
+					}
 					else
 					{
 						Logging.logWarning("invalid map colour line '%s'", line);
@@ -611,6 +617,7 @@ public class BlockColours
 		try
 		{
 			fout = new OutputStreamWriter(new FileOutputStream(f));
+			fout.write(String.format("version: %s\n", Reference.VERSION));
 			this.saveBiomes(fout);
 			this.saveBlockTypes(fout);
 			this.saveBlocks(fout);
@@ -642,7 +649,8 @@ public class BlockColours
 		try
 		{
 			fout = new OutputStreamWriter(new FileOutputStream(f));
-
+			fout.write(String.format("version: %s\n", Reference.VERSION));
+			
 			fout.write("block minecraft:yellow_flower * 60ffff00	# make dandelions more yellow\n" + "block minecraft:red_flower 0 60ff0000		# make poppy more red\n" + "block minecraft:red_flower 1 601c92d6		# make Blue Orchid more red\n"
 					+ "block minecraft:red_flower 2 60b865fb		# make Allium more red\n" + "block minecraft:red_flower 3 60e4eaf2		# make Azure Bluet more red\n" + "block minecraft:red_flower 4 60d33a17		# make Red Tulip more red\n"
 					+ "block minecraft:red_flower 5 60e17124		# make Orange Tulip more red\n" + "block minecraft:red_flower 6 60ffffff		# make White Tulip more red\n" + "block minecraft:red_flower 7 60eabeea		# make Pink Tulip more red\n"
@@ -688,6 +696,28 @@ public class BlockColours
 		}
 	}
 
+    public boolean CheckFileVersion(File fn)
+    {
+        String lineData = "";
+        try
+        {
+            RandomAccessFile inFile = new RandomAccessFile(fn,"rw");
+            lineData = inFile.readLine();
+            inFile.close();
+        }
+        catch(IOException ex)
+        {
+            System.err.println(ex.getMessage());
+        }
+        
+        if (lineData.equals(String.format("version: %s", Reference.VERSION)))
+        {
+        	return true;
+        }
+        
+        return false;
+    }
+	
 	public class BlockData
 	{
 		public int color = 0;
