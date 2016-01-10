@@ -85,4 +85,17 @@ public class Marker
 		double d2 = this.z - entityIn.posZ;
 		return MathHelper.sqrt_double((d0 * d0) + (d1 * d1) + (d2 * d2));
 	}
+
+	public float getRed()
+	{
+		return (((colour >> 16) & 0xff) / 255.0f);
+	}
+	public float getGreen()
+	{
+		return (((colour >> 8) & 0xff) / 255.0f);
+	}
+	public float getBlue()
+	{
+		return (((colour) & 0xff) / 255.0f);
+	}
 }

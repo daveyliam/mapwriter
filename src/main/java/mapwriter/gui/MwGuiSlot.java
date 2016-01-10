@@ -6,11 +6,13 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public abstract class MwGuiSlot
@@ -305,26 +307,23 @@ public abstract class MwGuiSlot
 					i2 = this.top;
 				}
 				// draw the scrollbar
-				worldrenderer.startDrawingQuads();
-				worldrenderer.setColorRGBA_I(0, 255);
-				worldrenderer.addVertexWithUV(k, this.bottom, 0.0D, 0.0D, 1.0D);
-				worldrenderer.addVertexWithUV(l, this.bottom, 0.0D, 1.0D, 1.0D);
-				worldrenderer.addVertexWithUV(l, this.top, 0.0D, 1.0D, 0.0D);
-				worldrenderer.addVertexWithUV(k, this.top, 0.0D, 0.0D, 0.0D);
+				worldrenderer.begin(GL11.GL_QUADS , DefaultVertexFormats.POSITION_TEX_COLOR);
+				worldrenderer.pos(k, this.bottom, 0.0D).tex(0.0D, 1.0D).color(0, 0, 0, 255).endVertex();
+				worldrenderer.pos(l, this.bottom, 0.0D).tex(1.0D, 1.0D).color(0, 0, 0, 255).endVertex();
+				worldrenderer.pos(l, this.top, 0.0D).tex(1.0D, 0.0D).color(0, 0, 0, 255).endVertex();
+				worldrenderer.pos(k, this.top, 0.0D).tex(0.0D, 0.0D).color(0, 0, 0, 255).endVertex();
 				tessellator.draw();
-				worldrenderer.startDrawingQuads();
-				worldrenderer.setColorRGBA_I(8421504, 255);
-				worldrenderer.addVertexWithUV(k, i2 + l1, 0.0D, 0.0D, 1.0D);
-				worldrenderer.addVertexWithUV(l, i2 + l1, 0.0D, 1.0D, 1.0D);
-				worldrenderer.addVertexWithUV(l, i2, 0.0D, 1.0D, 0.0D);
-				worldrenderer.addVertexWithUV(k, i2, 0.0D, 0.0D, 0.0D);
+				worldrenderer.begin(GL11.GL_QUADS , DefaultVertexFormats.POSITION_TEX_COLOR);
+				worldrenderer.pos(k, i2 + l1, 0.0D).tex(0.0D, 1.0D).color(128, 128, 128, 255).endVertex();
+				worldrenderer.pos(l, i2 + l1, 0.0D).tex(1.0D, 1.0D).color(128, 128, 128, 255).endVertex();
+				worldrenderer.pos(l, i2, 0.0D).tex(1.0D, 0.0D).color(128, 128, 128, 255).endVertex();
+				worldrenderer.pos(k, i2, 0.0D).tex(0.0D, 0.0D).color(128, 128, 128, 255).endVertex();
 				tessellator.draw();
-				worldrenderer.startDrawingQuads();
-				worldrenderer.setColorRGBA_I(12632256, 255);
-				worldrenderer.addVertexWithUV(k, (i2 + l1) - 1, 0.0D, 0.0D, 1.0D);
-				worldrenderer.addVertexWithUV(l - 1, (i2 + l1) - 1, 0.0D, 1.0D, 1.0D);
-				worldrenderer.addVertexWithUV(l - 1, i2, 0.0D, 1.0D, 0.0D);
-				worldrenderer.addVertexWithUV(k, i2, 0.0D, 0.0D, 0.0D);
+				worldrenderer.begin(GL11.GL_QUADS , DefaultVertexFormats.POSITION_TEX_COLOR);
+				worldrenderer.pos(k, (i2 + l1) - 1, 0.0D).tex(0.0D, 1.0D).color(192, 192, 192, 255).endVertex();
+				worldrenderer.pos(l - 1, (i2 + l1) - 1, 0.0D).tex(1.0D, 1.0D).color(192, 192, 192, 255).endVertex();
+				worldrenderer.pos(l - 1, i2, 0.0D).tex(1.0D, 0.0D).color(192, 192, 192, 255).endVertex();
+				worldrenderer.pos(k, i2, 0.0D).tex(0.0D, 0.0D).color(192, 192, 192, 255).endVertex();
 				tessellator.draw();
 			}
 
@@ -504,17 +503,15 @@ public abstract class MwGuiSlot
 
 				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 				GlStateManager.disableTexture2D();
-				worldrenderer.startDrawingQuads();
-				worldrenderer.setColorOpaque_I(8421504);
-				worldrenderer.addVertexWithUV(xLeft, yTotal + slotHeight, 0.0D, 0.0D, 1.0D);
-				worldrenderer.addVertexWithUV(xRight, yTotal + slotHeight, 0.0D, 1.0D, 1.0D);
-				worldrenderer.addVertexWithUV(xRight, (yTotal), 0.0D, 1.0D, 0.0D);
-				worldrenderer.addVertexWithUV(xLeft, (yTotal), 0.0D, 0.0D, 0.0D);
-				worldrenderer.setColorOpaque_I(0);
-				worldrenderer.addVertexWithUV(xLeft + 1, (yTotal + slotHeight) - 1, 0.0D, 0.0D, 1.0D);
-				worldrenderer.addVertexWithUV(xRight - 1, (yTotal + slotHeight) - 1, 0.0D, 1.0D, 1.0D);
-				worldrenderer.addVertexWithUV(xRight - 1, yTotal + 1, 0.0D, 1.0D, 0.0D);
-				worldrenderer.addVertexWithUV(xLeft + 1, yTotal + 1, 0.0D, 0.0D, 0.0D);
+				worldrenderer.begin( GL11.GL_QUADS , DefaultVertexFormats.POSITION_TEX_COLOR);
+				worldrenderer.pos(xLeft, yTotal + slotHeight, 0.0D).tex(0.0D, 1.0D).color(128, 128, 128, 255).endVertex();
+				worldrenderer.pos(xRight, yTotal + slotHeight, 0.0D).tex(1.0D, 1.0D).color(128, 128, 128, 255).endVertex();
+				worldrenderer.pos(xRight, (yTotal), 0.0D).tex(1.0D, 0.0D).color(128, 128, 128, 255).endVertex();
+				worldrenderer.pos(xLeft, (yTotal), 0.0D).tex(0.0D, 0.0D).color(128, 128, 128, 255).endVertex();
+				worldrenderer.pos(xLeft + 1, (yTotal + slotHeight) - 1, 0.0D).tex(0.0D, 1.0D).color(0, 0, 0, 255).endVertex();
+				worldrenderer.pos(xRight - 1, (yTotal + slotHeight) - 1, 0.0D).tex(1.0D, 1.0D).color(0, 0, 0, 255).endVertex();
+				worldrenderer.pos(xRight - 1, yTotal + 1, 0.0D).tex(1.0D, 0.0D).color(0, 0, 0, 255).endVertex();
+				worldrenderer.pos(xLeft + 1, yTotal + 1, 0.0D).tex(0.0D, 0.0D).color(0, 0, 0, 255).endVertex();
 				tessellator.draw();
 				GlStateManager.enableTexture2D();
 			}
