@@ -27,6 +27,8 @@ public class MapRenderer
 	// player arrow on the rendered map
 	public Point.Double playerArrowScreenPos = new Point.Double(0, 0);
 	private int textOffset = 12;
+	private int textY = 0;
+	private int textX = 0;
 	
 	public MapRenderer(Mw mw, MapMode mapMode, MapView mapView)
 	{
@@ -225,6 +227,8 @@ public class MapRenderer
 	private void drawStatusText()
 	{
 		this.textOffset = 12;
+		this.textY = this.mapMode.textY;
+		this.textX = this.mapMode.textX;
 		drawCoords();
 		drawBiomeName();
 		drawUndergroundMode();
@@ -236,14 +240,14 @@ public class MapRenderer
 		if (!this.mapMode.config.coordsMode.equals(MapModeConfig.coordsModeStringArray[0]))
 		{
 			GlStateManager.pushMatrix();
-			GlStateManager.translate(this.mapMode.textX, this.mapMode.textY, 0);
+			GlStateManager.translate(this.textX, this.textY, 0);
 			if (this.mapMode.config.coordsMode.equals(MapModeConfig.coordsModeStringArray[1]))
 			{
 				GlStateManager.scale(0.5f, 0.5f, 1.0f);	
 				this.textOffset = (int)(this.textOffset * 0.5f);
 			}
 			Render.drawCentredString(0, 0, this.mapMode.textColour, "%d, %d, %d", this.mw.playerXInt, this.mw.playerYInt, this.mw.playerZInt);
-			this.mapMode.textY += this.textOffset;
+			this.textY += this.textOffset;
 			GlStateManager.popMatrix();
 		}
 	}
@@ -253,14 +257,14 @@ public class MapRenderer
 		if (!this.mapMode.config.biomeMode.equals(MapModeConfig.coordsModeStringArray[0]))
 		{
 			GlStateManager.pushMatrix();
-			GlStateManager.translate(this.mapMode.textX, this.mapMode.textY, 0);
+			GlStateManager.translate(this.textX, this.textY, 0);
 			if (this.mapMode.config.biomeMode.equals(MapModeConfig.coordsModeStringArray[1]))
 			{
 				GlStateManager.scale(0.5f, 0.5f, 1.0f);
 				this.textOffset = (int)(this.textOffset * 0.5f);
 			}
 			Render.drawCentredString(0, 0, this.mapMode.textColour, this.mw.playerBiome);
-			this.mapMode.textY += this.textOffset;
+			this.textY += this.textOffset;
 			GlStateManager.popMatrix();
 		}
 	}
@@ -270,11 +274,11 @@ public class MapRenderer
 		if (Config.undergroundMode)
 		{
 			GlStateManager.pushMatrix();
-			GlStateManager.translate(this.mapMode.textX, this.mapMode.textY, 0);
+			GlStateManager.translate(this.textX, this.textY, 0);
 			GlStateManager.scale(0.5f, 0.5f, 1.0f);
 			this.textOffset = (int)(this.textOffset * 0.5f);
 			Render.drawCentredString(0, 0, this.mapMode.textColour, "underground mode");
-			this.mapMode.textY += this.textOffset;
+			this.textY += this.textOffset;
 			GlStateManager.popMatrix();
 		}
 	}
