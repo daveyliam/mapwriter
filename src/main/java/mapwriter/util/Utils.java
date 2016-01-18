@@ -18,6 +18,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.realms.Realms;
 import net.minecraft.server.integrated.IntegratedServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.chunk.Chunk;
@@ -153,6 +154,10 @@ public class Utils
 			// is set statically to "MpServer".
 			IntegratedServer server = Minecraft.getMinecraft().getIntegratedServer();
 			worldName = (server != null) ? server.getFolderName() : "sp_world";
+		}
+		else if (Minecraft.getMinecraft().isConnectedToRealms())
+		{
+			worldName = "Realms";
 		}
 		else
 		{
