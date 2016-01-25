@@ -20,6 +20,11 @@ public class ConfigurationHandler
 			configuration = new Configuration(configFile);
 			setMapModeDefaults();
 			loadConfig();
+			
+			configuration.get(Reference.catOptions, "overlayModeIndex", Config.overlayModeIndexDef).setShowInGui(false);
+			configuration.get(Reference.catOptions, "overlayZoomLevel", Config.zoomInLevelsDef).setShowInGui(false);
+			
+			
 		}
 	}
 
@@ -45,7 +50,7 @@ public class ConfigurationHandler
 		Config.configTextureSize = configuration.getInt("textureSize", Reference.catOptions, Config.configTextureSizeDef, 1024, 4096, "", "mw.config.textureSize");
 		
 		Config.overlayModeIndex = configuration.getInt("overlayModeIndex", Reference.catOptions, Config.overlayModeIndexDef, 0, 1000, "", "mw.config.overlayModeIndex");
-		Config.overlayZoomLevel = configuration.getInt("overlayZoomLevel", Reference.catOptions, 0, Config.zoomInLevels, Config.zoomOutLevels, "", "mw.config.overlayZoomLevel");
+		Config.overlayZoomLevel = configuration.getInt("overlayZoomLevel", Reference.catOptions, Config.overlayZoomLevelDef, Config.zoomInLevels, Config.zoomOutLevels, "", "mw.config.overlayZoomLevel");
 
 		Config.moreRealisticMap = configuration.getBoolean("moreRealisticMap", Reference.catOptions, Config.moreRealisticMapDef, "", "mw.config.moreRealisticMap");
 
@@ -75,9 +80,6 @@ public class ConfigurationHandler
 
 	public static void setMapModeDefaults()
 	{
-		configuration.get(Reference.catOptions, "overlayModeIndex", Config.overlayModeIndexDef).setShowInGui(false);
-		configuration.get(Reference.catOptions, "overlayZoomLevel", Config.zoomInLevelsDef).setShowInGui(false);
-		
 		Config.fullScreenMap.setDefaults();
 		Config.largeMap.setDefaults();
 		Config.smallMap.setDefaults();
