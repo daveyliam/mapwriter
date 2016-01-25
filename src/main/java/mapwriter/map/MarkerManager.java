@@ -159,12 +159,12 @@ public class MarkerManager
 	public void addMarker(Marker marker)
 	{
 		this.markerList.add(marker);
-		this.save(WorldConfig.getInstance().worldConfiguration, Reference.catMarkers);
 	}
 	
 	public void addMarker(String name, String groupName, int x, int y, int z, int dimension, int colour)
 	{
 		this.addMarker(new Marker(name, groupName, x, y, z, dimension, colour));
+		this.save(WorldConfig.getInstance().worldConfiguration, Reference.catMarkers);
 	}
 
 	// returns true if the marker exists in the arraylist.
