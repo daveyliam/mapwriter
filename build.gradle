@@ -57,6 +57,7 @@ version = config.mc_version + "-" + config.forge_version
 runDir = "eclipse"
 mappings = config.mcp_version
 replace '@MOD_VERSION@', config.mod_version
+replace '@ACCEPTED_MC_VERSION@', config.accepted_mc_version
 }
 
 processResources

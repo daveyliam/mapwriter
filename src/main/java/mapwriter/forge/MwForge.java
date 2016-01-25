@@ -22,7 +22,8 @@ name = Reference.MOD_NAME,
 version = Reference.VERSION,
 guiFactory = Reference.MOD_GUIFACTORY_CLASS,
 clientSideOnly = true,
-updateJSON = Reference.ForgeVersionURL)
+updateJSON = Reference.ForgeVersionURL,
+acceptedMinecraftVersions="@ACCEPTED_MC_VERSION@")
 public class MwForge
 {
 
