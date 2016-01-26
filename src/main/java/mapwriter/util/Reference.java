@@ -26,9 +26,9 @@ public final class Reference
 
 	public static final String PlayerTrailName = "player";
 
-	public static final Pattern patternInvalidChars = Pattern.compile("[^a-zA-Z0-9_]");
-	public static final Pattern patternInvalidChars2 = Pattern.compile("[^a-zA-Z0-9_ -]");
-
+	public static final Pattern patternInvalidChars = Pattern.compile("[^\\p{L}\\p{Nd}_]");
+	public static final Pattern patternInvalidChars2 = Pattern.compile("[^\\p{L}\\p{Nd}_ -]");
+	
 	public static final String catWorld = "world";
 	public static final String catMarkers = "markers";
 	public static final String worldDirConfigName = "mapwriter.cfg";
