@@ -1,22 +1,30 @@
+
+// For those who want the bleeding edge
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
         maven {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
         }
-        maven {
-            name = "sonatype"
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
-        }
+		maven { 
+			url = 'https://oss.sonatype.org/content/groups/public' 
+		}
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
+		//classpath 'com.matthewprenger:CurseGradle:1.0.5-SNAPSHOT'
     }
 }
 
-apply plugin: 'forge'
-apply plugin: 'curseforge'
+// for people who want stable
+plugins {
+    //id "net.minecraftforge.gradle.forge" version "2.0.2"
+	id 'com.matthewprenger.cursegradle' version '1.0.4'
+}
+
+apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'com.matthewprenger.cursegradle'
 
 repositories {
 	mavenLocal()
@@ -49,6 +57,7 @@ version = config.mc_version + "-" + config.forge_version
 runDir = "eclipse"
 mappings = config.mcp_version
 replace '@MOD_VERSION@', config.mod_version
+replace '@ACCEPTED_MC_VERSION@', config.accepted_mc_version
 }
 
 processResources
@@ -77,14 +86,9 @@ jar {
 //classifier = 'universal'
 }
 
-task sourceJar(type: Jar) {
-    from sourceSets.main.allSource
-    classifier = 'src'
-}
-
 task devJar(type: Jar) {
-from sourceSets.main.output
-classifier = 'dev'
+	from sourceSets.main.output
+	classifier = 'dev'
 }
 
 artifacts {
@@ -118,8 +122,14 @@ gradle.taskGraph.whenReady { taskGraph ->
   }
 }
 
-curse {
-    projectId = config.curse_project_id
-    apiKey = project.hasProperty('curseForgeApiKey') ? project.curseForgeApiKey : ''
-    releaseType = 'release'
+curseforge {
+  apiKey = project.hasProperty('curseForgeApiKey') ? project.curseForgeApiKey : ''
+  project {
+	//changelogType = "text"
+    id = config.curse_project_id
+    changelog = "" // A file can also be set using: changelog = file('changelog.txt')
+    releaseType = config.release_type
+	mainArtifact jar
+	addGameVersion config.mc_version
+  }
 }
