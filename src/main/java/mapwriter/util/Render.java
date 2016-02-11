@@ -322,7 +322,7 @@ public class Render
 
 	public static void setCircularStencil(double x, double y, double r)
 	{
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GlStateManager.enableDepth();
 		// disable drawing to the color buffer.
 		// circle will only be drawn to depth buffer.
 		GlStateManager.colorMask(false, false, false, false);
@@ -367,7 +367,6 @@ public class Render
 		GlStateManager.depthMask(true);
 		GlStateManager.depthFunc(GL11.GL_LEQUAL);
 		GlStateManager.disableDepth();
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
 
 		// set the zDepth to 0 to make sure there arent any problems drawing
 		// other things when circular map isnt drawn

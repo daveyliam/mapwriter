@@ -329,7 +329,7 @@ public class MapRenderer
 		this.drawStatusText();
 
 		// some shader mods seem to need depth testing re-enabled
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GlStateManager.enableDepth();
 		GlStateManager.popMatrix();
 	}
 
