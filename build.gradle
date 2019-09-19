@@ -11,7 +11,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:1.1-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
     }
 }
 
@@ -22,7 +22,7 @@ group = 'mapwriter'
 archivesBaseName = 'MapWriter'
 
 minecraft {
-	version = '1.7.2-10.12.0.1034'
+	version = '1.7.10-10.13.0.1160'
     assetDir = "eclipse/assets"
 }
 processResources
