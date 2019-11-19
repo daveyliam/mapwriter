@@ -1,0 +1,186 @@
+# Keys
+key.mw_open_gui=Abrir menu de mapa
+key.mw_new_marker=Nuevo marcador
+key.mw_next_map_mode=Siguiente modo de mapa
+key.mw_next_marker_group=Siguiente grupo de marcadores
+key.mw_teleport=Teletransportar a marcador
+key.mw_zoom_in=Acercar mapa
+key.mw_zoom_out=Alejar mapa
+key.mw_underground_mode=Mapa subterraneo
+
+#Config
+mw.configgui.ctgy.general=General
+mw.configgui.ctgy.general.tooltip=Abre las opciones generales
+mw.configgui.ctgy.fullScreenMap=Mapa de pantalla completa
+mw.configgui.ctgy.fullScreenMap.tooltip=Abre las opciones de mapa de pantalla completa
+mw.configgui.ctgy.largeMap=Mapa grande
+mw.configgui.ctgy.largeMap.tooltip=Abre las opciones del mapa grande
+mw.configgui.ctgy.smallMap=Mapa pequeño
+mw.configgui.ctgy.smallMap.tooltip=Abre las opciones del mapa pequeño
+
+#Config Global
+mw.config.linearTextureScaling=Linear texture scaling enabled
+mw.config.linearTextureScaling.tooltip=Enabled linear texture scaling. (nearest is used otherwise)
+mw.config.useSavedBlockColours=Usar colores de bloques guardados
+mw.config.useSavedBlockColours.tooltip=Activar esto va a prevenir el uso del color de los bloques predefinidos, y permitirá definir los colores por ti mismo
+mw.config.teleportEnabled=Teletransporte activado
+mw.config.teleportEnabled.tooltip=Permite teletransportarse a lugares del mapa
+mw.config.teleportCommand=Comando de teletransporte
+mw.config.teleportCommand.tooltip=El comando usado para teletransportar al jugador
+
+mw.config.maxChunkSaveDistSq=Máxima distancia de renderizado
+mw.config.maxChunkSaveDistSq.tooltip=La distancia máxima alrededor del jugador a la que se guardaran los chunks.
+mw.config.mapPixelSnapEnabled=Map pixel snap
+mw.config.mapPixelSnapEnabled.tooltip=Enables rounding the texture coordinates to the nearest pixel boundary. (this makes the map look less blurry in zoom level 0
+mw.config.maxDeathMarkers=Máximo de marcadores de muerte
+mw.config.maxDeathMarkers.tooltip=La cantidad máxima de marcadores de muerte
+mw.config.chunksPerTick=Chunks por tick
+mw.config.chunksPerTick.tooltip=Define la maxima cantidad de actualizaciones de chunk por tick
+mw.config.saveDirOverride=Directorio de guardado
+mw.config.saveDirOverride.tooltip=Sobreescribe el directorio de guardado de imágenes y regiones
+mw.config.portNumberInWorldNameEnabled=Puerto en el nombre del mundo
+mw.config.portNumberInWorldNameEnabled.tooltip=Activa o desactiva el puerto del servidor en el nombre del mundo
+mw.config.undergroundMode=Modo subterraneo
+mw.config.undergroundMode.tooltip=Activa el modo subterraneo del mapa
+mw.config.regionFileOutputEnabledSP=Guardar ficheros de región de SP
+mw.config.regionFileOutputEnabledSP.tooltip=Activa o desactiva el guardado de ficheros de región (archivos .mca) en un sólo jugador.
+mw.config.regionFileOutputEnabledMP=Guardar ficheros de región de MP
+mw.config.regionFileOutputEnabledMP.tooltip=Activa o desactiva el guardado de ficheros de región (archivos .mca) en multijugador.
+mw.config.backgroundTextureMode=Modo de texturas de fondo
+mw.config.backgroundTextureMode.tooltip=Define el tipo de fondo para los mapas
+mw.config.backgroundTextureMode.none=Ninguno
+mw.config.backgroundTextureMode.static=Estático
+mw.config.backgroundTextureMode.panning=Panorámico
+mw.config.zoomOutLevels=Niveles de alejamiento
+mw.config.zoomOutLevels.tooltip=El número máximo de veces que se puede alejar el mapa. Valores muy altos disminuirán el rendimiento.
+mw.config.zoomInLevels=Niveles de acercamiento
+mw.config.zoomInLevels.tooltip=El número máximo de veces que se puede acercar al mapa.
+mw.config.textureSize=Tamaño de texturas
+mw.config.textureSize.tooltip=Define el tamaño de las texturas del mapa
+mw.config.moreRealisticMap=Mapa realista
+mw.config.moreRealisticMap.tooltip=Activa el uso de un diferente algoritmo de altura que resulta en un mapa más realista
+mw.config.newMarkerDialog=Nuevo dialogo de marcadores
+mw.config.newMarkerDialog.tooltip=Activa para usar el nuevo dialogo de los marcadores
+mw.config.drawMarkersInWorld=Mostrar marcadores en el mundo
+mw.config.drawMarkersInWorld.tooltip=Crea un haz de luz vertical visible en el mundo en la ubicación de los marcadores
+mw.config.drawMarkersNameInWorld=Mostrar nombres de marcadores en el mundo
+mw.config.drawMarkersNameInWorld.tooltip=Muestra una etiqueta con el nombre de los marcadores colocados en el mundo
+mw.config.drawMarkersDistanceInWorld=Mostrar la distancia hasta los marcadores en el mundo
+mw.config.drawMarkersDistanceInWorld.tooltip=Muestra una etiqueta con la distancia hasta la ubicación de los marcadores colocados en el mundo
+
+#Config map
+mw.config.map.enabled=Mapa activado
+mw.config.map.enabled.tooltip=Activar o desactivar este modo de mapa
+mw.config.map.playerArrowSize=Tamaño del indicador del jugador
+mw.config.map.playerArrowSize.tooltip=El tamaño del indicador del jugador en el mapa
+mw.config.map.markerSize=Tamaño de marcadores
+mw.config.map.markerSize.tooltip=El tamaño de los marcadores en el mapa
+mw.config.map.alphaPercent=Transparencia de mapa
+mw.config.map.alphaPercent.tooltip=La transparencia del mapa. Desde 0% hasta 100%.
+mw.config.map.heightPercent=Porcentaje de altura
+mw.config.map.heightPercent.tooltip=El tamaño de mapa como un porcentaje al tamaño total de la pantalla. Ignorado si los margenes están definidos.
+mw.config.map.marginTop=Margen superior
+mw.config.map.marginTop.tooltip=Distancia en pixeles desde la parte superior de la pantalla
+mw.config.map.marginBottom=Margen inferior
+mw.config.map.marginBottom.tooltip=Distancia en pixeles desde la parte inferior de la pantalla
+mw.config.map.marginLeft=Margen izquierdo
+mw.config.map.marginLeft.tooltip=Distancia en óxeñes desde la izquierda de la pantalla
+mw.config.map.marginRight=Margen derecho
+mw.config.map.marginRight.tooltip=Distancia en pixeles desde la derecha de la pantalla
+mw.config.map.rotate=Rotar mapa
+mw.config.map.rotate.tooltip=Activar el rotado de mapa. Sólo disponible en modo circular.
+mw.config.map.circular=Mapa circular
+mw.config.map.circular.tooltip=Activa el mapa circular, o de lo contrario el mapa cuadrado
+mw.config.map.borderMode=Borde
+mw.config.map.borderMode.tooltip=Activar o desactivar el borde alrededor del mapa
+mw.config.map.trailMarkerSize=Trail marker size
+mw.config.map.trailMarkerSize.tooltip=The size of trail markers on the map
+mw.config.map.coordsMode=Modo de coordenadas
+mw.config.map.coordsMode.tooltip=Cambia entre ningunas, pequeñas o grandes coordenadas bajo el mapa.
+mw.config.map.biomeMode=Modo de bioma
+mw.config.map.biomeMode.tooltip=Cambia entre ninguno, pequeño o un grande nombre de bioma bajo el mapa.
+mw.config.map.coordsMode.disabled=Desactivado
+mw.config.map.coordsMode.small=Pequeño
+mw.config.map.coordsMode.large=Grande
+mw.config.map.position=Posición del mapa
+mw.config.map.position.tooltip=Ubicación del mapa en la pantalla
+mw.config.map.position.topRight=Arriba a la derecha
+mw.config.map.position.topLeft=Arriba a la izquierda
+mw.config.map.position.botRight=Abajo a la derecha
+mw.config.map.position.botLeft=Abajo a la izquierda
+
+#Gui
+mw.gui.mwgui.help=Ayuda
+mw.gui.mwgui.options=Opciones
+mw.gui.mwgui.dimension=dimensión: %d
+mw.gui.mwgui.group.1=grupo: %s
+mw.gui.mwgui.group.2=grupo
+mw.gui.mwgui.overlay=revestimiento: %s
+mw.gui.mwgui.keys=Teclas
+mw.gui.mwgui.newversion=Nueva versión: %s
+mw.gui.mwgui.helptext.1=Mueve el mapa arrastrando el click izquierdo o con las flechas del teclado.
+mw.gui.mwgui.helptext.2=Acerca o aleja usando la rueda del ratón o Repág/Avpág.
+mw.gui.mwgui.helptext.3=Crea un nuevo marcador con click derecho.
+mw.gui.mwgui.helptext.4=Arrastra un marcador con el mouse izquierdo para moverlo.
+mw.gui.mwgui.helptext.5=Usa la rueda del ratón sobre un marcador para cambiar su color.
+mw.gui.mwgui.helptext.6=Usa la rueda del ratón sobre la lista de dimensiones para cambiarlas.
+mw.gui.mwgui.helptext.7=Edita un marcador con click derecho.
+mw.gui.mwgui.helptext.8=Doble click en un marcador para centrar la pantalla en él.
+mw.gui.mwgui.helptext.9=Click izquierdo en la lista de marcadores para seleccionarlo.
+mw.gui.mwgui.helptext.nextmarkergroup=Siguiente grupo de marcadores
+mw.gui.mwgui.helptext.deletemarker=Eliminar marcador seleccionado
+mw.gui.mwgui.helptext.cyclecolour=Cambiar color de marcador
+mw.gui.mwgui.helptext.centermap=Centrar mapa en el jugador
+mw.gui.mwgui.helptext.centermapplayer=Centrar mapa en el marcador seleccionado
+mw.gui.mwgui.helptext.selectnextmarker=Seleccionar siguiente marcador
+mw.gui.mwgui.helptext.teleport=Teletransportar al cursor o al marcador seleccionado
+mw.gui.mwgui.helptext.savepng=Guardar PNG del area visible del mapa
+mw.gui.mwgui.helptext.regenerate=Regenerar parte visible del mapa desde los ficheros de regiones
+mw.gui.mwgui.helptext.undergroundmap=Mapa subterraneo
+mw.gui.mwgui.helptext.markerlist=Muestra la lista de marcadores
+mw.gui.mwgui.status.biome=bioma: %s
+mw.gui.mwgui.status.cursor=cursor: (%d, %d, %d)
+mw.gui.mwgui.status.cursorNoY=cursor: (%d, ?, %d)
+mw.gui.mwgui.group=grupo
+mw.gui.mwgui.chatmsg.regenmap=regenerando %dx%d bloques comenzando de (%d, %d)
+mw.gui.mwgui.chatmsg.merge=fusionando a '%s'
+
+mw.gui.mwguidimensiondialog.title=Cambiar dimensión a
+mw.gui.mwguidimensiondialog.error=dimensión inválida
+
+mw.gui.mwguimarkerdialog.title.new=Nombre de marcador
+mw.gui.mwguimarkerdialog.title.edit=Editar el nombre del marcador
+mw.gui.mwguimarkerdialog.error=el marcador debe tener un nombre
+mw.gui.mwguimarkerdialog.title.group=Grupo de marcador
+mw.gui.mwguimarkerdialog.error.group=el marcador debe pertenecer a un grupo
+mw.gui.mwguimarkerdialog.title.x=X
+mw.gui.mwguimarkerdialog.error.x=valor inválido
+mw.gui.mwguimarkerdialog.title.y=Y
+mw.gui.mwguimarkerdialog.error.y=valor inválido
+mw.gui.mwguimarkerdialog.title.z=Z
+mw.gui.mwguimarkerdialog.error.z=valor inválido
+
+mw.gui.mwguimarkerdialognew.title.new=Nuevo marcador
+mw.gui.mwguimarkerdialognew.title.edit=Editar marcador
+mw.gui.mwguimarkerdialognew.editMarkerName=Nombre
+mw.gui.mwguimarkerdialognew.editMarkerGroup=Grupo
+mw.gui.mwguimarkerdialognew.editMarkerX=X
+mw.gui.mwguimarkerdialognew.editMarkerY=Y
+mw.gui.mwguimarkerdialognew.editMarkerZ=Z
+mw.gui.mwguimarkerdialognew.editMarkerColor=Color
+mw.gui.mwguimarkerdialognew.title=Altura de teletransporte
+mw.gui.mwguimarkerdialognew.error=altura inválida
+
+mw.gui.ScrollableColorSelector.Red=Rojo
+mw.gui.ScrollableColorSelector.Green=Verde
+mw.gui.ScrollableColorSelector.Blue=Azul
+
+#task
+mw.task.mergetask.chatmsg.merge.done=imágenes exitosamente escritas al directorio %s
+mw.task.mergetask.chatmsg.merge.error=error: no se pudo escribir las imágenes al directorio %s
+mw.task.rebuildregionstask.chatmsg.rebuild.compleet=tarea de reconstrucción completada
+
+#messages
+mw.msg.tp.disabled=el teletransporte está desactivado en la configuración
+mw.msg.tp.dimError=no se puede teletransportar a un marcador de otra dimensión
+mw.msg.warp.error=el comando de teletransporte es 'warp', sólo se puede teletransportar a marcadores

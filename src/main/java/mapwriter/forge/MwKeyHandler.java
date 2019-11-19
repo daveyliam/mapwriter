@@ -1,16 +1,20 @@
 package mapwriter.forge;
 
+import java.util.ArrayList;
+
 import mapwriter.Mw;
+import mapwriter.util.Reference;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.Optional;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.InputEvent;
 
 import org.lwjgl.input.Keyboard;
 
-import cpw.mods.fml.client.registry.ClientRegistry;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.InputEvent;
-
-public class MwKeyHandler {
-
+public class MwKeyHandler
+{
 	public static KeyBinding keyMapGui = new KeyBinding("key.mw_open_gui", Keyboard.KEY_M, "Mapwriter");
 	public static KeyBinding keyNewMarker = new KeyBinding("key.mw_new_marker", Keyboard.KEY_INSERT, "Mapwriter");
 	public static KeyBinding keyMapMode = new KeyBinding("key.mw_next_map_mode", Keyboard.KEY_N, "Mapwriter");
@@ -19,52 +23,50 @@ public class MwKeyHandler {
 	public static KeyBinding keyZoomIn = new KeyBinding("key.mw_zoom_in", Keyboard.KEY_PRIOR, "Mapwriter");
 	public static KeyBinding keyZoomOut = new KeyBinding("key.mw_zoom_out", Keyboard.KEY_NEXT, "Mapwriter");
 	public static KeyBinding keyUndergroundMode = new KeyBinding("key.mw_underground_mode", Keyboard.KEY_U, "Mapwriter");
-	//public static KeyBinding keyQuickLargeMap = new KeyBinding("key.mw_quick_large_map", Keyboard.KEY_NONE);
-	
-	public MwKeyHandler(){
-        ClientRegistry.registerKeyBinding(keyMapGui);
-        ClientRegistry.registerKeyBinding(keyNewMarker);
-        ClientRegistry.registerKeyBinding(keyMapMode);
-        ClientRegistry.registerKeyBinding(keyNextGroup);
-        ClientRegistry.registerKeyBinding(keyTeleport);
-        ClientRegistry.registerKeyBinding(keyZoomIn);
-        ClientRegistry.registerKeyBinding(keyZoomOut);
-        ClientRegistry.registerKeyBinding(keyUndergroundMode);
+
+	public final KeyBinding[] keys =
+	{
+			keyMapGui,
+			keyNewMarker,
+			keyMapMode,
+			keyNextGroup,
+			keyTeleport,
+			keyZoomIn,
+			keyZoomOut,
+			keyUndergroundMode
+	};
+
+	public MwKeyHandler()
+	{
+		ArrayList<String> listKeyDescs = new ArrayList<String>();
+		// Register bindings
+		for (KeyBinding key : this.keys)
+		{
+			if (key != null)
+			{
+				ClientRegistry.registerKeyBinding(key);
+			}
+			listKeyDescs.add(key.getKeyDescription());
+		}
 	}
 
-    @SubscribeEvent
-    public void onKeyPress(InputEvent.KeyInputEvent event){
-        if(keyMapGui.getIsKeyPressed()){
-            KeyBinding.setKeyBindState(keyMapGui.getKeyCode(), false);
-            Mw.instance.onKeyDown(keyMapGui);
-        }
-        if(keyNewMarker.getIsKeyPressed()){
-            KeyBinding.setKeyBindState(keyNewMarker.getKeyCode(), false);
-            Mw.instance.onKeyDown(keyNewMarker);
-        }
-        if(keyMapMode.getIsKeyPressed()){
-            KeyBinding.setKeyBindState(keyMapMode.getKeyCode(), false);
-            Mw.instance.onKeyDown(keyMapMode);
-        }
-        if(keyNextGroup.getIsKeyPressed()){
-            KeyBinding.setKeyBindState(keyNextGroup.getKeyCode(), false);
-            Mw.instance.onKeyDown(keyNextGroup);
-        }
-        if(keyTeleport.getIsKeyPressed()){
-            KeyBinding.setKeyBindState(keyTeleport.getKeyCode(), false);
-            Mw.instance.onKeyDown(keyTeleport);
-        }
-        if(keyZoomIn.getIsKeyPressed()){
-            KeyBinding.setKeyBindState(keyZoomIn.getKeyCode(), false);
-            Mw.instance.onKeyDown(keyZoomIn);
-        }
-        if(keyZoomOut.getIsKeyPressed()){
-            KeyBinding.setKeyBindState(keyZoomOut.getKeyCode(), false);
-            Mw.instance.onKeyDown(keyZoomOut);
-        }
-        if(keyUndergroundMode.getIsKeyPressed()){
-            KeyBinding.setKeyBindState(keyUndergroundMode.getKeyCode(), false);
-            Mw.instance.onKeyDown(keyUndergroundMode);
-        }
-    }
+	@SubscribeEvent
+	public void keyEvent(InputEvent.KeyInputEvent event)
+	{
+		if (!Loader.isModLoaded("notenoughkeys"))
+		{
+			this.checkKeys();
+		}
+	}
+
+	private void checkKeys()
+	{
+		for (KeyBinding key : this.keys)
+		{
+			if ((key != null) && key.isPressed())
+			{
+				Mw.getInstance().onKeyDown(key);
+			}
+		}
+	}
 }

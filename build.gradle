@@ -1,63 +1,135 @@
+
+// For those who want the bleeding edge
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
         maven {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
         }
-        maven {
-            name = "sonatype"
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
-        }
+		maven { 
+			url = 'https://oss.sonatype.org/content/groups/public' 
+		}
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:1.1-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
+		//classpath 'com.matthewprenger:CurseGradle:1.0.5-SNAPSHOT'
     }
 }
 
-apply plugin: 'forge'
+// for people who want stable
+plugins {
+    //id "net.minecraftforge.gradle.forge" version "2.0.2"
+	id 'com.matthewprenger.cursegradle' version '1.0.4'
+}
 
-version = '2.1.1'
-group = 'mapwriter'
-archivesBaseName = 'MapWriter'
+apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'com.matthewprenger.cursegradle'
+
+repositories {
+	mavenLocal()
+} 
+
+// Define properties file
+ext.configFile = file "build.properties"
+
+configFile.withReader {
+// Load config. It shall from now be referenced as simply config or project.config
+def prop = new Properties()
+prop.load(it)
+project.ext.config = new ConfigSlurper().parse prop
+}
+
+dependencies {
+	if (config.isSet('dependicies'))	{
+		def dep = config.dependicies.split(", ")
+		dep.each { compile it }
+	}
+}
+
+group= config.mod_group
+version = config.mod_version
+archivesBaseName = config.mod_name
+
 
 minecraft {
-	version = '1.7.2-10.12.0.1034'
-    assetDir = "eclipse/assets"
+version = config.mc_version + "-" + config.forge_version
+runDir = "eclipse"
+mappings = config.mcp_version
+replace '@MOD_VERSION@', config.mod_version
+replace '@ACCEPTED_MC_VERSION@', config.accepted_mc_version
 }
+
 processResources
 {
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-        
+                
         // replace version and mcversion
         expand 'version':project.version, 'mcversion':project.minecraft.version
     }
-    
+        
     // copy everything else, thats not the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
 }
 
+version = "${project.minecraft.version}-${project.version}"
+
 jar {
-    //classifier = 'universal'
-    version = "${project.minecraft.version}-${project.version}"
+//classifier = 'universal'
 }
 
-task sourceJar(type: Jar) {
-    from sourceSets.main.allSource
-    classifier = 'sources'
-    version = "${project.minecraft.version}-${project.version}"
-}
-
-task deobfJar(type: Jar) {
-    from sourceSets.main.output
-    classifier = 'deobf'
-    version = "${project.minecraft.version}-${project.version}"
+task devJar(type: Jar) {
+	from sourceSets.main.output
+	classifier = 'dev'
 }
 
 artifacts {
-    archives sourceJar, deobfJar
+    		archives sourceJar
+			archives devJar
+}
+
+eclipse {
+    // replace absolute paths with classpath variable GRADLE_CACHE
+    pathVariables 'GRADLE_CACHE': gradle.gradleUserHomeDir
+}
+
+eclipse.classpath.file.whenMerged { classpath ->
+  classpath.entries.each { entry ->
+    if (entry.kind == 'lib') {
+      // for jar files referenced in project folder, use relative path
+      def prefix = projectDir.absolutePath.replace('\\', '/')
+      entry.path = entry.path.replace(prefix, "/$eclipse.project.name")
+    }
+  }
+}
+
+gradle.taskGraph.whenReady { taskGraph ->
+  if (!taskGraph.allTasks.findAll{ it.name == 'eclipseClasspath' }.empty) {
+    gradle.buildFinished {
+      println '----------------------------------------------------------------------'
+      print   "Please set the Eclipse classpath variable 'GRADLE_USER_HOME' in Preferences "
+      println "-> Java -> Build path -> Classpath Variable to $gradle.gradleUserHomeDir"
+      println '----------------------------------------------------------------------'
+    }
+  }
+}
+
+curseforge {
+  apiKey = project.hasProperty('curseForgeApiKey') ? project.curseForgeApiKey : ''
+  project {
+	//changelogType = "text"
+    id = config.curse_project_id
+    changelog = "" // A file can also be set using: changelog = file('changelog.txt')
+    releaseType = config.release_type
+	mainArtifact jar
+	addGameVersion config.mc_version
+  }
 }

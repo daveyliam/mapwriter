@@ -1,12 +1,25 @@
-.gradle
-build
-out
-classes
-*.iml
-*.ipr
-*.iws
-runtime
+# eclipse
+bin
+*.launch
+.settings
+.metadata
 .classpath
 .project
-.settings
-bin
+
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
+
+# gradle
+build
+.gradle
+
+# other
+eclipse
+run
+/Run.bat
+/mapwriter_Client.launch
+/mapwriter_Server.launch
