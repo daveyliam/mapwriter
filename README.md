@@ -32,7 +32,7 @@ Instructions for development:
 
 1) Set up your Forge/MCP environment.
 
-2) Move or copy the mapwriter folder to forge/mcp/src/minecraft/
+2) Move or copy the mapwriter folder found in src to forge/mcp/src/minecraft/
 
 3) Copy or move the textures from resources/assets/mapwriter/textures/map/*.png
    to forge/mcp/bin/minecraft/assets/mapwriter/textures/map/*.png
