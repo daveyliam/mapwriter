@@ -1,27 +1,26 @@
 package mapwriter.forge;
 
-import java.net.InetSocketAddress;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.logging.Logger;
 
 import mapwriter.Mw;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
+//import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.EventHandler;
+import cpw.mods.fml.common.Mod.Init;
+import cpw.mods.fml.common.Mod.PostInit;
+import cpw.mods.fml.common.Mod.PreInit;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
-import cpw.mods.fml.common.network.FMLNetworkEvent;
+//import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+//import cpw.mods.fml.common.gameevent.TickEvent;
+import cpw.mods.fml.common.network.NetworkMod;
 
 @Mod(modid="MapWriter", name="MapWriter", version="2.1.1")
+@NetworkMod(clientSideRequired=true, serverSideRequired=false)
 public class MwForge {
 	
 	@Instance("MapWriter")
@@ -30,41 +29,36 @@ public class MwForge {
 	@SidedProxy(clientSide="mapwriter.forge.ClientProxy", serverSide="mapwriter.forge.CommonProxy")
 	public static CommonProxy proxy;
 	
-	public static Logger logger = LogManager.getLogger("MapWriter");
+	//public static Logger logger = LogManager.getLogger("MapWriter");
+    public static Logger logger;
 	
-	@EventHandler
+	@PreInit
 	public void preInit(FMLPreInitializationEvent event) {
-        FMLCommonHandler.instance().bus().register(this);
+        logger = event.getModLog();
         MinecraftForge.EVENT_BUS.register(this);
         proxy.preInit(event.getSuggestedConfigurationFile());
 	}
 	
-	@EventHandler
+	@Init
 	public void load(FMLInitializationEvent event) {
 		proxy.load();
 	}
 	
-	@EventHandler
+	@PostInit
 	public void postInit(FMLPostInitializationEvent event) {
 		proxy.postInit();
 	}
 	
-    @SubscribeEvent
+    // TODO is this neccessary anymore?
+    /*@SubscribeEvent
     public void renderMap(RenderGameOverlayEvent.Post event){
         if(event.type == RenderGameOverlayEvent.ElementType.ALL){
             Mw.instance.onTick();
         }
-    }
+    }*/
 
-    @SubscribeEvent
-    public void onConnected(FMLNetworkEvent.ClientConnectedToServerEvent event){
-    	if (!event.isLocal) {
-    		InetSocketAddress address = (InetSocketAddress) event.manager.getSocketAddress();
-    		Mw.instance.setServerDetails(address.getHostName(), address.getPort());
-    	}
-    }
-
-    @SubscribeEvent
+    // TODO is this neccessary anymore? already done on disconnect in MwConnectionHandler
+    /*@SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event){
         if (event.phase == TickEvent.Phase.START){
         	// run the cleanup code when Mw is loaded and the player becomes null.
@@ -73,5 +67,5 @@ public class MwForge {
                 Mw.instance.close();
             }
         }
-    }
+    }*/
 }

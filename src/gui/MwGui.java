@@ -65,9 +65,9 @@ public class MwGui extends GuiScreen {
     	public void draw(int x, int y, String s) {
     		this.x = x;
     		this.y = y;
-    		this.w = MwGui.this.fontRendererObj.getStringWidth(s) + 4;
+    		this.w = MwGui.this.fontRenderer.getStringWidth(s) + 4;
     		MwGui.drawRect(this.x, this.y, this.x + this.w, this.y + this.h, 0x80000000);
-    		MwGui.this.drawString(MwGui.this.fontRendererObj, s, this.x + 2, this.y + 2, 0xffffff);
+    		MwGui.this.drawString(MwGui.this.fontRenderer, s, this.x + 2, this.y + 2, 0xffffff);
     	}
     	
     	public void drawToRightOf(Label label, String s) {
@@ -121,7 +121,8 @@ public class MwGui extends GuiScreen {
     	Keyboard.enableRepeatEvents(false);
     	this.mc.displayGuiScreen((GuiScreen) null);
         this.mc.setIngameFocus();
-        this.mc.getSoundHandler().resumeSounds();
+        //this.mc.getSoundHandler().resumeSounds();
+        this.mc.sndManager.resumeAllSounds();
     }
     
     // get a marker near the specified block pos if it exists.
@@ -286,17 +287,17 @@ public class MwGui extends GuiScreen {
 		//	break;
 		
 		default:
-			if (key == MwKeyHandler.keyMapGui.getKeyCode()) {
+			if (key == MwKeyHandler.keyMapGui.keyCode) {
 				// exit on the next tick
     			this.exit = 1;
-    		} else if (key == MwKeyHandler.keyZoomIn.getKeyCode()) {
+    		} else if (key == MwKeyHandler.keyZoomIn.keyCode) {
     			this.mapView.adjustZoomLevel(-1);
-    		} else if (key == MwKeyHandler.keyZoomOut.getKeyCode()) {
+    		} else if (key == MwKeyHandler.keyZoomOut.keyCode) {
     			this.mapView.adjustZoomLevel(1);
-    		} else if (key == MwKeyHandler.keyNextGroup.getKeyCode()) {
+    		} else if (key == MwKeyHandler.keyNextGroup.keyCode) {
     			this.mw.markerManager.nextGroup();
 	        	this.mw.markerManager.update();
-    		} else if (key == MwKeyHandler.keyUndergroundMode.getKeyCode()) {
+    		} else if (key == MwKeyHandler.keyUndergroundMode.keyCode) {
     			this.mw.toggleUndergroundMode();
     			this.mapView.setUndergroundMode(this.mw.undergroundMode);
 			}
@@ -503,13 +504,13 @@ public class MwGui extends GuiScreen {
  				s += provider.getStatusString(this.mapView.getDimension(), bX, bY, bZ);
     	 
          drawRect(10, this.height - 21, this.width - 20, this.height - 6, 0x80000000);
-         this.drawCenteredString(this.fontRendererObj,
+         this.drawCenteredString(this.fontRenderer,
          		s, this.width / 2, this.height - 18, 0xffffff);
     }
     
     public void drawHelp() {
     	drawRect(10, 20, this.width - 20, this.height - 30, 0x80000000);
-    	this.fontRendererObj.drawSplitString(
+    	this.fontRenderer.drawSplitString(
     			"Keys:\n\n" + 
     			"  Space\n" +
     			"  Delete\n" +
@@ -528,7 +529,7 @@ public class MwGui extends GuiScreen {
     			"Mouse wheel over selected marker to cycle colour.\n" + 
     			"Mouse wheel over dimension or group box to cycle.\n",
     			15, 24, this.width - 30, 0xffffff);
-    	this.fontRendererObj.drawSplitString(
+    	this.fontRenderer.drawSplitString(
     			"| Next marker group\n" +
     			"| Delete selected marker\n" +
     			"| Cycle selected marker colour\n" +
@@ -545,17 +546,17 @@ public class MwGui extends GuiScreen {
     public void drawMouseOverHint(int x, int y, String title, int mX, int mY, int mZ) {
     	String desc = String.format("(%d, %d, %d)", mX, mY, mZ);
     	int stringW = Math.max(
-    			this.fontRendererObj.getStringWidth(title),
-    			this.fontRendererObj.getStringWidth(desc));
+    			this.fontRenderer.getStringWidth(title),
+    			this.fontRenderer.getStringWidth(desc));
     	
     	x = Math.min(x, this.width - (stringW + 16));
     	y = Math.min(Math.max(10, y), this.height - 14);
     	
     	drawRect(x + 8, y - 10, x + stringW + 16, y + 14, 0x80000000);
-    	this.drawString(this.fontRendererObj,
+    	this.drawString(this.fontRenderer,
     			title,
     			x + 10, y - 8, 0xffffff);
-    	this.drawString(this.fontRendererObj,
+    	this.drawString(this.fontRenderer,
     			desc,
     			x + 10, y + 4, 0xcccccc);
     }
@@ -605,7 +606,7 @@ public class MwGui extends GuiScreen {
         
         // draw name of player under mouse cursor
         if (this.isPlayerNearScreenPos(mouseX, mouseY)) {
-        	this.drawMouseOverHint(mouseX, mouseY, this.mc.thePlayer.getDisplayName(),
+        	this.drawMouseOverHint(mouseX, mouseY, this.mc.thePlayer.username,
         			this.mw.playerXInt,
 					this.mw.playerYInt,
 					this.mw.playerZInt);

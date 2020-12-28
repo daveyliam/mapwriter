@@ -9,7 +9,6 @@ import mapwriter.api.IMwChunkOverlay;
 import mapwriter.api.IMwDataProvider;
 import mapwriter.api.MwAPI;
 import mapwriter.map.mapmode.MapMode;
-import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
 
@@ -20,17 +19,22 @@ public class MapRenderer {
 	// accessed by the MwGui to check whether the mouse cursor is near the
 	// player arrow on the rendered map
 	public Point.Double playerArrowScreenPos = new Point.Double(0, 0);
-	 
-	private ResourceLocation backgroundTexture = new ResourceLocation("mapwriter", "textures/map/background.png");
-	private ResourceLocation roundMapTexture = new ResourceLocation("mapwriter", "textures/map/border_round.png");
-	private ResourceLocation squareMapTexture = new ResourceLocation("mapwriter", "textures/map/border_square.png");
-	private ResourceLocation playerArrowTexture = new ResourceLocation("mapwriter", "textures/map/arrow_player.png");
-	private ResourceLocation northArrowTexture = new ResourceLocation("mapwriter", "textures/map/arrow_north.png");
-	
+
+	private int backgroundTexture;
+	private int roundMapTexture;
+	private int squareMapTexture;
+	private int playerArrowTexture;
+	private int northArrowTexture;
+
 	public MapRenderer(Mw mw, MapMode mapMode, MapView mapView) {
 		this.mw = mw;
 		this.mapMode = mapMode;
 		this.mapView = mapView;
+		this.backgroundTexture = this.mw.mc.renderEngine.getTexture("/assets/mapwriter/textures/map/background.png");
+		this.roundMapTexture = this.mw.mc.renderEngine.getTexture("/assets/mapwriter/textures/map/border_round.png");
+		this.squareMapTexture = this.mw.mc.renderEngine.getTexture("/assets/mapwriter/textures/map/border_square.png");
+		this.playerArrowTexture = this.mw.mc.renderEngine.getTexture("/assets/mapwriter/textures/map/arrow_player.png");
+		this.northArrowTexture = this.mw.mc.renderEngine.getTexture("/assets/mapwriter/textures/map/arrow_north.png");
 	}
 	
 	private void drawMap() {

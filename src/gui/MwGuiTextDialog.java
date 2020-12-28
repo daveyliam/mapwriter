@@ -33,7 +33,7 @@ public class MwGuiTextDialog extends GuiScreen {
 			this.text = this.textField.getText();
 		}
     	int w = this.width * textDialogWidthPercent / 100;
-    	this.textField = new GuiTextField(this.fontRendererObj,
+    	this.textField = new GuiTextField(this.fontRenderer,
     			(this.width - w) / 2 + 5,
     			textDialogY,
     			w - 10,
@@ -109,7 +109,7 @@ public class MwGuiTextDialog extends GuiScreen {
     			textDialogErrorY + 14,
     			0x80000000);
     	this.drawCenteredString(
-    			this.fontRendererObj,
+    			this.fontRenderer,
         		this.title,
         		this.width / 2,
         		textDialogTitleY,
@@ -117,7 +117,7 @@ public class MwGuiTextDialog extends GuiScreen {
     	this.textField.drawTextBox();
     	if (this.showError) {
 	    	this.drawCenteredString(
-	    			this.fontRendererObj,
+	    			this.fontRenderer,
 	        		this.error,
 	        		this.width / 2,
 	        		textDialogErrorY,

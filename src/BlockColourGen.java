@@ -4,8 +4,6 @@ import mapwriter.region.BlockColours;
 import mapwriter.region.BlockColours.BlockType;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.util.IIcon;
 import net.minecraft.world.biome.BiomeGenBase;
 
 // Static class to generate BlockColours.
@@ -16,18 +14,18 @@ import net.minecraft.world.biome.BiomeGenBase;
 
 public class BlockColourGen {
 	
-	private static int getIconMapColour(IIcon icon, Texture terrainTexture) {
+	private static int getIconMapColour(Texture terrainTexture, double minU, double maxU, double minV, double maxV) {
 		// flipped icons have the U and V coords reversed (minU > maxU, minV > maxV).
 		// thanks go to taelnia for fixing this. 
-		int iconX = (int) Math.round(((float) terrainTexture.w) * Math.min(icon.getMinU(), icon.getMaxU()));
-		int iconY = (int) Math.round(((float) terrainTexture.h) * Math.min(icon.getMinV(), icon.getMaxV()));
-		int iconWidth = (int) Math.round(((float) terrainTexture.w) * Math.abs(icon.getMaxU() - icon.getMinU()));
-		int iconHeight = (int) Math.round(((float) terrainTexture.h) * Math.abs(icon.getMaxV() - icon.getMinV()));
+		int iconX = (int) Math.round(((float) terrainTexture.w) * Math.min(minU, maxU));
+		int iconY = (int) Math.round(((float) terrainTexture.h) * Math.min(minV, maxV));
+		int iconWidth = (int) Math.round(((float) terrainTexture.w) * Math.abs(maxU - minU));
+		int iconHeight = (int) Math.round(((float) terrainTexture.h) * Math.abs(maxV - minV));
 		
 		int[] pixels = new int[iconWidth * iconHeight];
 		
 		//MwUtil.log("(%d, %d) %dx%d", iconX, iconY, iconWidth, iconHeight);
-		
+
 		terrainTexture.getRGB(iconX, iconY, iconWidth, iconHeight, pixels, 0, iconWidth);
 		
 		// need to use custom averaging routine rather than scaling down to one pixel to
@@ -39,7 +37,8 @@ public class BlockColourGen {
 		// for normal blocks multiply the block colour by the render colour.
 		// for other blocks the block colour will be multiplied by the biome colour.
         int blockid = blockAndMeta >> 4;
-		Block block = (Block) Block.blockRegistry.getObjectById(blockid);
+		//Block block = (Block) Block.blockRegistry.getObjectById(blockid);
+		Block block = Block.blocksList[blockid];
 		BlockType blockType = bc.getBlockType(blockAndMeta);
 		switch (blockType) {
 		
@@ -72,11 +71,11 @@ public class BlockColourGen {
 		// generate array of foliage, grass, and water colour multipliers
 		// for each biome.
 		
-		for (int i = 0; i < BiomeGenBase.getBiomeGenArray().length; i++) {
-			if (BiomeGenBase.getBiomeGenArray()[i] != null) {
-				bc.setBiomeWaterShading(i, BiomeGenBase.getBiomeGenArray()[i].getWaterColorMultiplier() & 0xffffff);
-				bc.setBiomeGrassShading(i, BiomeGenBase.getBiomeGenArray()[i].getBiomeGrassColor(0,0,0) & 0xffffff); //FIXME 0,0,0?
-				bc.setBiomeFoliageShading(i, BiomeGenBase.getBiomeGenArray()[i].getBiomeFoliageColor(0,0,0) & 0xffffff); //FIXME 0,0,0?
+		for (int i = 0; i < BiomeGenBase.biomeList.length; i++) {
+			if (BiomeGenBase.biomeList[i] != null) {
+				bc.setBiomeWaterShading(i, BiomeGenBase.biomeList[i].getWaterColorMultiplier() & 0xffffff);
+				bc.setBiomeGrassShading(i, BiomeGenBase.biomeList[i].getBiomeGrassColor() & 0xffffff);
+				bc.setBiomeFoliageShading(i, BiomeGenBase.biomeList[i].getBiomeFoliageColor() & 0xffffff);
 			} else {
 				bc.setBiomeWaterShading(i, 0xffffff);
 				bc.setBiomeGrassShading(i, 0xffffff);
@@ -96,7 +95,8 @@ public class BlockColourGen {
 		// get the bound texture id
 		//int terrainTextureId = Render.getBoundTextureId();
 		
-		int terrainTextureId = Minecraft.getMinecraft().renderEngine.getTexture(TextureMap.locationBlocksTexture).getGlTextureId();
+		//int terrainTextureId = Minecraft.getMinecraft().renderEngine.getTexture(TextureMap.locationBlocksTexture).getGlTextureId();
+        int terrainTextureId = Minecraft.getMinecraft().renderEngine.getTexture("/terrain.png");
 		
 		// create texture object from the currently bound GL texture
 		if (terrainTextureId == 0) {
@@ -118,31 +118,36 @@ public class BlockColourGen {
 			for (int dv = 0; dv < 16; dv++) {
 				
 				int blockAndMeta = ((blockID & 0xfff) << 4) | (dv & 0xf);
-				Block block = (Block) Block.blockRegistry.getObjectById(blockID);
+				Block block = Block.blocksList[blockID];
 				int blockColour = 0;
 				
 				if (block != null) {
 					
-					IIcon icon = null;
+					//IIcon icon = null;
+                    int icon = -1;
 					try {
-						icon = block.getIcon(1, dv);
+                        icon = block.getBlockTextureFromSideAndMetadata(1, dv);
 					} catch (Exception e) {
 						//MwUtil.log("genFromTextures: exception caught when requesting block texture for %03x:%x", blockID, dv);
 						//e.printStackTrace();
 						e_count++;
 					}
 					
-					if (icon != null) {
-						double u1 = icon.getMinU();
-						double u2 = icon.getMaxU();
-						double v1 = icon.getMinV();
-						double v2 = icon.getMaxV();
+					//if (icon != null) {
+                    if (icon >= 0) {
+                    	// From RenderBlocks.renderTopFace. Gets UV coordinates for top face of block
+                        int texOffsetX = (icon & 15) << 4;
+                        int texOffsetY = icon & 240;
+                        double u1 = ((double)texOffsetX + block.getBlockBoundsMinX() * 16.0D) / 256.0D;
+                        double u2 = ((double)texOffsetX + block.getBlockBoundsMaxX() * 16.0D - 0.01D) / 256.0D;
+                        double v1 = ((double)texOffsetY + block.getBlockBoundsMinZ() * 16.0D) / 256.0D;
+                        double v2 = ((double)texOffsetY + block.getBlockBoundsMaxZ() * 16.0D - 0.01D) / 256.0D;
 						
 						if ((u1 == u1Last) && (u2 == u2Last) && (v1 == v1Last) && (v2 == v2Last)) {
 							blockColour = blockColourLast;
 							s_count++;
 						} else {
-							blockColour = getIconMapColour(icon, terrainTexture);
+                            blockColour = getIconMapColour(terrainTexture, u1, u2, v1, v2);
 							u1Last = u1;
 							u2Last = u2;
 							v1Last = v1;

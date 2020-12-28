@@ -70,7 +70,7 @@ public class OverlaySlime implements IMwDataProvider {
 		// We should pass the center of the map too to reduce the display like in this case
 		// and the zoom lvl, to provide higher level informations
 		
-		if (Minecraft.getMinecraft().thePlayer.getEntityWorld().provider.dimensionId != dim)
+		if (Minecraft.getMinecraft()./*thePlayer.getEntityWorld()*/theWorld.provider.dimensionId != dim)
 			return new ArrayList<IMwChunkOverlay>();
 		
 		int minChunkX = (MathHelper.ceiling_double_int(minX) >> 4) - 1;

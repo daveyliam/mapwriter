@@ -8,7 +8,9 @@ import mapwriter.overlay.OverlayGrid;
 import mapwriter.overlay.OverlaySlime;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
-import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.registry.TickRegistry;
+import cpw.mods.fml.relauncher.Side;
 
 public class ClientProxy extends CommonProxy {
 	
@@ -20,12 +22,14 @@ public class ClientProxy extends CommonProxy {
 	
 	public void load() {
 		Mw mw = new Mw(this.config);
-		MinecraftForge.EVENT_BUS.register(new EventHandler(mw));
-		FMLCommonHandler.instance().bus().register(new MwKeyHandler());
+		MinecraftForge.EVENT_BUS.register(new EventHandler());
+		MinecraftForge.EVENT_BUS.register(new MwKeyHandler());
 		// temporary workaround for user defined key bindings not being loaded
 		// at game start. see https://github.com/MinecraftForge/FML/issues/378
 		// for more info.
 		Minecraft.getMinecraft().gameSettings.loadOptions();
+		NetworkRegistry.instance().registerConnectionHandler(new MwConnectionHandler());
+		TickRegistry.registerTickHandler(new MwTickHandler(), Side.CLIENT);
 	}
 	
 	public void postInit() {

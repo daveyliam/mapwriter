@@ -14,13 +14,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGameOver;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.util.ChatComponentText;
+//import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import cpw.mods.fml.client.registry.KeyBindingRegistry;
 
 /*
 
@@ -151,6 +153,7 @@ public class Mw {
 	public RegionManager regionManager = null;
 	public ChunkManager chunkManager = null;
 	public Trail playerTrail = null;
+	public MwKeyHandler keyHandler = null;
 	
 	public static Mw instance;
 	
@@ -169,6 +172,10 @@ public class Mw {
 		this.ready = false;
 		
 		RegionManager.logger = MwForge.logger;
+
+		// register and load key bindings
+		this.keyHandler = new MwKeyHandler();
+		KeyBindingRegistry.registerKeyBinding(this.keyHandler);
 		
 		instance = this;
 	}
@@ -206,13 +213,13 @@ public class Mw {
 		this.linearTextureScalingEnabled = this.config.getOrSetBoolean(catOptions, "linearTextureScaling", this.linearTextureScalingEnabled);
 		this.useSavedBlockColours = this.config.getOrSetBoolean(catOptions, "useSavedBlockColours", this.useSavedBlockColours);
 		this.teleportEnabled = this.config.getOrSetBoolean(catOptions, "teleportEnabled", this.teleportEnabled);
-		this.teleportCommand = this.config.get(catOptions, "teleportCommand", this.teleportCommand).getString();
+		this.teleportCommand = this.config.get(catOptions, "teleportCommand", this.teleportCommand).value;
 		this.coordsMode = this.config.getOrSetInt(catOptions, "coordsMode", this.coordsMode, 0, 2);
 		this.maxChunkSaveDistSq = this.config.getOrSetInt(catOptions, "maxChunkSaveDistSq", this.maxChunkSaveDistSq, 1, 256 * 256);
 		this.mapPixelSnapEnabled = this.config.getOrSetBoolean(catOptions, "mapPixelSnapEnabled", this.mapPixelSnapEnabled);
 		this.maxDeathMarkers = this.config.getOrSetInt(catOptions, "maxDeathMarkers", this.maxDeathMarkers, 0, 1000);
 		this.chunksPerTick = this.config.getOrSetInt(catOptions, "chunksPerTick", this.chunksPerTick, 1, 500);
-		this.saveDirOverride = this.config.get(catOptions, "saveDirOverride", this.saveDirOverride).getString();
+		this.saveDirOverride = this.config.get(catOptions, "saveDirOverride", this.saveDirOverride).value;
 		this.portNumberInWorldNameEnabled = config.getOrSetBoolean(catOptions, "portNumberInWorldNameEnabled", this.portNumberInWorldNameEnabled);
 		this.undergroundMode = this.config.getOrSetBoolean(catOptions, "undergroundMode", this.undergroundMode);
 		this.regionFileOutputEnabledSP = this.config.getOrSetBoolean(catOptions, "regionFileOutputEnabledSP", this.regionFileOutputEnabledSP);
@@ -320,7 +327,8 @@ public class Mw {
 	public void toggleMarkerMode() {
 		this.markerManager.nextGroup();
 		this.markerManager.update();
-		this.mc.thePlayer.addChatMessage(new ChatComponentText("group " + this.markerManager.getVisibleGroupName() + " selected"));
+		//this.mc.thePlayer.addChatMessage(new ChatComponentText("group " + this.markerManager.getVisibleGroupName() + " selected"));
+		this.mc.thePlayer.addChatMessage("group " + this.markerManager.getVisibleGroupName() + " selected");
 	}
 	
 	// cheap and lazy way to teleport...
@@ -453,7 +461,7 @@ public class Mw {
 		}
 		
 		if ((this.mc.theWorld == null) || (this.mc.thePlayer == null)) {
-			MwUtil.log("Mw.load: world or player is null, cannot load yet");
+			//MwUtil.log("Mw.load: world or player is null, cannot load yet");
 			return;
 		}
 		
@@ -574,6 +582,13 @@ public class Mw {
 	// Event handlers
 	////////////////////////////////
 	
+	public void onConnectionOpened(String server, int port) {
+		MwUtil.log("connection opened to remote server: %s %d\n", server, port);
+		
+		// set worldname to server_hostname.server_port
+		this.setServerDetails(server, port);
+	}
+	
 	public void onWorldLoad(World world) {
 		//MwUtil.log("onWorldLoad: %s, name %s, dimension %d",
 		//		world,
@@ -615,8 +630,10 @@ public class Mw {
 				// if the player is not dead
 				this.onPlayerDeathAlreadyFired = false;
 				// if in game (no gui screen) center the minimap on the player and render it.
-			    this.miniMap.view.setViewCentreScaled(this.playerX, this.playerZ, this.playerDimension);
-				this.miniMap.drawCurrentMap();
+				if(this.mc.currentScreen == null) {
+				    this.miniMap.view.setViewCentreScaled(this.playerX, this.playerZ, this.playerDimension);
+					this.miniMap.drawCurrentMap();
+				}
 			}
 			
 			// process background tasks
@@ -685,15 +702,15 @@ public class Mw {
 		if ((this.mc.currentScreen == null) && (this.ready)) {
 			//Mw.log("client tick: %s key pressed", kb.keyDescription);
 			
-			if (kb == MwKeyHandler.keyMapMode) {
+			if (kb == this.keyHandler.keyMapMode) {
 				// map mode toggle
 				this.miniMap.nextOverlayMode(1);
 				
-			} else if (kb == MwKeyHandler.keyMapGui) {
+			} else if (kb == this.keyHandler.keyMapGui) {
 				// open map gui
 				this.mc.displayGuiScreen(new MwGui(this));
 			
-			} else if (kb == MwKeyHandler.keyNewMarker) {
+			} else if (kb == this.keyHandler.keyNewMarker) {
 				// open new marker dialog
 				String group = this.markerManager.getVisibleGroupName();
 				if (group.equals("none")) {
@@ -712,13 +729,14 @@ public class Mw {
 					)
 				);
 			
-			} else if (kb == MwKeyHandler.keyNextGroup) {
+			} else if (kb == this.keyHandler.keyNextGroup) {
 				// toggle marker mode
 				this.markerManager.nextGroup();
 				this.markerManager.update();
-				this.mc.thePlayer.addChatMessage(new ChatComponentText("group " + this.markerManager.getVisibleGroupName() + " selected"));
+				//this.mc.thePlayer.addChatMessage(new ChatComponentText("group " + this.markerManager.getVisibleGroupName() + " selected"));
+				this.mc.thePlayer.addChatMessage("group " + this.markerManager.getVisibleGroupName() + " selected");
 				
-			} else if (kb == MwKeyHandler.keyTeleport) {
+			} else if (kb == this.keyHandler.keyTeleport) {
 				// set or remove marker
 				Marker marker = this.markerManager.getNearestMarkerInDirection(
 						this.playerXInt,
@@ -727,13 +745,13 @@ public class Mw {
 				if (marker != null) {
 					this.teleportToMarker(marker);						
 				}
-			} else if (kb == MwKeyHandler.keyZoomIn) {
+			} else if (kb == this.keyHandler.keyZoomIn) {
 				// zoom in
 				this.miniMap.view.adjustZoomLevel(-1);
-			} else if (kb == MwKeyHandler.keyZoomOut) {
+			} else if (kb == this.keyHandler.keyZoomOut) {
 				// zoom out
 				this.miniMap.view.adjustZoomLevel(1);
-			} else if (kb == MwKeyHandler.keyUndergroundMode) {
+			} else if (kb == this.keyHandler.keyUndergroundMode) {
 				this.toggleUndergroundMode();
 			}
 		}

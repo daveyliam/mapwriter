@@ -4,7 +4,8 @@ import java.io.File;
 import java.util.List;
 
 import mapwriter.MwUtil;
-import net.minecraftforge.common.config.Configuration;
+//import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.Configuration;
 
 public class MwConfig extends Configuration {
 	
@@ -17,7 +18,7 @@ public class MwConfig extends Configuration {
 	}
 	
 	public void setBoolean(String category, String key, boolean value) {
-		this.get(category, key, value).set(value ? 1 : 0);
+		this.get(category, key, value).value = "" + (value ? 1 : 0);
 	}
 	
 	public int getOrSetInt(String category, String key, int defaultValue, int minValue, int maxValue) {
@@ -26,14 +27,14 @@ public class MwConfig extends Configuration {
 	}
 	
 	public void setInt(String category, String key, int value) {
-		this.get(category, key, value).set(value);
+		this.get(category, key, value).value = "" + value;
 	}
 	
 	public long getColour(String category, String key) {
 		long value = -1;
 		if (this.hasKey(category, key)) {
 			try {
-				String valueString = this.get(category, key, "").getString();
+				String valueString = this.get(category, key, "").value;
 				if (valueString.length() > 0) {
 					value = Long.parseLong(valueString, 16);
 					value &= 0xffffffffL;
@@ -65,17 +66,17 @@ public class MwConfig extends Configuration {
 	}
 	
 	public void setColour(String category, String key, int n) {
-		this.get(category, key, "00000000").set(String.format("%08x", n));
+		this.get(category, key, "00000000").value = String.format("%08x", n);
 	}
 	
 	public void setColour(String category, String key, int n, String comment) {
-		this.get(category, key, "00000000", comment).set(String.format("%08x", n));
+		this.get(category, key, "00000000", comment).value = String.format("%08x", n);
 	}
 	
 	public String getSingleWord(String category, String key) {
 		String value = "";
 		if (this.hasKey(category, key)) {
-			value = this.get(category, key, value).getString().trim();
+			value = this.get(category, key, value).value.trim();
 			int firstSpace = value.indexOf(' ');
 			if (firstSpace >= 0) {
 				value = value.substring(0, firstSpace);
@@ -88,7 +89,7 @@ public class MwConfig extends Configuration {
 		if ((comment != null) && (comment.length() > 0)) {
 			value = value + " # " + comment;
 		}
-		this.get(category, key, value).set(value);
+		this.get(category, key, value).value = value;
 	}
 	
 	public void getIntList(String category, String key, List<Integer> list) {
@@ -127,7 +128,7 @@ public class MwConfig extends Configuration {
 		}
 		// write integer array to config file
 		try {
-			this.get(category, key, array).set(array);
+			this.get(category, key, array).valueList = array;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

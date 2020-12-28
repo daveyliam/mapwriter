@@ -6,7 +6,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiSlot;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.ResourceLocation;
+//import net.minecraft.util.ResourceLocation;
 
 public class MwGuiOptionSlot extends GuiSlot {
 	
@@ -38,7 +38,7 @@ public class MwGuiOptionSlot extends GuiSlot {
 	
 	private GuiButton[] buttons = new GuiButton[12];
 	
-    static final ResourceLocation WIDGET_TEXTURE_LOC = new ResourceLocation("textures/gui/widgets.png");
+    //static final ResourceLocation WIDGET_TEXTURE_LOC = new ResourceLocation("textures/gui/widgets.png");
 	
 	public void updateButtonLabel(int i) {
 		switch(i) {
@@ -109,7 +109,7 @@ public class MwGuiOptionSlot extends GuiSlot {
 	}
 
     @Override
-	protected void elementClicked(int i, boolean doubleClicked, int x, int y) {
+	protected void elementClicked(int i, boolean doubleClicked) {
 		switch(i) {
 		case 0:
 	        // toggle coords
@@ -223,7 +223,7 @@ public class MwGuiOptionSlot extends GuiSlot {
 	}
 
     @Override
-    protected void drawSlot(int i, int x, int y, int i4, Tessellator tessellator, int i5, int i6){
+    protected void drawSlot(int i, int x, int y, int i4, Tessellator tessellator){
         GuiButton button = buttons[i];
         button.xPosition = x;
         button.yPosition = y;

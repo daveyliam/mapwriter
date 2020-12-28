@@ -3,25 +3,36 @@ package mapwriter.forge;
 import mapwriter.Mw;
 import net.minecraft.client.settings.KeyBinding;
 
+import java.util.EnumSet;
+
 import org.lwjgl.input.Keyboard;
 
-import cpw.mods.fml.client.registry.ClientRegistry;
+/*import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.InputEvent;
+import cpw.mods.fml.common.gameevent.InputEvent;*/
 
-public class MwKeyHandler {
+import cpw.mods.fml.client.registry.KeyBindingRegistry.KeyHandler;
+import cpw.mods.fml.common.TickType;
+import net.minecraftforge.common.Configuration;
 
-	public static KeyBinding keyMapGui = new KeyBinding("key.mw_open_gui", Keyboard.KEY_M, "Mapwriter");
-	public static KeyBinding keyNewMarker = new KeyBinding("key.mw_new_marker", Keyboard.KEY_INSERT, "Mapwriter");
-	public static KeyBinding keyMapMode = new KeyBinding("key.mw_next_map_mode", Keyboard.KEY_N, "Mapwriter");
-	public static KeyBinding keyNextGroup = new KeyBinding("key.mw_next_marker_group", Keyboard.KEY_COMMA, "Mapwriter");
-	public static KeyBinding keyTeleport = new KeyBinding("key.mw_teleport", Keyboard.KEY_PERIOD, "Mapwriter");
-	public static KeyBinding keyZoomIn = new KeyBinding("key.mw_zoom_in", Keyboard.KEY_PRIOR, "Mapwriter");
-	public static KeyBinding keyZoomOut = new KeyBinding("key.mw_zoom_out", Keyboard.KEY_NEXT, "Mapwriter");
-	public static KeyBinding keyUndergroundMode = new KeyBinding("key.mw_underground_mode", Keyboard.KEY_U, "Mapwriter");
+public class MwKeyHandler extends KeyHandler {
+
+	public static KeyBinding keyMapGui = new KeyBinding("Open Map GUI", Keyboard.KEY_M);
+	public static KeyBinding keyNewMarker = new KeyBinding("New Marker", Keyboard.KEY_INSERT);
+	public static KeyBinding keyMapMode = new KeyBinding("Next Map Mode", Keyboard.KEY_N);
+	public static KeyBinding keyNextGroup = new KeyBinding("Next Marker Group", Keyboard.KEY_COMMA);
+	public static KeyBinding keyTeleport = new KeyBinding("Teleport to Marker", Keyboard.KEY_PERIOD);
+	public static KeyBinding keyZoomIn = new KeyBinding("Map Zoom In", Keyboard.KEY_PRIOR);
+	public static KeyBinding keyZoomOut = new KeyBinding("Map Zoom Out", Keyboard.KEY_NEXT);
+	public static KeyBinding keyUndergroundMode = new KeyBinding("Underground Mode", Keyboard.KEY_U);
 	//public static KeyBinding keyQuickLargeMap = new KeyBinding("key.mw_quick_large_map", Keyboard.KEY_NONE);
+
+    static KeyBinding[] keyBindings = new KeyBinding[] {
+        keyMapGui, keyNewMarker, keyMapMode, keyNextGroup, keyTeleport, keyZoomIn, keyZoomOut, keyUndergroundMode};
+    static boolean[] keyBooleans = new boolean[] {
+        false, false, false, false, false, false, false, false};
 	
-	public MwKeyHandler(){
+	/*public MwKeyHandler(){
         ClientRegistry.registerKeyBinding(keyMapGui);
         ClientRegistry.registerKeyBinding(keyNewMarker);
         ClientRegistry.registerKeyBinding(keyMapMode);
@@ -30,9 +41,13 @@ public class MwKeyHandler {
         ClientRegistry.registerKeyBinding(keyZoomIn);
         ClientRegistry.registerKeyBinding(keyZoomOut);
         ClientRegistry.registerKeyBinding(keyUndergroundMode);
-	}
+	}*/
+    
+    public MwKeyHandler() {
+        super(keyBindings, keyBooleans);
+    }
 
-    @SubscribeEvent
+    /*@SubscribeEvent
     public void onKeyPress(InputEvent.KeyInputEvent event){
         if(keyMapGui.getIsKeyPressed()){
             KeyBinding.setKeyBindState(keyMapGui.getKeyCode(), false);
@@ -66,5 +81,33 @@ public class MwKeyHandler {
             KeyBinding.setKeyBindState(keyUndergroundMode.getKeyCode(), false);
             Mw.instance.onKeyDown(keyUndergroundMode);
         }
+    }*/
+
+    @Override
+    public String getLabel() {
+        return "MapWriter Key Bindings";
+    }
+
+    @Override
+    public void keyDown(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd, boolean isRepeat) {
+        if (types.contains(TickType.CLIENT)) {
+            // make sure not in GUI element (e.g. chat box)
+            if ((Mw.instance.mc.currentScreen == null) && (Mw.instance.ready) && (tickEnd)) {
+                //System.out.format("client tick: %s key pressed\n", kb.keyDescription);
+                
+                Mw.instance.onKeyDown(kb);
+            }
+        }
+    }
+
+    @Override
+    public void keyUp(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd) {
+        // do nothing
+    }
+
+    @Override
+    public EnumSet<TickType> ticks() {
+        // keys should be handled in game in the client
+        return EnumSet.of(TickType.CLIENT);
     }
 }
