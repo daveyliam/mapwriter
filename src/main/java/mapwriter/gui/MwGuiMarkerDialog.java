@@ -7,10 +7,10 @@ import mapwriter.map.MarkerManager;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
 
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Mouse;
 
 import java.util.List;
@@ -46,8 +46,8 @@ public class MwGuiMarkerDialog extends GuiScreen {
     private int markerZ = 0;
     private int dimension = 0;
 
-    private ResourceLocation leftArrowTexture = new ResourceLocation("mapwriter", "textures/map/arrow_text_left.png");
-    private ResourceLocation rightArrowTexture = new ResourceLocation("mapwriter", "textures/map/arrow_text_right.png");
+    private int leftArrowTexture = Minecraft.getMinecraft().renderEngine.getTexture("/assets/mapwriter/textures/map/arrow_text_left.png");
+    private int rightArrowTexture = Minecraft.getMinecraft().renderEngine.getTexture("/assets/mapwriter/textures/map/arrow_text_right.png");
 
     class ScrollableTextBox {
         public int x;
