@@ -6,6 +6,8 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.biome.BiomeGenBase;
 
+import java.util.HashMap;
+
 // Static class to generate BlockColours.
 // This is separate from BlockColours because it needs to run in the GL rendering thread
 // whereas the generated BlockColours object is used only in the background thread.
@@ -36,7 +38,7 @@ public class BlockColourGen {
 	private static int adjustBlockColourFromType(BlockColours bc, int blockAndMeta, int blockColour) {
 		// for normal blocks multiply the block colour by the render colour.
 		// for other blocks the block colour will be multiplied by the biome colour.
-        int blockid = blockAndMeta >> 4;
+		int blockid = blockAndMeta >> 4;
 		//Block block = (Block) Block.blockRegistry.getObjectById(blockid);
 		Block block = Block.blocksList[blockid];
 		BlockType blockType = bc.getBlockType(blockAndMeta);
@@ -87,23 +89,6 @@ public class BlockColourGen {
 	public static void genBlockColours(BlockColours bc) {
 		
 		MwUtil.log("generating block map colours from textures");
-
-		// copy terrain texture to MwRender pixel bytebuffer
-		
-		// bind the terrain texture
-		//Minecraft.getMinecraft().func_110434_K().func_110577_a(TextureMap.field_110575_b);
-		// get the bound texture id
-		//int terrainTextureId = Render.getBoundTextureId();
-		
-		//int terrainTextureId = Minecraft.getMinecraft().renderEngine.getTexture(TextureMap.locationBlocksTexture).getGlTextureId();
-        int terrainTextureId = Minecraft.getMinecraft().renderEngine.getTexture("/terrain.png");
-		
-		// create texture object from the currently bound GL texture
-		if (terrainTextureId == 0) {
-			MwUtil.log("error: could get terrain texture ID");
-			return;
-		}
-		Texture terrainTexture = new Texture(terrainTextureId);
 		
 		double u1Last = 0;
 		double u2Last = 0;
@@ -114,7 +99,9 @@ public class BlockColourGen {
 		int b_count = 0;
 		int s_count = 0;
 
-		for (int blockID = 0; blockID < 4096; blockID++) { //TODO: replace hardcoded 4096 with actual registry size
+		HashMap<String, Texture> terrainTextures = new HashMap<String, Texture>();
+
+		for (int blockID = 0; blockID < Block.blocksList.length; blockID++) {
 			for (int dv = 0; dv < 16; dv++) {
 				
 				int blockAndMeta = ((blockID & 0xfff) << 4) | (dv & 0xf);
@@ -124,36 +111,56 @@ public class BlockColourGen {
 				if (block != null) {
 					
 					//IIcon icon = null;
-                    int icon = -1;
+					int icon = -1;
 					try {
-                        icon = block.getBlockTextureFromSideAndMetadata(1, dv);
+						icon = block.getBlockTextureFromSideAndMetadata(1, dv);
 					} catch (Exception e) {
 						//MwUtil.log("genFromTextures: exception caught when requesting block texture for %03x:%x", blockID, dv);
 						//e.printStackTrace();
 						e_count++;
 					}
-					
-					//if (icon != null) {
-                    if (icon >= 0) {
-                    	// From RenderBlocks.renderTopFace. Gets UV coordinates for top face of block
-                        int texOffsetX = (icon & 15) << 4;
-                        int texOffsetY = icon & 240;
-                        double u1 = ((double)texOffsetX + block.getBlockBoundsMinX() * 16.0D) / 256.0D;
-                        double u2 = ((double)texOffsetX + block.getBlockBoundsMaxX() * 16.0D - 0.01D) / 256.0D;
-                        double v1 = ((double)texOffsetY + block.getBlockBoundsMinZ() * 16.0D) / 256.0D;
-                        double v2 = ((double)texOffsetY + block.getBlockBoundsMaxZ() * 16.0D - 0.01D) / 256.0D;
+
+					if (icon >= 0) {
+						// From RenderBlocks.renderTopFace. Gets UV coordinates for top face of block
+						int texOffsetX = (icon & 15) << 4;
+						int texOffsetY = icon & 240;
+						double u1 = ((double)texOffsetX + block.getBlockBoundsMinX() * 16.0D) / 256.0D;
+						double u2 = ((double)texOffsetX + block.getBlockBoundsMaxX() * 16.0D - 0.01D) / 256.0D;
+						double v1 = ((double)texOffsetY + block.getBlockBoundsMinZ() * 16.0D) / 256.0D;
+						double v2 = ((double)texOffsetY + block.getBlockBoundsMaxZ() * 16.0D - 0.01D) / 256.0D;
 						
 						if ((u1 == u1Last) && (u2 == u2Last) && (v1 == v1Last) && (v2 == v2Last)) {
 							blockColour = blockColourLast;
 							s_count++;
 						} else {
-                            blockColour = getIconMapColour(terrainTexture, u1, u2, v1, v2);
-							u1Last = u1;
-							u2Last = u2;
-							v1Last = v1;
-							v2Last = v2;
-							blockColourLast = blockColour;
-							b_count++;
+							// Get Texture object needed by Block
+							String textureFile = block.getTextureFile();
+							Texture terrainTexture = terrainTextures.get(textureFile);
+
+							if(terrainTexture == null) {
+								// Texture object not created yet, create it
+								int terrainTextureId = Minecraft.getMinecraft().renderEngine.getTexture(textureFile);
+
+								if (terrainTextureId != 0) {
+									//MwUtil.log("genFromTextures: loaded terrain texture '" + textureFile + "'");
+									terrainTexture = new Texture(terrainTextureId);
+									terrainTextures.put(textureFile, terrainTexture);
+								}
+							}
+
+							if(terrainTexture == null) {
+								//MwUtil.log("genFromTextures: could not get terrain texture for %03x:%x", blockID, dv);
+								e_count++;
+							}
+							else {
+								blockColour = getIconMapColour(terrainTexture, u1, u2, v1, v2);
+								u1Last = u1;
+								u2Last = u2;
+								v1Last = v1;
+								v2Last = v2;
+								blockColourLast = blockColour;
+								b_count++;
+							}
 						}
 						//if (dv == 0)
 						//	MwUtil.log("block %03x:%x colour = %08x", blockID, dv, blockColour);
