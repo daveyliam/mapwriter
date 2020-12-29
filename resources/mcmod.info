@@ -3,7 +3,7 @@
   "modid": "MapWriter",
   "name": "MapWriter",
   "description": "An open source mini map mod",
-  "version": "2.1.1_backport",
+  "version": "2.1.1_backport+hotfix.1",
   "mcversion": "1.4.7",
   "url": "http://www.minecraftforum.net/topic/1570989-/",
   "updateUrl": "",
