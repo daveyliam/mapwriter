@@ -32,10 +32,12 @@ Instructions for development:
 
 1) Set up your Forge/MCP environment.
 
-2) Move or copy the mapwriter folder found in src to forge/mcp/src/minecraft/
+2) Move or copy the mapwriter folder found in `src/main/java` to
+   `forge/mcp/src/minecraft/`
 
-3) Copy or move the textures from resources/assets/mapwriter/textures/map/*.png
-   to forge/mcp/bin/minecraft/assets/mapwriter/textures/map/*.png
+3) Copy or move the textures from
+   `src/main/resources/assets/mapwriter/textures/map/*.png` to
+   `forge/mcp/bin/minecraft/assets/mapwriter/textures/map/*.png`
 
 4) Modify the code, and use recompile.bat and startclient.bat to test.
    Alternatively use Eclipse and recompile and test by pressing the run button.
@@ -46,7 +48,7 @@ Reobfuscation and Packaging:
 
 2) Run the reobfuscate.bat script.
 
-3) Create a zip file of the 'forge/mcp/reobf/minecraft/mapwriter' folder.
+3) Create a zip file of the `forge/mcp/reobf/minecraft/mapwriter` folder.
 
 4) Add the textures to the zip file in the folder
    [MapWriter.zip]/assets/mapwriter/textures/map/*.png
